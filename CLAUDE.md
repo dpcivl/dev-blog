@@ -24,6 +24,7 @@
      - `title`, `description`, `pubDatetime` (ISO 8601, 예: `2026-05-05T13:00:00Z`)
      - `tags`: 한국어 태그 OK (예: `트러블슈팅`, `astro`)
      - `draft: false`, `featured: true/false` 적절히
+   - ⚠️ **`pubDatetime` 은 반드시 현재 UTC 시각 또는 과거**로 설정. 미래 시각이면 [src/utils/postFilter.ts](src/utils/postFilter.ts)의 `isPublishTimePassed` 필터에 걸려 production(Vercel) 빌드에서 제외됨 (dev 서버에서는 보이므로 dev 화면만 보고 발행됐다고 착각하기 쉬움). 작성 직전에 `date -u` 로 현재 시각 확인 후 그보다 이전 시각으로 설정.
    - 사용자가 거칠게 적은 메모를 다음 형태로 정돈한다:
      - **상황** → **시도/검증** → **원인/해결** → **회고** 흐름
      - 구어체 한국어, 1인칭("나"), `~다` 어미

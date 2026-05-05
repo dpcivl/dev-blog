@@ -1,7 +1,7 @@
 ---
 title: "Claude API는 기억하지 않는다 — 멀티턴 대화에서 컨텍스트를 유지하는 법"
 description: "API는 stateless다. assistant 메시지를 messages 배열에 누적해서 보내야 챗봇이 직전 대화를 기억한다. 직접 비교 실험으로 확인했다."
-pubDatetime: 2026-05-05T15:00:00Z
+pubDatetime: 2026-05-05T13:30:00Z
 tags:
   - claude-api
   - llm
