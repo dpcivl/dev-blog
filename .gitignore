@@ -23,6 +23,9 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
+# claude code local settings
+.claude/
+
 # pagefind
 
 public/pagefind
