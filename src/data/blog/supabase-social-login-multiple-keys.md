@@ -34,6 +34,8 @@ featured: true
 )
 ```
 
+> 실제 메시지에는 카카오에서 발급된 32자리 hex 형태의 앱 키가 그대로 들어가 있다. 위에서는 마스킹했다.
+
 **`Unacceptable audience in id_token`** — 들어본 적 없는 메시지였다.
 
 ## 함정 1 — id_token의 `aud`(audience)가 매칭 안 됨

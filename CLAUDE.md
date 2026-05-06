@@ -65,7 +65,38 @@
 
 - **fact-check**: 사용자 메모의 사실관계가 의심스러우면 git 로그 / 빌드 결과 / 코드를 직접 확인 후 정정
 - **이미 발행된 글 재발행 금지**: inbox "처리 완료"에 이미 있는 항목은 다시 발행하지 않음
-- **민감 정보**: API 키, 토큰, 개인정보가 메모에 섞여있으면 발행 전에 제거하고 사용자에게 알림
+
+### 🔴 보안 스크러빙 (반드시 발행 직전 수행)
+
+이 블로그는 GitHub public 저장소 + Vercel 공개 배포다. **포스트에 들어가는 모든 텍스트는 인터넷에 영구 공개된다고 간주한다.** 한 번 push되면 git history / GitHub 검색 / 외부 스크래퍼에서 회수 불가능.
+
+**절대 본문·코드 블록·에러 로그·스크린샷·frontmatter 어디에도 포함하면 안 되는 것:**
+
+- API 키 / 토큰 / 시크릿 (모든 종류 — Kakao/Google/Supabase/OpenAI/Anthropic/AWS/GitHub PAT/JWT 등)
+- OAuth `client_secret`, refresh token, id_token, access_token 본문
+- 비밀번호 / DB 접속 문자열
+- private URL (예: 회사 내부 도메인, 미공개 staging URL, 본인의 개인 supabase 프로젝트 URL `*.supabase.co`)
+- 작성자가 명시한 게 아닌 한 본인/제3자의 이메일 / 전화번호 / 실명·식별자
+- 결제 카드 정보, 사업자번호 등
+
+**의심 패턴 (발행 전에 grep 한 번 돌릴 것):**
+
+- 32자리 이상 hex 문자열 (`[0-9a-f]{32,}`)
+- `eyJ` 로 시작하는 JWT
+- `sk-`, `sk_live_`, `sk_test_`, `ghp_`, `gho_`, `github_pat_` 등 알려진 prefix
+- 20+자리 base64-like 문자열 (특히 `=` padding 포함 시)
+- `*.supabase.co/auth/v1/...`, `*.vercel.app` 등 고유 인스턴스 식별 가능한 도메인
+- `password`, `secret`, `token`, `api_key`, `Bearer ` 키워드 주변
+
+**조치:**
+
+1. 위 항목 발견 시 즉시 마스킹 (`REDACTED_*`, `<your_key_here>`, `0b52...4805` 같은 일부 숨김)
+2. 메모에 키 일부가 섞여있으면 **발행 보류하고 사용자에게 확인**. 자동 마스킹으로 진행하지 말고 명시적으로 알릴 것
+3. 사용자가 이미 push된 시크릿을 발견했다면 **마스킹보다 키 재발급(rotate)을 우선 권고** — 마스킹만으로는 git history / 캐시 / 외부 스크래퍼에서 회수 불가능
+
+**작성자 메모를 인용할 때의 원칙**:
+
+> 메모를 글에 그대로 옮겨붙이지 말 것. 한 줄씩 읽으면서 "이게 외부에 노출돼도 되는가" 를 명시적으로 체크 후 옮긴다. 특히 에러 로그 / 스크린샷 / 명령어 출력은 시크릿이 섞여있을 확률이 높음.
 
 ## 기타 규칙
 
