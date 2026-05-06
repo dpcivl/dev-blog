@@ -27,3 +27,7 @@
   → 발행: [vercel-shows-old-posts-after-deletion.md](./data/blog/vercel-shows-old-posts-after-deletion.md)
 - ~~Claude API 멀티턴 대화 — assistant 메시지 누적 여부에 따라 기억/망각이 갈림~~
   → 발행: [claude-api-multi-turn-context.md](./data/blog/claude-api-multi-turn-context.md)
+
+### 2026-05-06
+- ~~Persona 실험 — 시스템 프롬프트 vs user 메시지의 차이, JSON 출력 강제와 안전장치(text.find/rfind)~~
+  → 발행: [claude-api-system-prompt-vs-user-message.md](./data/blog/claude-api-system-prompt-vs-user-message.md)
