@@ -16,8 +16,8 @@
 > Claude가 자동 발행하지 않는 영역. **계획, 아이디어, 진행 중인 실험, 출시 후 회고용 메모** 등을 자유롭게 적어두세요.
 > 결과/배움이 나와 발행할 만해지면 위쪽 "처리 대기"로 옮기시면 됩니다.
 
-- 구글 로그인을 했더니 카카오 로그인 했을 때의 데이터가 뜬다.
-알고 보니 비회원 로그인 했을 때 데이터도 같이 뜬다. 
+
+
 ---
 
 ## 처리 완료
@@ -37,3 +37,7 @@
   → 발행: [supabase-social-login-multiple-keys.md](./data/blog/supabase-social-login-multiple-keys.md)
 - ~~Claude Code 부서별 세션이 git 명령어를 어김 — CLAUDE.md를 작업 폴더에 두니 해결~~
   → 발행: [claude-code-instructions-placement-by-working-dir.md](./data/blog/claude-code-instructions-placement-by-working-dir.md)
+
+### 2026-05-07
+- ~~Claude API 스트리밍 공부 — TTFT가 핵심, 이벤트 라이프사이클, Tool Use 스트리밍의 차이~~
+  → 발행: [claude-api-streaming-ttft-and-events.md](./data/blog/claude-api-streaming-ttft-and-events.md)
