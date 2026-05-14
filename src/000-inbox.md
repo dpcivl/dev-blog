@@ -17,7 +17,6 @@
 > 결과/배움이 나와 발행할 만해지면 위쪽 "처리 대기"로 옮기시면 됩니다.
 
 
-
 ---
 
 ## 처리 완료
@@ -41,3 +40,7 @@
 ### 2026-05-07
 - ~~Claude API 스트리밍 공부 — TTFT가 핵심, 이벤트 라이프사이클, Tool Use 스트리밍의 차이~~
   → 발행: [claude-api-streaming-ttft-and-events.md](./data/blog/claude-api-streaming-ttft-and-events.md)
+
+### 2026-05-14
+- ~~바이브 코딩 AI 세션 관리 전략 — 공통 지침은 루트 CLAUDE.md, 특화 지침은 작업 폴더 CLAUDE.md로 분리~~
+  → 발행: [ai-session-management-common-vs-specialized.md](./data/blog/ai-session-management-common-vs-specialized.md)
