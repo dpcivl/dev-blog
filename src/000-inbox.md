@@ -45,3 +45,7 @@
   → 발행: [ai-session-management-common-vs-specialized.md](./data/blog/ai-session-management-common-vs-specialized.md)
 - ~~Tool Use 학습 — calculator/날씨/시간 도구, 메시지 흐름, 에이전트 루프로 다중 도구 자동 선택~~
   → 발행: [claude-api-tool-use-and-agent-loop.md](./data/blog/claude-api-tool-use-and-agent-loop.md)
+
+### 2026-05-15
+- ~~Vision 학습 — base64/URL 두 방식, 토큰 비용, 작은 텍스트/다이어그램 한계, Haiku→Sonnet 모델 선택~~
+  → 발행: [claude-api-vision-base64-url-and-model.md](./data/blog/claude-api-vision-base64-url-and-model.md)
