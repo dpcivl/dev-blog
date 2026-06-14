@@ -1,7 +1,10 @@
 ---
 import { Font } from "astro:assets";
 import { ClientRouter } from "astro:transitions";
-import { PUBLIC_GOOGLE_SITE_VERIFICATION } from "astro:env/client";
+import {
+  PUBLIC_GOOGLE_SITE_VERIFICATION,
+  PUBLIC_NAVER_SITE_VERIFICATION,
+} from "astro:env/client";
 import Analytics from "@vercel/analytics/astro";
 import { SITE } from "@/config";
 import "@/styles/global.css";
@@ -132,6 +135,17 @@ const structuredData = {
         <meta
           name="google-site-verification"
           content={PUBLIC_GOOGLE_SITE_VERIFICATION}
+        />
+      )
+    }
+    {
+      // If PUBLIC_NAVER_SITE_VERIFICATION is set in the environment variable,
+      // include naver-site-verification tag in the heading.
+      // Naver Search Advisor: https://searchadvisor.naver.com/
+      PUBLIC_NAVER_SITE_VERIFICATION && (
+        <meta
+          name="naver-site-verification"
+          content={PUBLIC_NAVER_SITE_VERIFICATION}
         />
       )
     }
