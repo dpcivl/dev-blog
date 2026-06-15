@@ -19,6 +19,7 @@ type Props = {
   pubDatetime?: Date;
   modDatetime?: Date | null;
   scrollSmooth?: boolean;
+  noIndex?: boolean;
 };
 
 const {
@@ -31,6 +32,7 @@ const {
   pubDatetime,
   modDatetime,
   scrollSmooth = false,
+  noIndex = false,
 } = Astro.props;
 
 const socialImageURL = new URL(ogImage, Astro.url);
@@ -64,6 +66,7 @@ const structuredData = {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href={canonicalURL} />
     <meta name="generator" content={Astro.generator} />
+    {noIndex && <meta name="robots" content="noindex, nofollow" />}
 
     <!-- Load Font -->
     <Font

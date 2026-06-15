@@ -1,0 +1,151 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import ProjectCard from "@/components/portfolio/ProjectCard.astro";
+import WorkCard from "@/components/portfolio/WorkCard.astro";
+import { SITE } from "@/config";
+
+const projects = await getCollection("portfolio");
+
+const sorted = projects.sort(
+  (a, b) => (b.data.order ?? 0) - (a.data.order ?? 0)
+);
+
+const inProgress = sorted.filter(
+  p => p.data.type === "side" && p.data.status === "in-progress"
+);
+const completed = sorted.filter(
+  p => p.data.type === "side" && p.data.status === "completed"
+);
+const work = sorted.filter(p => p.data.type === "work");
+
+const hasAny = inProgress.length + completed.length + work.length > 0;
+---
+
+<Layout title={`포트폴리오 | ${SITE.title}`} noIndex={true}>
+  <Header />
+  <main id="main-content" data-pagefind-ignore class="app-layout">
+    <section class="pt-8 pb-6 border-b border-border">
+      <h1 class="my-4 inline-block text-4xl font-bold sm:my-8 sm:text-5xl">
+        포트폴리오
+      </h1>
+      <p class="text-lg">
+        {SITE.author} — 임베디드 SW · AI Agent · 풀스택 전반의 작업 기록.
+      </p>
+      <p class="mt-2 text-sm opacity-75">
+        각 카드는 관련 블로그 글로 연결됩니다. 자세한 사고 과정과 트러블슈팅은 본문 글에서 확인하세요.
+      </p>
+    </section>
+
+    {
+      !hasAny && (
+        <section class="pt-12 pb-12 text-center opacity-75">
+          <p>아직 등록된 프로젝트가 없습니다.</p>
+        </section>
+      )
+    }
+
+    {
+      inProgress.length > 0 && (
+        <section class="pt-12 pb-6">
+          <h2 class="text-2xl font-semibold tracking-wide mb-6">
+            진행 중인 프로젝트
+          </h2>
+          <div class="grid gap-5 sm:grid-cols-2">
+            {inProgress.map(project => <ProjectCard project={project} />)}
+          </div>
+        </section>
+      )
+    }
+
+    {
+      completed.length > 0 && (
+        <section class="pt-12 pb-6">
+          <h2 class="text-2xl font-semibold tracking-wide mb-6">
+            완성된 사이드 프로젝트
+          </h2>
+          <div class="grid gap-5 sm:grid-cols-2">
+            {completed.map(project => <ProjectCard project={project} />)}
+          </div>
+        </section>
+      )
+    }
+
+    {
+      work.length > 0 && (
+        <section class="pt-12 pb-6">
+          <h2 class="text-2xl font-semibold tracking-wide mb-6">경력</h2>
+          <div class="flex flex-col gap-5">
+            {work.map(project => <WorkCard project={project} />)}
+          </div>
+        </section>
+      )
+    }
+  </main>
+  <Footer />
+</Layout>
+
+<style is:global>
+  .tech-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: 4px;
+    background: var(--color-accent);
+    color: var(--color-background);
+    margin-right: 0.25rem;
+    margin-bottom: 0.25rem;
+    opacity: 0.85;
+  }
+
+  .card {
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    transition:
+      border-color 0.15s ease,
+      transform 0.15s ease;
+    background: var(--color-background);
+  }
+
+  .card:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+  }
+
+  .card-cover {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+  }
+
+  .meta {
+    font-size: 0.85rem;
+    opacity: 0.75;
+    margin-bottom: 0.5rem;
+  }
+
+  .meta-sep {
+    margin: 0 0.4rem;
+    opacity: 0.5;
+  }
+
+  .related-link {
+    display: inline-block;
+    font-size: 0.85rem;
+    margin-right: 0.75rem;
+    margin-top: 0.25rem;
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-decoration-style: dashed;
+    text-underline-offset: 3px;
+  }
+
+  .related-link:hover {
+    text-decoration-style: solid;
+  }
+</style>

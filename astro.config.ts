@@ -16,7 +16,11 @@ export default defineConfig({
   site: SITE.website,
   integrations: [
     sitemap({
-      filter: page => SITE.showArchives || !page.endsWith("/archives"),
+      filter: page => {
+        // Exclude portfolio (unlisted — accessible only via direct URL)
+        if (page.includes("/portfolio")) return false;
+        return SITE.showArchives || !page.endsWith("/archives");
+      },
     }),
   ],
   markdown: {
