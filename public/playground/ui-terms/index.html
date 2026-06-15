@@ -1,0 +1,1052 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UI 용어 playground — 에챠피의 기록 연습</title>
+    <meta
+      name="description"
+      content="UI 용어 정리 글에서 다룬 버튼 상태, 애니메이션, easing, 컴포넌트 전환을 직접 만져볼 수 있는 playground."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      :root {
+        --bg: #fafafa;
+        --surface: #ffffff;
+        --border: #e5e5e5;
+        --text: #1a1a1a;
+        --text-muted: #666666;
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --danger: #dc2626;
+        --danger-dark: #991b1b;
+        --success: #16a34a;
+        --warning: #d97706;
+        --code-bg: #f4f4f5;
+        --code-text: #18181b;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md:
+          0 4px 6px -1px rgba(0, 0, 0, 0.08),
+          0 2px 4px -2px rgba(0, 0, 0, 0.06);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans,
+          Ubuntu, Cantarell, "Helvetica Neue", "Apple SD Gothic Neo",
+          "Noto Sans KR", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        max-width: 1200px;
+        margin: 0 auto;
+        gap: 2rem;
+        padding: 2rem 1.5rem;
+      }
+
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+          padding: 1rem;
+          gap: 1rem;
+        }
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 2rem;
+        align-self: start;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.25rem;
+      }
+
+      .sidebar h2 {
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        margin: 0 0 0.75rem 0;
+      }
+
+      .sidebar nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+
+      .sidebar a {
+        color: var(--text);
+        text-decoration: none;
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        transition: background 0.15s ease;
+      }
+
+      .sidebar a:hover {
+        background: var(--code-bg);
+      }
+
+      .sidebar .back-link {
+        display: block;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+        color: var(--primary);
+        font-size: 0.875rem;
+      }
+
+      .content {
+        min-width: 0;
+      }
+
+      header.page-header {
+        margin-bottom: 2rem;
+      }
+
+      header.page-header h1 {
+        font-size: 2rem;
+        margin: 0 0 0.5rem 0;
+        font-weight: 700;
+      }
+
+      header.page-header p {
+        color: var(--text-muted);
+        margin: 0;
+      }
+
+      section.demo {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.75rem;
+        margin-bottom: 1.5rem;
+      }
+
+      section.demo h2 {
+        font-size: 1.4rem;
+        margin: 0 0 0.5rem 0;
+      }
+
+      section.demo > p.intro {
+        color: var(--text-muted);
+        margin: 0 0 1.5rem 0;
+      }
+
+      .demo-area {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .demo-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: center;
+      }
+
+      .demo-row.spaced {
+        gap: 1.5rem;
+      }
+
+      .label {
+        display: inline-block;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-bottom: 0.25rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .demo-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      pre {
+        background: var(--code-bg);
+        color: var(--code-text);
+        padding: 0.9rem 1rem;
+        border-radius: 6px;
+        overflow-x: auto;
+        font-size: 0.85rem;
+        font-family:
+          ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono",
+          Menlo, monospace;
+        line-height: 1.5;
+        margin: 0;
+      }
+
+      /* ===== Button styles ===== */
+      .btn {
+        font-family: inherit;
+        font-size: 0.95rem;
+        font-weight: 500;
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        background: var(--primary);
+        color: white;
+        transition:
+          background 0.15s ease,
+          transform 0.1s ease,
+          box-shadow 0.15s ease,
+          opacity 0.15s ease;
+      }
+
+      .btn:hover {
+        background: var(--primary-dark);
+      }
+
+      .btn:active {
+        transform: scale(0.97);
+      }
+
+      .btn.is-disabled,
+      .btn[disabled] {
+        background: #94a3b8;
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+      .btn.is-disabled:hover,
+      .btn[disabled]:hover {
+        background: #94a3b8;
+      }
+      .btn.is-disabled:active,
+      .btn[disabled]:active {
+        transform: none;
+      }
+
+      .btn.is-loading {
+        background: var(--primary-dark);
+        cursor: progress;
+        padding-left: 2.4rem;
+        position: relative;
+      }
+      .btn.is-loading::before {
+        content: "";
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        margin-top: -8px;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Button hierarchy */
+      .btn-secondary {
+        background: transparent;
+        color: var(--primary);
+        border: 1px solid var(--primary);
+      }
+      .btn-secondary:hover {
+        background: rgba(37, 99, 235, 0.08);
+      }
+      .btn-ghost {
+        background: transparent;
+        color: var(--text);
+      }
+      .btn-ghost:hover {
+        background: var(--code-bg);
+      }
+      .btn-danger {
+        background: var(--danger);
+      }
+      .btn-danger:hover {
+        background: var(--danger-dark);
+      }
+
+      /* Forced-state buttons (for the state-overview row) */
+      .btn-state-hover {
+        background: var(--primary-dark);
+      }
+      .btn-state-active {
+        background: var(--primary-dark);
+        transform: scale(0.97);
+      }
+
+      /* ===== Input ===== */
+      .input-demo {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        max-width: 320px;
+      }
+
+      .input-demo label {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+      }
+
+      .input {
+        font-family: inherit;
+        font-size: 0.95rem;
+        padding: 0.55rem 0.8rem;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: white;
+        transition:
+          border-color 0.15s ease,
+          box-shadow 0.15s ease;
+      }
+      .input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      }
+      .input.is-error {
+        border-color: var(--danger);
+      }
+      .input.is-error:focus {
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+      }
+
+      .input-error-msg {
+        font-size: 0.8rem;
+        color: var(--danger);
+      }
+
+      /* ===== Card ===== */
+      .card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1rem 1.25rem;
+        cursor: pointer;
+        max-width: 280px;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease,
+          border-color 0.2s ease;
+      }
+      .card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+      }
+      .card.is-selected {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+      }
+      .card h3 {
+        margin: 0 0 0.3rem 0;
+        font-size: 1.05rem;
+      }
+      .card p {
+        margin: 0;
+        font-size: 0.875rem;
+        color: var(--text-muted);
+      }
+
+      /* ===== Modal ===== */
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+        z-index: 100;
+      }
+      .modal-backdrop.is-open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .modal {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        max-width: 360px;
+        width: 90%;
+        transform: translateY(20px) scale(0.96);
+        transition: transform 0.25s ease-out;
+        box-shadow: var(--shadow-md);
+      }
+      .modal-backdrop.is-open .modal {
+        transform: translateY(0) scale(1);
+      }
+      .modal h3 {
+        margin: 0 0 0.5rem 0;
+      }
+      .modal p {
+        color: var(--text-muted);
+        margin: 0 0 1rem 0;
+      }
+      .modal-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+      }
+
+      /* ===== Toast ===== */
+      .toast-container {
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        z-index: 200;
+      }
+      .toast {
+        background: var(--text);
+        color: white;
+        padding: 0.75rem 1.25rem;
+        border-radius: 8px;
+        box-shadow: var(--shadow-md);
+        transform: translateY(20px);
+        opacity: 0;
+        transition:
+          transform 0.3s ease-out,
+          opacity 0.3s ease-out;
+        font-size: 0.9rem;
+        max-width: 320px;
+      }
+      .toast.is-visible {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      /* ===== Tooltip ===== */
+      .tooltip-wrap {
+        position: relative;
+        display: inline-block;
+      }
+      .tooltip-wrap .tooltip {
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-4px);
+        background: var(--text);
+        color: white;
+        padding: 0.35rem 0.6rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.15s ease;
+      }
+      .tooltip-wrap:hover .tooltip {
+        opacity: 1;
+      }
+
+      /* ===== Animation property demos ===== */
+      .anim-box {
+        width: 80px;
+        height: 80px;
+        background: var(--primary);
+        border-radius: 8px;
+        margin: 0 auto;
+      }
+
+      .anim-box.fade {
+        transition: opacity 0.5s ease;
+      }
+      .anim-box.fade.is-hidden {
+        opacity: 0;
+      }
+
+      .anim-box.slide {
+        transition: transform 0.5s ease-out;
+      }
+      .anim-box.slide.is-moved {
+        transform: translateX(100px);
+      }
+
+      .anim-box.scale {
+        transition: transform 0.4s ease;
+      }
+      .anim-box.scale.is-big {
+        transform: scale(1.4);
+      }
+
+      .anim-box.combo {
+        transition:
+          transform 0.4s ease-out,
+          opacity 0.4s ease-out;
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      .anim-box.combo.is-shown {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      /* ===== Duration comparison ===== */
+      .duration-track {
+        width: 100%;
+        height: 80px;
+        position: relative;
+        background: var(--code-bg);
+        border-radius: 6px;
+        margin-top: 0.5rem;
+      }
+      .duration-mover {
+        position: absolute;
+        top: 50%;
+        left: 8px;
+        margin-top: -16px;
+        width: 32px;
+        height: 32px;
+        background: var(--primary);
+        border-radius: 6px;
+      }
+      .duration-mover.is-moved {
+        left: calc(100% - 40px);
+      }
+      .duration-mover.d150 {
+        transition: left 0.15s ease-out;
+      }
+      .duration-mover.d300 {
+        transition: left 0.3s ease-out;
+      }
+      .duration-mover.d800 {
+        transition: left 0.8s ease-out;
+      }
+
+      /* ===== Easing comparison ===== */
+      .easing-track {
+        width: 100%;
+        height: 50px;
+        position: relative;
+        background: var(--code-bg);
+        border-radius: 6px;
+        margin: 0.25rem 0;
+      }
+      .easing-mover {
+        position: absolute;
+        top: 50%;
+        left: 6px;
+        margin-top: -12px;
+        width: 24px;
+        height: 24px;
+        background: var(--primary);
+        border-radius: 4px;
+      }
+      .easing-mover.is-moved {
+        left: calc(100% - 30px);
+      }
+      .easing-mover.linear {
+        transition: left 1s linear;
+      }
+      .easing-mover.ease-in {
+        transition: left 1s ease-in;
+      }
+      .easing-mover.ease-out {
+        transition: left 1s ease-out;
+      }
+      .easing-mover.ease-in-out {
+        transition: left 1s ease-in-out;
+      }
+      .easing-mover.bounce {
+        transition: left 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      .easing-row {
+        display: grid;
+        grid-template-columns: 110px 1fr;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 0.6rem;
+      }
+      .easing-row code {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+      }
+
+      footer {
+        text-align: center;
+        margin-top: 3rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border);
+        color: var(--text-muted);
+        font-size: 0.85rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <h2>섹션</h2>
+        <nav>
+          <a href="#button-states">버튼 상태</a>
+          <a href="#hierarchy">위계 (hierarchy)</a>
+          <a href="#input">입력창 상태</a>
+          <a href="#card">카드 상태</a>
+          <a href="#modal">모달</a>
+          <a href="#toast">토스트</a>
+          <a href="#tooltip">툴팁</a>
+          <a href="#anim-property">애니메이션 property</a>
+          <a href="#duration">duration 비교</a>
+          <a href="#easing">easing 비교</a>
+        </nav>
+        <a class="back-link" href="/posts/ui-vocabulary-for-vibe-coding"
+          >← 원문 글로 돌아가기</a
+        >
+      </aside>
+
+      <main class="content">
+        <header class="page-header">
+          <h1>UI 용어 playground</h1>
+          <p>
+            원문에서 다룬 어휘들을 직접 호버·클릭하면서 확인할 수 있는 페이지.
+          </p>
+        </header>
+
+        <!-- ===== Button states ===== -->
+        <section class="demo" id="button-states">
+          <h2>버튼 상태</h2>
+          <p class="intro">
+            다섯 가지 상태. 첫 행은 각 상태를 강제로 고정해놓은 비교용. 두 번째
+            행은 실제로 만져보는 버튼.
+          </p>
+          <div class="demo-area">
+            <span class="label">상태별 비교 (고정)</span>
+            <div class="demo-row" style="margin-bottom: 1rem">
+              <div class="demo-col">
+                <button class="btn">default</button>
+                <small style="margin-top: 0.3rem; color: var(--text-muted)"
+                  >default</small
+                >
+              </div>
+              <div class="demo-col">
+                <button class="btn btn-state-hover">hover</button>
+                <small style="margin-top: 0.3rem; color: var(--text-muted)"
+                  >hover</small
+                >
+              </div>
+              <div class="demo-col">
+                <button class="btn btn-state-active">active</button>
+                <small style="margin-top: 0.3rem; color: var(--text-muted)"
+                  >active (pressed)</small
+                >
+              </div>
+              <div class="demo-col">
+                <button class="btn" disabled>disabled</button>
+                <small style="margin-top: 0.3rem; color: var(--text-muted)"
+                  >disabled</small
+                >
+              </div>
+              <div class="demo-col">
+                <button class="btn is-loading">loading</button>
+                <small style="margin-top: 0.3rem; color: var(--text-muted)"
+                  >loading</small
+                >
+              </div>
+            </div>
+            <span class="label">실제로 만져보기</span>
+            <div class="demo-row">
+              <button class="btn">호버 / 클릭 해보기</button>
+              <button class="btn" id="loading-trigger">
+                클릭하면 로딩 시작
+              </button>
+              <button class="btn" disabled>disabled (못 누름)</button>
+            </div>
+          </div>
+          <pre><code>/* 핵심 패턴 */
+.btn:hover { background: var(--primary-dark); }
+.btn:active { transform: scale(0.97); }
+.btn[disabled] { background: #94a3b8; cursor: not-allowed; opacity: 0.7; }
+.btn.is-loading { /* 스피너 + cursor: progress + 클릭 비활성 */ }</code></pre>
+        </section>
+
+        <!-- ===== Hierarchy ===== -->
+        <section class="demo" id="hierarchy">
+          <h2>위계 (hierarchy)</h2>
+          <p class="intro">한 화면에 여러 버튼이 있을 때 "뭐가 가장 중요한가" 를 시각적으로 알려준다.</p>
+          <div class="demo-area">
+            <div class="demo-row">
+              <button class="btn">primary</button>
+              <button class="btn btn-secondary">secondary</button>
+              <button class="btn btn-ghost">ghost</button>
+              <button class="btn btn-danger">danger</button>
+            </div>
+          </div>
+          <pre><code>.btn          /* primary: 꽉 찬 색, 메인 액션 */
+.btn-secondary /* 테두리만, 보조 액션 */
+.btn-ghost     /* 배경 없음, 가장 낮은 위계 */
+.btn-danger    /* 빨강, 위험한 동작 (삭제 등) */</code></pre>
+        </section>
+
+        <!-- ===== Input ===== -->
+        <section class="demo" id="input">
+          <h2>입력창 상태 (input)</h2>
+          <p class="intro">
+            클릭해서 focus 해보세요. 에러 입력창은 빨간 테두리 + 메시지.
+          </p>
+          <div class="demo-area">
+            <div class="demo-row spaced">
+              <div class="input-demo">
+                <label>일반 입력 (focus 해보기)</label>
+                <input class="input" placeholder="여기를 클릭" />
+              </div>
+              <div class="input-demo">
+                <label>에러 상태</label>
+                <input class="input is-error" value="잘못된 입력" />
+                <span class="input-error-msg">이메일 형식을 확인해주세요.</span>
+              </div>
+              <div class="input-demo">
+                <label>disabled</label>
+                <input class="input" value="수정 불가" disabled />
+              </div>
+            </div>
+          </div>
+          <pre><code>.input:focus { border-color: var(--primary);
+              box-shadow: 0 0 0 3px rgba(37,99,235,.15); }
+.input.is-error { border-color: var(--danger); }</code></pre>
+        </section>
+
+        <!-- ===== Card ===== -->
+        <section class="demo" id="card">
+          <h2>카드 상태 (card)</h2>
+          <p class="intro">호버하면 살짝 떠오름. 클릭해서 선택 가능.</p>
+          <div class="demo-area">
+            <div class="demo-row spaced">
+              <div class="card" data-card>
+                <h3>플랜 A</h3>
+                <p>가벼운 시작</p>
+              </div>
+              <div class="card" data-card>
+                <h3>플랜 B</h3>
+                <p>표준 추천</p>
+              </div>
+              <div class="card" data-card>
+                <h3>플랜 C</h3>
+                <p>풀 옵션</p>
+              </div>
+            </div>
+          </div>
+          <pre><code>.card:hover { transform: translateY(-3px); box-shadow: ...; }
+.card.is-selected { border-color: var(--primary); }</code></pre>
+        </section>
+
+        <!-- ===== Modal ===== -->
+        <section class="demo" id="modal">
+          <h2>모달 (modal)</h2>
+          <p class="intro">나타날 때 / 사라질 때 의 전환이 핵심.</p>
+          <div class="demo-area">
+            <button class="btn" id="modal-open">모달 열기</button>
+          </div>
+          <pre><code>.modal { transform: translateY(20px) scale(.96); opacity: 0; }
+.modal.is-open { transform: translateY(0) scale(1); opacity: 1; }
+/* duration: 0.25s, easing: ease-out (등장에 자연스러움) */</code></pre>
+        </section>
+
+        <!-- ===== Toast ===== -->
+        <section class="demo" id="toast">
+          <h2>토스트 (toast)</h2>
+          <p class="intro">3초 뒤 자동으로 사라진다.</p>
+          <div class="demo-area">
+            <button class="btn" id="toast-trigger">토스트 띄우기</button>
+          </div>
+          <pre><code>setTimeout(() => toast.remove(), 3000);
+/* "3초 뒤 자동으로 사라져라" 처럼 시간을 같이 준다 */</code></pre>
+        </section>
+
+        <!-- ===== Tooltip ===== -->
+        <section class="demo" id="tooltip">
+          <h2>툴팁 (tooltip)</h2>
+          <p class="intro">호버하면 작은 설명이 위에 뜬다.</p>
+          <div class="demo-area">
+            <span class="tooltip-wrap">
+              <button class="btn btn-secondary">호버해보기</button>
+              <span class="tooltip">이건 툴팁입니다.</span>
+            </span>
+          </div>
+          <pre><code>.tooltip { opacity: 0; transition: opacity 0.15s; }
+.tooltip-wrap:hover .tooltip { opacity: 1; }</code></pre>
+        </section>
+
+        <!-- ===== Animation property ===== -->
+        <section class="demo" id="anim-property">
+          <h2>애니메이션 property</h2>
+          <p class="intro">무엇이 움직이는가. 버튼을 눌러 토글하면서 비교.</p>
+          <div class="demo-area">
+            <div class="demo-row spaced" style="justify-content: space-around">
+              <div class="demo-col">
+                <div class="anim-box fade" id="box-fade"></div>
+                <small style="margin-top: 0.5rem; color: var(--text-muted)"
+                  >opacity (투명도)</small
+                >
+                <button
+                  class="btn btn-secondary"
+                  style="margin-top: 0.5rem"
+                  data-toggle="fade"
+                >
+                  fade
+                </button>
+              </div>
+              <div class="demo-col">
+                <div class="anim-box slide" id="box-slide"></div>
+                <small style="margin-top: 0.5rem; color: var(--text-muted)"
+                  >transform: translateX (위치)</small
+                >
+                <button
+                  class="btn btn-secondary"
+                  style="margin-top: 0.5rem"
+                  data-toggle="slide"
+                >
+                  slide
+                </button>
+              </div>
+              <div class="demo-col">
+                <div class="anim-box scale" id="box-scale"></div>
+                <small style="margin-top: 0.5rem; color: var(--text-muted)"
+                  >scale (크기)</small
+                >
+                <button
+                  class="btn btn-secondary"
+                  style="margin-top: 0.5rem"
+                  data-toggle="scale"
+                >
+                  scale
+                </button>
+              </div>
+              <div class="demo-col">
+                <div class="anim-box combo" id="box-combo"></div>
+                <small style="margin-top: 0.5rem; color: var(--text-muted)"
+                  >opacity + translateY (콤보)</small
+                >
+                <button
+                  class="btn btn-secondary"
+                  style="margin-top: 0.5rem"
+                  data-toggle="combo"
+                >
+                  show
+                </button>
+              </div>
+            </div>
+          </div>
+          <pre><code>/* 흔히 보는 "아래에서 떠오르며 나타나는" 효과 = opacity + translateY 콤보 */
+.combo { transform: translateY(20px); opacity: 0;
+         transition: transform 0.4s ease-out, opacity 0.4s ease-out; }
+.combo.is-shown { transform: translateY(0); opacity: 1; }</code></pre>
+        </section>
+
+        <!-- ===== Duration ===== -->
+        <section class="demo" id="duration">
+          <h2>duration 비교</h2>
+          <p class="intro">
+            같은 거리를 다른 시간으로. 즉각적 / 자연스러움 / 느긋의 차이.
+          </p>
+          <div class="demo-area">
+            <div>
+              <span class="label">0.15초 — 즉각적 (버튼 반응)</span>
+              <div class="duration-track">
+                <div class="duration-mover d150" data-duration></div>
+              </div>
+            </div>
+            <div style="margin-top: 1rem">
+              <span class="label">0.3초 — 자연스러움 (화면 전환 기본)</span>
+              <div class="duration-track">
+                <div class="duration-mover d300" data-duration></div>
+              </div>
+            </div>
+            <div style="margin-top: 1rem">
+              <span class="label">0.8초 — 느긋, 우아 (의도적)</span>
+              <div class="duration-track">
+                <div class="duration-mover d800" data-duration></div>
+              </div>
+            </div>
+            <button
+              class="btn"
+              style="margin-top: 1rem"
+              id="duration-trigger"
+            >
+              모두 움직이기 / 되돌리기
+            </button>
+          </div>
+          <pre><code>.d150 { transition: left 0.15s ease-out; }  /* 즉각적 */
+.d300 { transition: left 0.3s  ease-out; }  /* 자연스러움 */
+.d800 { transition: left 0.8s  ease-out; }  /* 느긋 */</code></pre>
+        </section>
+
+        <!-- ===== Easing ===== -->
+        <section class="demo" id="easing">
+          <h2>easing 비교</h2>
+          <p class="intro">
+            같은 거리, 같은 시간, 다른 가속. 곡선의 차이가 인상을 결정한다.
+          </p>
+          <div class="demo-area">
+            <div class="easing-row">
+              <code>linear</code>
+              <div class="easing-track">
+                <div class="easing-mover linear" data-easing></div>
+              </div>
+            </div>
+            <div class="easing-row">
+              <code>ease-in</code>
+              <div class="easing-track">
+                <div class="easing-mover ease-in" data-easing></div>
+              </div>
+            </div>
+            <div class="easing-row">
+              <code>ease-out</code>
+              <div class="easing-track">
+                <div class="easing-mover ease-out" data-easing></div>
+              </div>
+            </div>
+            <div class="easing-row">
+              <code>ease-in-out</code>
+              <div class="easing-track">
+                <div class="easing-mover ease-in-out" data-easing></div>
+              </div>
+            </div>
+            <div class="easing-row">
+              <code>bounce</code>
+              <div class="easing-track">
+                <div class="easing-mover bounce" data-easing></div>
+              </div>
+            </div>
+            <button class="btn" style="margin-top: 1rem" id="easing-trigger">
+              모두 움직이기 / 되돌리기
+            </button>
+          </div>
+          <pre><code>.linear      { transition: left 1s linear; }
+.ease-in     { transition: left 1s ease-in;     /* 천천히 출발 */ }
+.ease-out    { transition: left 1s ease-out;    /* 천천히 도착 — 등장에 자연스러움 */ }
+.ease-in-out { transition: left 1s ease-in-out; }
+.bounce      { transition: left 1s cubic-bezier(.34, 1.56, .64, 1); /* 끝에서 튕김 */ }</code></pre>
+        </section>
+
+        <footer>
+          이 페이지는
+          <a href="/posts/ui-vocabulary-for-vibe-coding"
+            >바이브코딩을 위한 UI 어휘 정리</a
+          >
+          의 부록입니다.
+        </footer>
+      </main>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-backdrop" id="modal">
+      <div class="modal">
+        <h3>이건 모달입니다</h3>
+        <p>나타날 때 살짝 떠오르며 페이드인, 사라질 때 반대로.</p>
+        <div class="modal-buttons">
+          <button class="btn btn-ghost" data-modal-close>취소</button>
+          <button class="btn" data-modal-close>확인</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+      // Loading button
+      const loadingBtn = document.getElementById("loading-trigger");
+      loadingBtn.addEventListener("click", () => {
+        if (loadingBtn.classList.contains("is-loading")) return;
+        const originalText = loadingBtn.textContent;
+        loadingBtn.classList.add("is-loading");
+        loadingBtn.textContent = "로딩 중...";
+        setTimeout(() => {
+          loadingBtn.classList.remove("is-loading");
+          loadingBtn.textContent = originalText;
+        }, 2000);
+      });
+
+      // Card selection
+      document.querySelectorAll("[data-card]").forEach(card => {
+        card.addEventListener("click", () => {
+          document
+            .querySelectorAll("[data-card]")
+            .forEach(c => c.classList.remove("is-selected"));
+          card.classList.add("is-selected");
+        });
+      });
+
+      // Modal
+      const modal = document.getElementById("modal");
+      document.getElementById("modal-open").addEventListener("click", () => {
+        modal.classList.add("is-open");
+      });
+      modal.querySelectorAll("[data-modal-close]").forEach(btn => {
+        btn.addEventListener("click", () => modal.classList.remove("is-open"));
+      });
+      modal.addEventListener("click", e => {
+        if (e.target === modal) modal.classList.remove("is-open");
+      });
+
+      // Toast
+      const toastContainer = document.getElementById("toast-container");
+      document.getElementById("toast-trigger").addEventListener("click", () => {
+        const toast = document.createElement("div");
+        toast.className = "toast";
+        toast.textContent = "토스트가 떴습니다 — 3초 뒤 사라져요.";
+        toastContainer.appendChild(toast);
+        // Trigger transition
+        requestAnimationFrame(() => toast.classList.add("is-visible"));
+        setTimeout(() => {
+          toast.classList.remove("is-visible");
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      });
+
+      // Animation property toggles
+      const animTargets = {
+        fade: { el: document.getElementById("box-fade"), cls: "is-hidden" },
+        slide: { el: document.getElementById("box-slide"), cls: "is-moved" },
+        scale: { el: document.getElementById("box-scale"), cls: "is-big" },
+        combo: { el: document.getElementById("box-combo"), cls: "is-shown" },
+      };
+      document.querySelectorAll("[data-toggle]").forEach(btn => {
+        const key = btn.dataset.toggle;
+        btn.addEventListener("click", () => {
+          animTargets[key].el.classList.toggle(animTargets[key].cls);
+        });
+      });
+      // Auto-show combo initially after small delay
+      setTimeout(() => animTargets.combo.el.classList.add("is-shown"), 400);
+
+      // Duration trigger
+      document
+        .getElementById("duration-trigger")
+        .addEventListener("click", () => {
+          document.querySelectorAll("[data-duration]").forEach(el => {
+            el.classList.toggle("is-moved");
+          });
+        });
+
+      // Easing trigger
+      document
+        .getElementById("easing-trigger")
+        .addEventListener("click", () => {
+          document.querySelectorAll("[data-easing]").forEach(el => {
+            el.classList.toggle("is-moved");
+          });
+        });
+    </script>
+  </body>
+</html>
