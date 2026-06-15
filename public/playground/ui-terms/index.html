@@ -949,7 +949,7 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal-backdrop" id="modal">
+    <div class="modal-backdrop" id="modal-overlay">
       <div class="modal">
         <h3>이건 모달입니다</h3>
         <p>나타날 때 살짝 떠오르며 페이드인, 사라질 때 반대로.</p>
@@ -988,15 +988,18 @@
       });
 
       // Modal
-      const modal = document.getElementById("modal");
+      const modalOverlay = document.getElementById("modal-overlay");
       document.getElementById("modal-open").addEventListener("click", () => {
-        modal.classList.add("is-open");
+        modalOverlay.classList.add("is-open");
       });
-      modal.querySelectorAll("[data-modal-close]").forEach(btn => {
-        btn.addEventListener("click", () => modal.classList.remove("is-open"));
+      modalOverlay.querySelectorAll("[data-modal-close]").forEach(btn => {
+        btn.addEventListener("click", () =>
+          modalOverlay.classList.remove("is-open")
+        );
       });
-      modal.addEventListener("click", e => {
-        if (e.target === modal) modal.classList.remove("is-open");
+      modalOverlay.addEventListener("click", e => {
+        if (e.target === modalOverlay)
+          modalOverlay.classList.remove("is-open");
       });
 
       // Toast
