@@ -1,0 +1,1073 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DB 어휘 playground — 에챠피의 기록 연습</title>
+    <meta
+      name="description"
+      content="DB 어휘 정리 글에서 다룬 정규화, 관계, 인덱스, 트랜잭션, 격리 수준, 마이그레이션을 직접 만져볼 수 있는 playground."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      :root {
+        --bg: #fafafa;
+        --surface: #ffffff;
+        --border: #e5e5e5;
+        --text: #1a1a1a;
+        --text-muted: #666666;
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --danger: #dc2626;
+        --success: #16a34a;
+        --warning: #d97706;
+        --code-bg: #f4f4f5;
+        --highlight: #fef3c7;
+        --highlight-strong: #fbbf24;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md:
+          0 4px 6px -1px rgba(0, 0, 0, 0.08),
+          0 2px 4px -2px rgba(0, 0, 0, 0.06);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans,
+          Ubuntu, Cantarell, "Helvetica Neue", "Apple SD Gothic Neo",
+          "Noto Sans KR", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        max-width: 1200px;
+        margin: 0 auto;
+        gap: 2rem;
+        padding: 2rem 1.5rem;
+      }
+
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+          padding: 1rem;
+          gap: 1rem;
+        }
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 2rem;
+        align-self: start;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.25rem;
+      }
+
+      .sidebar h2 {
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        margin: 0 0 0.75rem 0;
+      }
+
+      .sidebar nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+
+      .sidebar a {
+        color: var(--text);
+        text-decoration: none;
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        transition: background 0.15s ease;
+      }
+
+      .sidebar a:hover {
+        background: var(--code-bg);
+      }
+
+      .sidebar .back-link {
+        display: block;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+        color: var(--primary);
+        font-size: 0.875rem;
+      }
+
+      .content {
+        min-width: 0;
+      }
+
+      header.page-header {
+        margin-bottom: 2rem;
+      }
+
+      header.page-header h1 {
+        font-size: 2rem;
+        margin: 0 0 0.5rem 0;
+        font-weight: 700;
+      }
+
+      header.page-header p {
+        color: var(--text-muted);
+        margin: 0;
+      }
+
+      section.demo {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.75rem;
+        margin-bottom: 1.5rem;
+      }
+
+      section.demo h2 {
+        font-size: 1.4rem;
+        margin: 0 0 0.5rem 0;
+      }
+
+      section.demo > p.intro {
+        color: var(--text-muted);
+        margin: 0 0 1.5rem 0;
+      }
+
+      .demo-area {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+      }
+
+      .btn {
+        font-family: inherit;
+        font-size: 0.95rem;
+        font-weight: 500;
+        padding: 0.55rem 1.1rem;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        background: var(--primary);
+        color: white;
+        transition: background 0.15s ease, transform 0.1s ease;
+      }
+      .btn:hover { background: var(--primary-dark); }
+      .btn:active { transform: scale(0.97); }
+      .btn-secondary {
+        background: transparent;
+        color: var(--primary);
+        border: 1px solid var(--primary);
+      }
+      .btn-secondary:hover { background: rgba(37, 99, 235, 0.08); }
+      .btn-danger {
+        background: var(--danger);
+      }
+
+      pre {
+        background: var(--code-bg);
+        color: var(--text);
+        padding: 0.85rem 1rem;
+        border-radius: 6px;
+        overflow-x: auto;
+        font-size: 0.85rem;
+        font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, monospace;
+        line-height: 1.5;
+        margin: 0;
+      }
+
+      table.db-table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 0.85rem;
+        background: white;
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+      }
+      .db-table th, .db-table td {
+        border: 1px solid var(--border);
+        padding: 0.4rem 0.7rem;
+        text-align: left;
+      }
+      .db-table th {
+        background: var(--code-bg);
+        font-weight: 600;
+      }
+      .db-table tr.highlighted {
+        background: var(--highlight);
+      }
+      .db-table tr.flash {
+        animation: flash 0.6s ease-out;
+      }
+      @keyframes flash {
+        0% { background: var(--highlight-strong); }
+        100% { background: transparent; }
+      }
+
+      .table-title {
+        font-weight: 600;
+        margin-bottom: 0.4rem;
+        font-size: 0.95rem;
+      }
+
+      .label {
+        display: inline-block;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-bottom: 0.25rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .controls {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      .info-box {
+        background: rgba(37, 99, 235, 0.05);
+        border-left: 3px solid var(--primary);
+        padding: 0.7rem 1rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        margin: 0.5rem 0;
+      }
+      .info-box.danger {
+        background: rgba(220, 38, 38, 0.05);
+        border-left-color: var(--danger);
+      }
+      .info-box.success {
+        background: rgba(22, 163, 74, 0.05);
+        border-left-color: var(--success);
+      }
+
+      /* Relationships diagram */
+      .rel-diagram {
+        display: grid;
+        gap: 1.5rem;
+      }
+      .rel-row {
+        display: grid;
+        grid-template-columns: 100px 1fr;
+        gap: 1rem;
+        align-items: center;
+      }
+      .rel-row > strong { font-size: 0.95rem; }
+      .rel-cards {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .rel-box {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 0.5rem 0.8rem;
+        font-size: 0.85rem;
+        min-width: 90px;
+        text-align: center;
+        box-shadow: var(--shadow-sm);
+      }
+      .rel-box.fk { border-color: var(--primary); }
+      .rel-box small {
+        display: block;
+        color: var(--text-muted);
+        font-size: 0.7rem;
+      }
+      .rel-arrow {
+        font-size: 1.2rem;
+        color: var(--text-muted);
+      }
+
+      /* Index search visualization */
+      .arr {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+        margin-bottom: 0.5rem;
+      }
+      .arr-cell {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-family: ui-monospace, monospace;
+        transition: all 0.15s ease;
+      }
+      .arr-cell.scanning {
+        background: var(--highlight);
+        border-color: var(--warning);
+      }
+      .arr-cell.found {
+        background: rgba(22, 163, 74, 0.15);
+        border-color: var(--success);
+        font-weight: 700;
+      }
+      .arr-cell.skip {
+        opacity: 0.35;
+      }
+      .step-counter {
+        font-family: ui-monospace, monospace;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+      }
+
+      /* Transaction demo */
+      .accounts {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+      .account {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+      }
+      .account-name {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 0.25rem;
+      }
+      .account-balance {
+        font-size: 1.5rem;
+        font-weight: 700;
+        font-family: ui-monospace, monospace;
+        transition: color 0.3s ease;
+      }
+      .account-balance.changed {
+        color: var(--primary);
+      }
+      .account-balance.danger {
+        color: var(--danger);
+      }
+
+      /* Isolation timeline */
+      .timeline {
+        display: grid;
+        grid-template-columns: 50px 1fr 1fr;
+        gap: 0.5rem;
+        font-family: ui-monospace, monospace;
+        font-size: 0.85rem;
+      }
+      .timeline > * { padding: 0.5rem; }
+      .timeline-header {
+        font-weight: 700;
+        background: var(--code-bg);
+        border-radius: 4px;
+        text-align: center;
+      }
+      .timeline-step {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        opacity: 0.4;
+        transition: all 0.3s ease;
+      }
+      .timeline-step.active {
+        opacity: 1;
+        border-color: var(--primary);
+        background: rgba(37, 99, 235, 0.05);
+      }
+      .timeline-step.executed {
+        opacity: 1;
+        background: white;
+      }
+      .timeline-time {
+        text-align: center;
+        background: var(--code-bg);
+        color: var(--text-muted);
+        border-radius: 4px;
+        font-weight: 600;
+      }
+
+      /* Migration phases */
+      .migration-phases {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
+      }
+      .mig-phase {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 0.75rem;
+        font-size: 0.8rem;
+        opacity: 0.4;
+        transition: all 0.3s ease;
+      }
+      .mig-phase.active {
+        opacity: 1;
+        border-color: var(--primary);
+        background: rgba(37, 99, 235, 0.05);
+      }
+      .mig-phase.done {
+        opacity: 1;
+        border-color: var(--success);
+      }
+      .mig-phase strong {
+        display: block;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+      }
+      .mig-schema {
+        font-family: ui-monospace, monospace;
+        font-size: 0.78rem;
+        background: var(--code-bg);
+        padding: 0.4rem;
+        border-radius: 4px;
+        margin-top: 0.5rem;
+        line-height: 1.4;
+      }
+      @media (max-width: 700px) {
+        .migration-phases {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      footer {
+        text-align: center;
+        margin-top: 3rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border);
+        color: var(--text-muted);
+        font-size: 0.85rem;
+      }
+
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      @media (max-width: 700px) {
+        .two-col {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      select {
+        font-family: inherit;
+        font-size: 0.9rem;
+        padding: 0.4rem 0.6rem;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <h2>섹션</h2>
+        <nav>
+          <a href="#normalization">1. 정규화</a>
+          <a href="#relationships">2. 관계</a>
+          <a href="#index">3. 인덱스</a>
+          <a href="#transaction">4. 트랜잭션</a>
+          <a href="#isolation">5. 격리 수준</a>
+          <a href="#migration">6. 마이그레이션</a>
+        </nav>
+        <a class="back-link" href="/posts/db-vocabulary-for-vibe-coding"
+          >← 원문 글로 돌아가기</a
+        >
+      </aside>
+
+      <main class="content">
+        <header class="page-header">
+          <h1>DB 어휘 playground</h1>
+          <p>원문에서 다룬 6가지 개념을 실제 데이터·트랜잭션 시뮬레이션으로.</p>
+        </header>
+
+        <!-- ===== 1. Normalization ===== -->
+        <section class="demo" id="normalization">
+          <h2>1. 정규화 (Normalization)</h2>
+          <p class="intro">같은 데이터를 정규화 전/후로 비교. "전화번호 변경" 버튼을 눌러보세요.</p>
+
+          <div class="demo-area">
+            <div class="two-col">
+              <div>
+                <div class="table-title">❌ 정규화 전 (한 테이블)</div>
+                <table class="db-table" id="denorm-table">
+                  <thead>
+                    <tr><th>주문ID</th><th>고객</th><th>전화번호</th><th>상품</th></tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+              <div>
+                <div class="table-title">✅ 정규화 후 (분리)</div>
+                <div class="label" style="margin-top:0.25rem">customers</div>
+                <table class="db-table" id="norm-customers">
+                  <thead><tr><th>id</th><th>name</th><th>phone</th></tr></thead>
+                  <tbody></tbody>
+                </table>
+                <div class="label" style="margin-top:0.5rem">orders</div>
+                <table class="db-table" id="norm-orders">
+                  <thead><tr><th>주문ID</th><th>customer_id (FK)</th><th>상품</th></tr></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="controls" style="margin-top:1rem">
+              <button class="btn" data-update-phone="박효인">박효인 전화번호 바꾸기</button>
+              <button class="btn btn-secondary" id="norm-reset">초기화</button>
+            </div>
+            <div id="norm-result"></div>
+          </div>
+          <pre><code># Update Anomaly 시연
+# 정규화 전: 박효인의 모든 주문 행(여러 줄)을 다 갱신해야 함
+# 정규화 후: customers 테이블의 한 줄만 갱신하면 끝</code></pre>
+        </section>
+
+        <!-- ===== 2. Relationships ===== -->
+        <section class="demo" id="relationships">
+          <h2>2. 관계 (Relationships)</h2>
+          <p class="intro">1:N / 1:1 / N:M — FK 위치와 중간 테이블의 필요성.</p>
+
+          <div class="demo-area">
+            <div class="rel-diagram">
+
+              <div class="rel-row">
+                <strong>1:N</strong>
+                <div class="rel-cards">
+                  <div class="rel-box"><div>customers</div><small>id (PK)</small></div>
+                  <span class="rel-arrow">→</span>
+                  <div class="rel-box fk"><div>orders</div><small>customer_id (FK)</small></div>
+                  <span style="font-size:0.85rem;color:var(--text-muted);margin-left:0.5rem">FK는 "N쪽"인 orders에</span>
+                </div>
+              </div>
+
+              <div class="rel-row">
+                <strong>1:1</strong>
+                <div class="rel-cards">
+                  <div class="rel-box"><div>users</div><small>id (PK)</small></div>
+                  <span class="rel-arrow">↔</span>
+                  <div class="rel-box fk"><div>profiles</div><small>user_id (FK, UNIQUE)</small></div>
+                  <span style="font-size:0.85rem;color:var(--text-muted);margin-left:0.5rem">FK + UNIQUE 제약</span>
+                </div>
+              </div>
+
+              <div class="rel-row">
+                <strong>N:M</strong>
+                <div class="rel-cards">
+                  <div class="rel-box"><div>posts</div><small>id (PK)</small></div>
+                  <span class="rel-arrow">→</span>
+                  <div class="rel-box fk"><div>post_tags</div><small>post_id, tag_id<br>(중간 테이블)</small></div>
+                  <span class="rel-arrow">←</span>
+                  <div class="rel-box"><div>tags</div><small>id (PK)</small></div>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="info-box" style="margin-top:1rem">
+              <strong>FK 삭제 동작 — 부모를 지울 때 자식은?</strong>
+              <ul style="margin:0.4rem 0 0 1rem;padding:0">
+                <li><code>CASCADE</code> — 부모 삭제 시 자식도 자동 삭제 (게시글 삭제 → 댓글 삭제)</li>
+                <li><code>SET NULL</code> — 자식 FK 컬럼을 NULL 로 (작성자 탈퇴 → 글은 유지, 작성자 표시만 비움)</li>
+                <li><code>RESTRICT</code> (기본) — 자식이 있으면 부모 삭제 거부. 가장 안전</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== 3. Index ===== -->
+        <section class="demo" id="index">
+          <h2>3. 인덱스 (Indexes)</h2>
+          <p class="intro">정렬된 16개 숫자에서 값 찾기 — 선형 스캔 vs B-tree(이진 탐색)의 단계 수 비교.</p>
+
+          <div class="demo-area">
+            <div class="label">데이터 (이미 정렬됨)</div>
+            <div class="arr" id="index-arr"></div>
+
+            <div class="controls" style="margin-top:1rem">
+              <span>찾을 값:</span>
+              <select id="search-target"></select>
+              <button class="btn btn-secondary" id="linear-search">선형 스캔 (O(n))</button>
+              <button class="btn" id="btree-search">B-tree 검색 (O(log n))</button>
+              <button class="btn btn-secondary" id="index-reset">초기화</button>
+            </div>
+
+            <div class="step-counter" id="step-info">단계 수: -</div>
+          </div>
+          <pre><code># 16개 데이터에서 한 값 찾기
+# 선형 스캔: 최악 16번 비교 (O(n))
+# B-tree:    최악 4번 비교  (O(log₂ 16) = 4)
+# 데이터가 100만 건이면: 100만 vs 약 20</code></pre>
+        </section>
+
+        <!-- ===== 4. Transaction ===== -->
+        <section class="demo" id="transaction">
+          <h2>4. 트랜잭션 (Transactions)</h2>
+          <p class="intro">A → B 이체 500원. 출금 후 시스템 죽음 시뮬레이션. 트랜잭션 유무에 따라 결과가 갈린다.</p>
+
+          <div class="demo-area">
+            <div class="accounts">
+              <div class="account">
+                <div class="account-name">A 계좌</div>
+                <div class="account-balance" id="acc-a">1000원</div>
+              </div>
+              <div class="account">
+                <div class="account-name">B 계좌</div>
+                <div class="account-balance" id="acc-b">500원</div>
+              </div>
+            </div>
+
+            <div class="controls">
+              <label style="font-size:0.9rem">
+                <input type="checkbox" id="simulate-crash" checked />
+                중간 실패 시뮬레이션 (출금 직후 시스템 다운)
+              </label>
+            </div>
+            <div class="controls">
+              <button class="btn btn-danger" id="run-no-txn">트랜잭션 없이 이체</button>
+              <button class="btn" id="run-with-txn">트랜잭션으로 이체</button>
+              <button class="btn btn-secondary" id="txn-reset">초기화</button>
+            </div>
+            <div id="txn-result"></div>
+          </div>
+          <pre><code># 트랜잭션 없이 + 출금 직후 실패
+# A: 500원 (출금 성공), B: 500원 (입금 실패) → 500원 증발!
+#
+# 트랜잭션으로 감싸면
+# BEGIN; UPDATE A...; UPDATE B...; COMMIT;
+# 실패 시 ROLLBACK → A: 1000, B: 500 (원상복귀)</code></pre>
+        </section>
+
+        <!-- ===== 5. Isolation ===== -->
+        <section class="demo" id="isolation">
+          <h2>5. 격리 수준 — Dirty Read 시연</h2>
+          <p class="intro">두 트랜잭션이 동시에 진행될 때, 격리 수준에 따라 Tx2가 보는 값이 달라진다. "다음 단계" 버튼으로 진행하세요.</p>
+
+          <div class="demo-area">
+            <div class="controls">
+              <span>격리 수준:</span>
+              <select id="isolation-level">
+                <option value="read-uncommitted">Read Uncommitted</option>
+                <option value="read-committed" selected>Read Committed</option>
+              </select>
+              <button class="btn" id="isolation-next">다음 단계 →</button>
+              <button class="btn btn-secondary" id="isolation-reset">처음부터</button>
+            </div>
+
+            <div class="timeline">
+              <div class="timeline-header">시간</div>
+              <div class="timeline-header">Tx1 (이체)</div>
+              <div class="timeline-header">Tx2 (잔액 조회)</div>
+
+              <div class="timeline-time">T1</div>
+              <div class="timeline-step" data-step="0">BEGIN;</div>
+              <div class="timeline-step" data-step="0">&nbsp;</div>
+
+              <div class="timeline-time">T2</div>
+              <div class="timeline-step" data-step="1">UPDATE A SET balance = 500;<br><small>(아직 COMMIT 안 함)</small></div>
+              <div class="timeline-step" data-step="1">&nbsp;</div>
+
+              <div class="timeline-time">T3</div>
+              <div class="timeline-step" data-step="2">&nbsp;</div>
+              <div class="timeline-step" data-step="2">SELECT balance FROM A;<br><strong id="tx2-read-value">→ ?</strong></div>
+
+              <div class="timeline-time">T4</div>
+              <div class="timeline-step" data-step="3">ROLLBACK;</div>
+              <div class="timeline-step" data-step="3">&nbsp;</div>
+            </div>
+
+            <div id="isolation-result" style="margin-top:1rem"></div>
+          </div>
+          <pre><code># Read Uncommitted: Tx2가 500원을 본다 (Dirty Read)
+#                   → 그런데 Tx1이 ROLLBACK 했으므로 그 500은 "거짓 데이터"
+# Read Committed:   Tx2는 커밋된 1000원을 본다 (안전)
+# Postgres 기본은 Read Committed — Dirty Read 차단</code></pre>
+        </section>
+
+        <!-- ===== 6. Migration ===== -->
+        <section class="demo" id="migration">
+          <h2>6. 마이그레이션 — Expand-and-Contract</h2>
+          <p class="intro">운영 중 컬럼 이름을 바꾸는 4단계. <code>full_name</code> 하나를 <code>first_name + last_name</code> 으로 분리.</p>
+
+          <div class="demo-area">
+            <div class="controls">
+              <button class="btn" id="mig-next">다음 단계 →</button>
+              <button class="btn btn-secondary" id="mig-reset">초기화</button>
+              <span style="margin-left:0.5rem;color:var(--text-muted);font-size:0.85rem" id="mig-status">단계 0 / 4</span>
+            </div>
+
+            <div class="migration-phases">
+              <div class="mig-phase" data-phase="1">
+                <strong>1. Expand</strong>
+                새 컬럼 추가
+                <div class="mig-schema" id="schema-1">users<br>├ id<br>├ full_name<br>├ first_name (NEW)<br>└ last_name (NEW)</div>
+              </div>
+              <div class="mig-phase" data-phase="2">
+                <strong>2. Migrate</strong>
+                양쪽 모두 사용하는 코드 배포
+                <div class="mig-schema">앱이 read/write를<br>both로 처리<br>(전환 기간)</div>
+              </div>
+              <div class="mig-phase" data-phase="3">
+                <strong>3. Backfill</strong>
+                기존 데이터 채우기
+                <div class="mig-schema">UPDATE users<br>SET first_name = ...,<br>last_name = ...</div>
+              </div>
+              <div class="mig-phase" data-phase="4">
+                <strong>4. Contract</strong>
+                옛 컬럼 제거
+                <div class="mig-schema" id="schema-4">users<br>├ id<br>├ first_name<br>└ last_name</div>
+              </div>
+            </div>
+
+            <div class="info-box danger" style="margin-top:1rem">
+              <strong>나쁜 예 — 한 번에 바꾸기:</strong>
+              <code>ALTER TABLE users DROP COLUMN full_name; ADD COLUMN first_name...</code>
+              → 배포 순간 옛 코드가 죽음. 다운타임 발생.
+            </div>
+            <div class="info-box success">
+              <strong>좋은 예 — Expand &amp; Contract:</strong>
+              4 단계로 쪼개면 매 단계마다 옛/새 코드가 공존 가능 → 무중단 배포.
+            </div>
+          </div>
+        </section>
+
+        <footer>
+          이 페이지는
+          <a href="/posts/db-vocabulary-for-vibe-coding">바이브코딩을 위한 DB · 데이터 모델링 어휘</a>
+          의 부록입니다.
+        </footer>
+      </main>
+    </div>
+
+    <script>
+      // ===== Normalization =====
+      const denormInitial = [
+        { order: 101, name: "박효인", phone: "010-1111-2222", product: "키보드" },
+        { order: 102, name: "박효인", phone: "010-1111-2222", product: "마우스" },
+        { order: 103, name: "박효인", phone: "010-1111-2222", product: "모니터" },
+        { order: 104, name: "김와이프", phone: "010-3333-4444", product: "스피커" },
+        { order: 105, name: "김와이프", phone: "010-3333-4444", product: "헤드폰" },
+      ];
+      const normCustomersInitial = [
+        { id: 1, name: "박효인", phone: "010-1111-2222" },
+        { id: 2, name: "김와이프", phone: "010-3333-4444" },
+      ];
+      const normOrdersInitial = [
+        { order: 101, customer_id: 1, product: "키보드" },
+        { order: 102, customer_id: 1, product: "마우스" },
+        { order: 103, customer_id: 1, product: "모니터" },
+        { order: 104, customer_id: 2, product: "스피커" },
+        { order: 105, customer_id: 2, product: "헤드폰" },
+      ];
+
+      let denormData = JSON.parse(JSON.stringify(denormInitial));
+      let normCustomers = JSON.parse(JSON.stringify(normCustomersInitial));
+      let normOrders = JSON.parse(JSON.stringify(normOrdersInitial));
+
+      function renderNormTables() {
+        const denormBody = document.querySelector("#denorm-table tbody");
+        denormBody.innerHTML = denormData
+          .map(r => `<tr data-name="${r.name}"><td>${r.order}</td><td>${r.name}</td><td>${r.phone}</td><td>${r.product}</td></tr>`)
+          .join("");
+
+        const cBody = document.querySelector("#norm-customers tbody");
+        cBody.innerHTML = normCustomers
+          .map(c => `<tr data-name="${c.name}"><td>${c.id}</td><td>${c.name}</td><td>${c.phone}</td></tr>`)
+          .join("");
+
+        const oBody = document.querySelector("#norm-orders tbody");
+        oBody.innerHTML = normOrders
+          .map(o => `<tr><td>${o.order}</td><td>${o.customer_id}</td><td>${o.product}</td></tr>`)
+          .join("");
+      }
+      renderNormTables();
+
+      document.querySelectorAll("[data-update-phone]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const target = btn.dataset.updatePhone;
+          const newPhone = "010-9999-8888";
+
+          // Denormalized: update all matching rows
+          let denormCount = 0;
+          denormData = denormData.map(r => {
+            if (r.name === target) {
+              denormCount++;
+              return { ...r, phone: newPhone };
+            }
+            return r;
+          });
+
+          // Normalized: update one row in customers
+          let normCount = 0;
+          normCustomers = normCustomers.map(c => {
+            if (c.name === target) {
+              normCount++;
+              return { ...c, phone: newPhone };
+            }
+            return c;
+          });
+
+          renderNormTables();
+
+          // Highlight flash
+          document.querySelectorAll(`#denorm-table tr[data-name="${target}"]`).forEach(tr => tr.classList.add("flash"));
+          document.querySelectorAll(`#norm-customers tr[data-name="${target}"]`).forEach(tr => tr.classList.add("flash"));
+
+          const result = document.getElementById("norm-result");
+          result.innerHTML = `<div class="info-box danger">정규화 전: <strong>${denormCount} 행</strong> 수정 필요 (모든 주문 행)</div><div class="info-box success">정규화 후: <strong>${normCount} 행</strong> 수정 (customers 테이블 한 줄만)</div>`;
+        });
+      });
+
+      document.getElementById("norm-reset").addEventListener("click", () => {
+        denormData = JSON.parse(JSON.stringify(denormInitial));
+        normCustomers = JSON.parse(JSON.stringify(normCustomersInitial));
+        normOrders = JSON.parse(JSON.stringify(normOrdersInitial));
+        renderNormTables();
+        document.getElementById("norm-result").innerHTML = "";
+      });
+
+      // ===== Index search =====
+      const indexData = [3, 7, 12, 18, 23, 29, 34, 41, 47, 55, 62, 68, 74, 81, 88, 95];
+      const arrEl = document.getElementById("index-arr");
+      const searchTarget = document.getElementById("search-target");
+      const stepInfo = document.getElementById("step-info");
+
+      function renderIndexArr() {
+        arrEl.innerHTML = indexData.map((v, i) => `<div class="arr-cell" data-i="${i}">${v}</div>`).join("");
+      }
+      renderIndexArr();
+
+      indexData.forEach((v) => {
+        const opt = document.createElement("option");
+        opt.value = v;
+        opt.textContent = v;
+        searchTarget.appendChild(opt);
+      });
+      searchTarget.value = 62;
+
+      function clearIndexHighlights() {
+        document.querySelectorAll("#index-arr .arr-cell").forEach(c => {
+          c.classList.remove("scanning", "found", "skip");
+        });
+      }
+
+      async function linearSearch() {
+        clearIndexHighlights();
+        const target = parseInt(searchTarget.value);
+        let steps = 0;
+        stepInfo.textContent = "단계 수: ";
+        for (let i = 0; i < indexData.length; i++) {
+          const cell = arrEl.children[i];
+          cell.classList.add("scanning");
+          steps++;
+          stepInfo.textContent = `단계 수: ${steps}`;
+          await new Promise(r => setTimeout(r, 200));
+          if (indexData[i] === target) {
+            cell.classList.remove("scanning");
+            cell.classList.add("found");
+            stepInfo.textContent = `선형 스캔 완료 — ${steps} 단계`;
+            return;
+          }
+          cell.classList.remove("scanning");
+        }
+      }
+
+      async function btreeSearch() {
+        clearIndexHighlights();
+        const target = parseInt(searchTarget.value);
+        let lo = 0, hi = indexData.length - 1, steps = 0;
+        stepInfo.textContent = "단계 수: ";
+
+        // Initially fade all
+        for (let i = 0; i < indexData.length; i++) arrEl.children[i].classList.add("skip");
+
+        while (lo <= hi) {
+          const mid = Math.floor((lo + hi) / 2);
+          steps++;
+          stepInfo.textContent = `단계 수: ${steps}`;
+
+          // Highlight searchable range
+          for (let i = lo; i <= hi; i++) arrEl.children[i].classList.remove("skip");
+          arrEl.children[mid].classList.add("scanning");
+          await new Promise(r => setTimeout(r, 500));
+
+          if (indexData[mid] === target) {
+            arrEl.children[mid].classList.remove("scanning");
+            arrEl.children[mid].classList.add("found");
+            stepInfo.textContent = `B-tree 검색 완료 — ${steps} 단계 (O(log₂ ${indexData.length}) = ${Math.ceil(Math.log2(indexData.length))})`;
+            return;
+          }
+          arrEl.children[mid].classList.remove("scanning");
+          if (indexData[mid] < target) {
+            // Discard left half
+            for (let i = lo; i <= mid; i++) arrEl.children[i].classList.add("skip");
+            lo = mid + 1;
+          } else {
+            for (let i = mid; i <= hi; i++) arrEl.children[i].classList.add("skip");
+            hi = mid - 1;
+          }
+          await new Promise(r => setTimeout(r, 300));
+        }
+      }
+
+      document.getElementById("linear-search").addEventListener("click", linearSearch);
+      document.getElementById("btree-search").addEventListener("click", btreeSearch);
+      document.getElementById("index-reset").addEventListener("click", () => {
+        clearIndexHighlights();
+        stepInfo.textContent = "단계 수: -";
+      });
+
+      // ===== Transaction =====
+      const accA = document.getElementById("acc-a");
+      const accB = document.getElementById("acc-b");
+      const txnResult = document.getElementById("txn-result");
+
+      function resetAccounts() {
+        accA.textContent = "1000원";
+        accB.textContent = "500원";
+        accA.classList.remove("changed", "danger");
+        accB.classList.remove("changed", "danger");
+        txnResult.innerHTML = "";
+      }
+
+      async function transfer(useTransaction) {
+        resetAccounts();
+        const crash = document.getElementById("simulate-crash").checked;
+
+        // Step 1: withdraw from A
+        await new Promise(r => setTimeout(r, 300));
+        accA.textContent = "500원";
+        accA.classList.add(useTransaction ? "changed" : "danger");
+
+        // Simulate crash
+        if (crash) {
+          await new Promise(r => setTimeout(r, 800));
+          if (useTransaction) {
+            // Rollback
+            txnResult.innerHTML = `<div class="info-box success">⚡ 시스템 실패 감지 → <strong>ROLLBACK</strong> → 원상 복귀</div>`;
+            await new Promise(r => setTimeout(r, 500));
+            accA.textContent = "1000원";
+            accA.classList.remove("changed");
+          } else {
+            txnResult.innerHTML = `<div class="info-box danger">💥 시스템 실패! 입금 안 됨 → <strong>500원 증발</strong> (총합 1000 + 500 → 500 + 500 = 1000)</div>`;
+          }
+          return;
+        }
+
+        // Step 2: deposit to B
+        await new Promise(r => setTimeout(r, 500));
+        accB.textContent = "1000원";
+        accB.classList.add("changed");
+
+        if (useTransaction) {
+          await new Promise(r => setTimeout(r, 500));
+          txnResult.innerHTML = `<div class="info-box success">✅ COMMIT — 이체 완료 (둘 다 반영)</div>`;
+        } else {
+          txnResult.innerHTML = `<div class="info-box">이체 완료 (운 좋게 실패 없이)</div>`;
+        }
+      }
+
+      document.getElementById("run-no-txn").addEventListener("click", () => transfer(false));
+      document.getElementById("run-with-txn").addEventListener("click", () => transfer(true));
+      document.getElementById("txn-reset").addEventListener("click", resetAccounts);
+
+      // ===== Isolation =====
+      let isolationStep = 0;
+      const isolationResult = document.getElementById("isolation-result");
+      const tx2ReadValue = document.getElementById("tx2-read-value");
+
+      function renderIsolation() {
+        document.querySelectorAll(".timeline-step").forEach(el => {
+          el.classList.remove("active", "executed");
+          const s = parseInt(el.dataset.step);
+          if (s < isolationStep) el.classList.add("executed");
+          else if (s === isolationStep) el.classList.add("active");
+        });
+
+        const level = document.getElementById("isolation-level").value;
+        if (isolationStep <= 2) {
+          tx2ReadValue.textContent = "→ ?";
+        } else {
+          // After step 2 (Tx2 reads at T3)
+          if (level === "read-uncommitted") {
+            tx2ReadValue.innerHTML = "→ <strong style='color:var(--danger)'>500원 (Dirty!)</strong>";
+          } else {
+            tx2ReadValue.innerHTML = "→ <strong style='color:var(--success)'>1000원 (커밋된 값)</strong>";
+          }
+        }
+
+        // Result after last step
+        if (isolationStep > 3) {
+          if (level === "read-uncommitted") {
+            isolationResult.innerHTML = `<div class="info-box danger">Tx2는 500을 봤지만, Tx1이 ROLLBACK 했다. → Tx2가 본 500은 <strong>존재한 적도 없는 값</strong> (Dirty Read)</div>`;
+          } else {
+            isolationResult.innerHTML = `<div class="info-box success">Tx2는 커밋된 1000원만 봄. ROLLBACK 되어도 문제없음 — Postgres 기본 동작.</div>`;
+          }
+        } else {
+          isolationResult.innerHTML = "";
+        }
+      }
+      renderIsolation();
+
+      document.getElementById("isolation-next").addEventListener("click", () => {
+        if (isolationStep < 4) {
+          isolationStep++;
+          renderIsolation();
+        }
+      });
+      document.getElementById("isolation-reset").addEventListener("click", () => {
+        isolationStep = 0;
+        renderIsolation();
+      });
+      document.getElementById("isolation-level").addEventListener("change", renderIsolation);
+
+      // ===== Migration =====
+      let migPhase = 0;
+      const migStatus = document.getElementById("mig-status");
+
+      function renderMigration() {
+        document.querySelectorAll(".mig-phase").forEach(el => {
+          const p = parseInt(el.dataset.phase);
+          el.classList.remove("active", "done");
+          if (p < migPhase) el.classList.add("done");
+          else if (p === migPhase) el.classList.add("active");
+        });
+        migStatus.textContent = `단계 ${migPhase} / 4`;
+      }
+      renderMigration();
+
+      document.getElementById("mig-next").addEventListener("click", () => {
+        if (migPhase < 4) {
+          migPhase++;
+          renderMigration();
+        }
+      });
+      document.getElementById("mig-reset").addEventListener("click", () => {
+        migPhase = 0;
+        renderMigration();
+      });
+    </script>
+  </body>
+</html>
