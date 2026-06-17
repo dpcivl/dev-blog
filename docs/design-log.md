@@ -176,8 +176,9 @@ Phase 7  — 회귀 테스트 + 마무리
 - **모바일 break**: 768px 이하 → 사이드바가 상단으로
 
 ### 상태
-- ✅ **Phase 1: 완료 (2026-06-17)** — `src/styles/global.css` 에 토큰 적용 + Pretendard CDN 임포트. `redesign/phase-1-tokens` 브랜치
-- Phase 2~7: 미진행
+- ✅ **Phase 1: 완료 (2026-06-17, 메인 머지)** — `src/styles/global.css` 에 토큰 적용 + Pretendard CDN 임포트
+- 🔧 **Phase 2: 진행 중 (2026-06-17)** — 헤더 재구성 + 시리즈/플레이그라운드 라우트 생성. `redesign/phase-2-header` 브랜치
+- Phase 3~7: 미진행
 
 ### Phase 1 적용 내역
 - 라이트/다크 토큰 모두 새 값으로 교체
@@ -186,3 +187,14 @@ Phase 7  — 회귀 테스트 + 마무리
 - 데스크탑(768px+) 베이스 폰트 16px → 17px
 - 코드 블록은 기존 Google Sans Code + 시스템 mono 폴백 명시
 - 빌드 통과 (`astro check` 0 errors, `astro build` Complete)
+- Phase 1.1: 다크모드 액센트 보정 (결정 8 참조)
+
+### Phase 2 적용 내역 (진행 중)
+- `src/components/Header.astro` 재구성:
+  - 좌측 로고에 favicon SVG 추가 (텍스트 + 아이콘 조합)
+  - 탭: `포스트` / `시리즈` / `플레이그라운드` / `태그` / 🔍 / 🌙 (한국어 라벨)
+  - About / Archives 항목은 nav 에서 제외 (About 은 추후 사이드바, Archives 는 미사용)
+  - 모바일 햄버거 메뉴 동작 유지 (ViewTransition `astro:after-swap` 핸들러 보존)
+- `src/pages/series/index.astro` 신규: 시리즈 인덱스 (현재 "용어정리" 1개, 태그 기반 글 자동 그룹핑)
+- `src/pages/playground/index.astro` 신규: 플레이그라운드 인덱스 (UI / DB 2개 하드코딩)
+- 빌드 통과, `/series` 와 `/playground` 정상 생성

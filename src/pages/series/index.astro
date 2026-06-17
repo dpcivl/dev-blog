@@ -1,0 +1,79 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+
+// 시리즈 정의 — 새 시리즈 추가 시 여기에 항목 추가
+const SERIES = [
+  {
+    id: "vocab",
+    title: "바이브코딩을 위한 용어 정리",
+    description:
+      "AI에게 정확히 시키기 위한 영역별 어휘 정리. 본문 + 인터랙티브 playground 패턴으로 진행 중.",
+    tag: "용어정리",
+    color: "vocab",
+  },
+];
+
+const posts = await getCollection("blog");
+
+// 각 시리즈의 글 목록을 태그로 필터해서 묶기
+const seriesWithPosts = SERIES.map(s => {
+  const series_posts = posts
+    .filter(p => p.data.tags?.includes(s.tag))
+    .sort(
+      (a, b) =>
+        new Date(a.data.pubDatetime).getTime() -
+        new Date(b.data.pubDatetime).getTime()
+    );
+  return { ...s, posts: series_posts };
+});
+---
+
+<Layout title={`시리즈 | 에챠피의 기록 연습`}>
+  <Header />
+  <main id="main-content" class="app-layout">
+    <section class="pt-8 pb-6 border-b border-border">
+      <h1 class="my-4 text-4xl font-bold sm:my-8 sm:text-5xl">시리즈</h1>
+      <p>
+        한 주제를 여러 편으로 나눠 정리한 글 묶음. 처음부터 차례로 읽어도 좋고,
+        궁금한 편만 골라 봐도 됩니다.
+      </p>
+    </section>
+
+    {
+      seriesWithPosts.map(s => (
+        <section class="pt-12 pb-6">
+          <h2 class="text-2xl font-semibold tracking-wide">{s.title}</h2>
+          <p class="text-muted mt-1">{s.description}</p>
+          <ol class="mt-4 ms-4 list-decimal space-y-2">
+            {s.posts.map(p => (
+              <li>
+                <a
+                  href={`/posts/${p.id}/`}
+                  class="text-accent decoration-dashed hover:underline"
+                >
+                  {p.data.title}
+                </a>
+                <p class="text-sm opacity-75">{p.data.description}</p>
+              </li>
+            ))}
+          </ol>
+          {s.posts.length === 0 && (
+            <p class="text-muted">아직 발행된 글이 없습니다.</p>
+          )}
+        </section>
+      ))
+    }
+
+    {
+      SERIES.length === 0 && (
+        <section class="pt-12 pb-12 text-center opacity-75">
+          <p>아직 등록된 시리즈가 없습니다.</p>
+        </section>
+      )
+    }
+  </main>
+  <Footer />
+</Layout>
