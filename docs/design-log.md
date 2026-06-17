@@ -205,6 +205,7 @@ Phase 7  — 회귀 테스트 + 마무리
 - Phase 4~7: 미진행
 
 ### Phase 3 적용 내역 (진행 중)
+- Phase 3.1: 푸터에서 SNS 링크 제거 (사이드바와 중복). `app-layout` → `page-shell` 폭 통일. 카피라이트만 가운데 정렬로 유지.
 - 신규: `src/components/Sidebar.astro` — 프로필 사진(원형) + 박효인/Park Hyoin + 태그라인 + SNS 아이콘
 - 신규 utility: `.page-shell` (max-w-5xl 중앙 정렬) + `.page-grid` (desktop 220px 1fr 그리드)
 - 사이드바 동작: 데스크탑(>=768px) 좌측 sticky / 모바일(<768px) 메인 위에 중앙 정렬 스택
