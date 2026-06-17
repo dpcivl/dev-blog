@@ -28,8 +28,8 @@ html[data-theme="dark"] {
   --foreground: #e8e8e8;          /* 헤딩 / 본문 */
   --muted: #9ca3af;               /* 메타 정보 */
   --border: #2a2e35;
-  --accent: #d8d4ea;              /* 쿼츠 그대로 — 어두운 배경 위 명도 대비 충분 */
-  --accent-bg: rgba(216, 212, 234, 0.12);  /* 은은한 호버/태그 배경 */
+  --accent: #bb9af7;              /* Tokyo Night 라벤더 — 본문(#e8e8e8) 과 명도/채도 차이 확보 */
+  --accent-bg: rgba(187, 154, 247, 0.12);  /* 은은한 호버/태그 배경 */
 }
 
 @theme inline {
