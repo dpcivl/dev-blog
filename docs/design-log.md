@@ -201,8 +201,21 @@ Phase 7  — 회귀 테스트 + 마무리
 ### 상태
 - ✅ **Phase 1: 완료 (2026-06-17, 메인 머지)** — 토큰 적용 + Pretendard
 - ✅ **Phase 2: 완료 (2026-06-17, 메인 머지)** — 헤더 재구성 + 시리즈/플레이그라운드 라우트
-- 🔧 **Phase 3: 진행 중 (2026-06-17)** — 사이드바 + 2컬럼 레이아웃. `redesign/phase-3-sidebar` 브랜치
-- Phase 4~7: 미진행
+- ✅ **Phase 3: 완료 (2026-06-17, 메인 머지)** — 사이드바 + 2컬럼 레이아웃 + Footer SNS 제거
+- 🔧 **Phase 4: 진행 중 (2026-06-17)** — 포스트 카드 디자인. `redesign/phase-4-cards` 브랜치
+- Phase 5~7: 미진행
+
+### Phase 4 적용 내역 (진행 중)
+- `src/components/Card.astro` 재설계:
+  - 카드 간 구분선 (`border-bottom: 1px var(--border)`, 마지막은 제외)
+  - 카드 내부 padding 1.25rem (이전: 단순 마진만)
+  - 카드 전체가 hover 시 `accent-bg` 톤 부드러운 배경 → 클릭 영역 확장 + 위계 분명
+  - 제목: 기본 foreground 색 / hover 시 accent 색으로 전환 (이전: 항상 accent로 무거웠음)
+  - 날짜 메타: 작은 폰트(0.8rem) + opacity 0.65 → 본문에서 분리
+  - 설명: line-height 1.65 로 가독성 ↑
+  - **viewTransitionName** 유지 (글 이동 시 제목 전환 애니메이션 보존)
+- 작성자 메모 B번 ("포스트 목록 간격 여유") 직접 반영
+- 빌드 통과
 
 ### Phase 3 적용 내역 (진행 중)
 - Phase 3.1: 푸터에서 SNS 링크 제거 (사이드바와 중복). `app-layout` → `page-shell` 폭 통일. 카피라이트만 가운데 정렬로 유지.
