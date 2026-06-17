@@ -9,7 +9,7 @@ import Datetime from "@/components/Datetime.astro";
 import EditPost from "@/components/EditPost.astro";
 import ShareLinks from "@/components/ShareLinks.astro";
 import BackButton from "@/components/BackButton.astro";
-import BackToTopButton from "@/components/BackToTopButton.astro";
+import ScrollButtons from "@/components/ScrollButtons.astro";
 import { getPath } from "@/utils/getPath";
 import { slugifyStr } from "@/utils/slugify";
 import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
@@ -125,24 +125,22 @@ const nextPost =
       {tags.map(tag => <Tag tag={slugifyStr(tag)} tagName={tag} size="sm" />)}
     </ul>
 
-    <BackToTopButton />
-
     <ShareLinks />
 
     <hr class="my-6 border-dashed" />
 
     <!-- Previous/Next Post Buttons -->
-    <div data-pagefind-ignore class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <div data-pagefind-ignore class="grid grid-cols-1 gap-4 sm:grid-cols-2">
       {
         prevPost && (
           <a
             href={getPath(prevPost.id, prevPost.filePath)}
-            class="flex w-full gap-1 hover:opacity-75"
+            class="prev-next-card group flex items-center gap-3 rounded-lg border border-border p-4 transition hover:border-accent hover:-translate-y-0.5"
           >
-            <IconChevronLeft class="inline-block flex-none rtl:rotate-180" />
-            <div>
-              <span>Previous Post</span>
-              <div class="text-sm text-accent/85">{prevPost.title}</div>
+            <IconChevronLeft class="inline-block flex-none stroke-current opacity-60 group-hover:opacity-100 rtl:rotate-180" />
+            <div class="min-w-0">
+              <div class="text-xs opacity-60">이전 글</div>
+              <div class="mt-0.5 line-clamp-2 text-sm font-medium group-hover:text-accent">{prevPost.title}</div>
             </div>
           </a>
         )
@@ -151,19 +149,20 @@ const nextPost =
         nextPost && (
           <a
             href={getPath(nextPost.id, nextPost.filePath)}
-            class="flex w-full justify-end gap-1 text-end hover:opacity-75 sm:col-start-2"
+            class="prev-next-card group flex items-center justify-end gap-3 rounded-lg border border-border p-4 text-end transition hover:border-accent hover:-translate-y-0.5 sm:col-start-2"
           >
-            <div>
-              <span>Next Post</span>
-              <div class="text-sm text-accent/85">{nextPost.title}</div>
+            <div class="min-w-0">
+              <div class="text-xs opacity-60">다음 글</div>
+              <div class="mt-0.5 line-clamp-2 text-sm font-medium group-hover:text-accent">{nextPost.title}</div>
             </div>
-            <IconChevronRight class="inline-block flex-none rtl:rotate-180" />
+            <IconChevronRight class="inline-block flex-none stroke-current opacity-60 group-hover:opacity-100 rtl:rotate-180" />
           </a>
         )
       }
     </div>
     </main>
   </div>
+  <ScrollButtons />
   <Footer />
 </Layout>
 
