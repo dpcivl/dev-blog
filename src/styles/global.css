@@ -1,8 +1,8 @@
 @import "tailwindcss";
 @import "./typography.css";
 
-/* Pretendard — 본문/헤딩용 한·영 모던 폰트. CDN 동적 서브셋(필요한 글자만 로드) */
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+/* Pretendard 는 Layout.astro <head> 의 <link> 로 로드 (CDN @import 가 Vite 빌드에서
+   누락되는 이슈 회피). src/layouts/Layout.astro 참고. */
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 

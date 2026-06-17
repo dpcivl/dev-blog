@@ -204,8 +204,20 @@ Phase 7  — 회귀 테스트 + 마무리
 - ✅ **Phase 3: 완료 (2026-06-17, 메인 머지)** — 사이드바 + 2컬럼 레이아웃 + Footer SNS 제거
 - ✅ **Phase 4: 완료 (2026-06-17, 메인 머지)** — 포스트 카드 디자인 (간격 여유)
 - ✅ **Phase 5: 완료 (2026-06-17, 메인 머지)** — 스크롤 버튼(맨위/맨아래) + prev/next 카드 폴리시
-- 🔧 **Phase 6: 진행 중 (2026-06-17)** — 시리즈/플레이그라운드 인덱스 폴리시. `redesign/phase-6-index-polish` 브랜치
-- Phase 7: 미진행
+- ✅ **Phase 6: 완료 (2026-06-17, 메인 머지)** — 시리즈/플레이그라운드 인덱스 폴리시
+- 🔧 **Phase 7: 진행 중 (2026-06-17)** — 회귀 테스트 + 마무리. `redesign/phase-7-cleanup` 브랜치
+
+### Phase 7 적용 내역 (진행 중)
+- 미사용 컴포넌트 삭제: `BackToTopButton.astro` (ScrollButtons 로 대체됨), `Socials.astro` (사이드바로 흡수됨)
+- **Pretendard 로딩 방식 수정**: `global.css` 의 `@import url(...)` 가 Vite 빌드에서 dist 에 누락되는 이슈 발견. 명시적 `<link rel="stylesheet">` 태그로 변경하여 `Layout.astro <head>` 에 직접 삽입. `preconnect` 도 함께 추가
+- 회귀 테스트 통과:
+  - 포트폴리오 `noindex` 메타 + `data-pagefind-ignore` 유지 ✅
+  - 포트폴리오 sitemap 제외 유지 ✅
+  - 글 페이지 JSON-LD `BlogPosting` 스키마 유지 ✅
+  - 글 상세 페이지에만 ScrollButtons 노출 ✅ (홈/목록에는 없음)
+  - 사이드바 프로필 사진 노출 ✅
+  - 사이트 제목 "Park Hyoin" 일관 적용 ✅
+  - 빌드 성공 (`astro check` 0 errors, `astro build` Complete)
 
 ### Phase 6 적용 내역 (진행 중)
 - `src/pages/series/index.astro` 재설계:
