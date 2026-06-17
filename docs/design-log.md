@@ -98,6 +98,21 @@
 
 긴 글(NDT 글 같은) 에서 네비 편의성. 우측 하단 fixed floating button.
 
+#### 결정 13 — canonical URL 을 SITE.website 기반으로 통일 (2026-06-17)
+
+**상황**: 구글 검색에서 `site:parkhyo.in` 으로 보니 같은 사이트가 **3개 변형으로 색인**됨:
+- `https://parkhyo.in` (정식)
+- `http://parkhyo.in` (HTTP)
+- `https://www.parkhyo.in` (www)
+
+SEO 점수가 분산되고 파비콘도 변형마다 따로 결정됨.
+
+**원인**: `Layout.astro` 의 `canonicalURL = new URL(Astro.url.pathname, Astro.url)` 가 **현재 요청 URL** 의 host 기반이었음. 즉 www 로 들어오면 canonical 도 www 가 됨.
+
+**변경**: `canonicalURL = new URL(Astro.url.pathname, SITE.website)` — 모든 변형이 항상 `SITE.website` (`https://parkhyo.in/`) 기반으로 canonical 선언.
+
+**추가 필요 (작성자 작업)**: Vercel 대시보드에서 도메인 설정 — `www.parkhyo.in` 와 `http://` 가 `https://parkhyo.in/` 로 **301 리다이렉트** 되도록. 이건 코드가 아니라 Vercel 콘솔 설정.
+
 #### 결정 12 — 사이드바에 RSS 구독 아이콘 추가 (2026-06-17)
 
 **변경**: `src/components/Sidebar.astro` 의 SNS 아이콘 행 끝에 RSS 아이콘 추가 (`/rss.xml` 링크).
