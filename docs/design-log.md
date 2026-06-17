@@ -98,6 +98,15 @@
 
 긴 글(NDT 글 같은) 에서 네비 편의성. 우측 하단 fixed floating button.
 
+#### 결정 11 — 홈 글 목록 갯수 제한 (2026-06-17)
+
+**변경**: 홈에 너무 길게 보이던 글 목록을 짧게 정리.
+- `SITE.postPerIndex`: 4 → **3** (Recent Posts)
+- 신규 `SITE.featuredPostsPerIndex: 5` 추가 (Featured) — 이전엔 무제한이었음
+- `src/pages/index.astro` 의 Featured 렌더링에 slice 적용
+
+**이유**: 작성자 피드백 — "홈 화면 글 목록이 너무 길다". 전체 글은 `/posts` 에서 보면 됨.
+
 #### 결정 10 — OG 이미지: 동적 생성 + 도메인 정렬 (2026-06-17, 1차 리디자인 후 폴리시)
 
 **상황**: 링크 공유 시 미리보기(OG 이미지) 가 AstroPaper 템플릿 홍보 이미지로 나옴. 작성자가 발견.
