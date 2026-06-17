@@ -3,7 +3,7 @@ export const SITE = {
   author: "박효인",
   profile: "https://github.com/dpcivl",
   desc: "학습 기록과 개발 경험을 정리하는 공간",
-  title: "에챠피의 기록 연습",
+  title: "Park Hyoin",
   ogImage: "astropaper-og.jpg",
   lightAndDarkMode: true,
   postPerIndex: 4,

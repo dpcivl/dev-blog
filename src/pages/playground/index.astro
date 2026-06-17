@@ -1,0 +1,56 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import { SITE } from "@/config";
+
+const PLAYGROUNDS = [
+  {
+    title: "UI 용어 playground",
+    href: "/playground/ui-terms/",
+    description:
+      "버튼 상태(default/hover/active/disabled/loading), 애니메이션 property·duration·easing, 모달/토스트/툴팁을 직접 호버·클릭으로 체험.",
+    relatedPost: "ui-vocabulary-for-vibe-coding",
+    relatedPostTitle: "바이브코딩을 위한 UI 어휘 정리",
+  },
+  {
+    title: "DB 용어 playground",
+    href: "/playground/db-terms/",
+    description:
+      "정규화 Update Anomaly, 1:N·N:M 관계, B-tree 검색 단계, 트랜잭션 rollback, Dirty Read, expand-and-contract 마이그레이션을 시뮬레이션.",
+    relatedPost: "db-vocabulary-for-vibe-coding",
+    relatedPostTitle: "바이브코딩을 위한 DB · 데이터 모델링 어휘",
+  },
+];
+---
+
+<Layout title={`플레이그라운드 | ${SITE.title}`}>
+  <Header />
+  <main id="main-content" class="app-layout">
+    <section class="pt-8 pb-6 border-b border-border">
+      <h1 class="my-4 text-4xl font-bold sm:my-8 sm:text-5xl">플레이그라운드</h1>
+      <p>
+        용어 정리 글의 부록으로 만든 인터랙티브 데모. 글로만 보면 추상적인 개념을
+        직접 만져보면서 익힐 수 있습니다.
+      </p>
+    </section>
+
+    <section class="pt-12 pb-6 grid gap-5 sm:grid-cols-2">
+      {
+        PLAYGROUNDS.map(p => (
+          <a
+            href={p.href}
+            class="block border border-border rounded-lg p-5 transition hover:border-accent hover:-translate-y-0.5"
+          >
+            <h2 class="text-xl font-semibold mb-2">{p.title}</h2>
+            <p class="text-sm opacity-90">{p.description}</p>
+            <p class="text-xs mt-3 opacity-70">
+              관련 글: <span class="text-accent">{p.relatedPostTitle}</span>
+            </p>
+          </a>
+        ))
+      }
+    </section>
+  </main>
+  <Footer />
+</Layout>

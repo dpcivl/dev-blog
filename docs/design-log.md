@@ -98,6 +98,29 @@
 
 긴 글(NDT 글 같은) 에서 네비 편의성. 우측 하단 fixed floating button.
 
+#### 결정 9 — 사이트 브랜드명: "Park Hyoin" (영문)
+
+**변경**: `SITE.title` 을 `"에챠피의 기록 연습"` → `"Park Hyoin"` 로 변경.
+
+**적용 범위**:
+- 브라우저 탭 (`<title>`)
+- OG / Twitter 카드
+- RSS 피드 제목
+- JSON-LD 구조화 데이터
+- 헤더 로고의 `aria-label` / `title` 속성
+- Playground 정적 HTML 페이지의 `<title>` 도 같이 갱신
+
+**이유**:
+- 작성자 요청
+- 모던 개인 블로그의 표준 브랜딩 (예: Lee Robinson, Josh Comeau 도 본명 그대로)
+- 영문 이름이 채용/포트폴리오 노출 채널(사람인 등) 에서 일관성을 줌
+- 헤더 텍스트는 이미 제거됐고(결정 9 직전), 사이트 정체성은 favicon + 본명으로 표현
+
+**고려한 대안**:
+- ~~한글 본명("박효인")~~ — 글로벌 호환성 떨어짐
+- ~~"Park Hyoin Blog"~~ — 군더더기
+- ~~"Park Hyoin's Notes"~~ — 영문 어색
+
 #### 결정 8 — 다크 모드 액센트 보정 (Phase 1 follow-up)
 
 Phase 1 배포 후 작성자 확인: **다크 모드에서 본문(`#e8e8e8`)과 액센트(`#d8d4ea` 쿼츠)가 거의 같은 명도(91% vs 88%)라 제목·링크가 본문과 구분이 안 됨.**
@@ -176,8 +199,9 @@ Phase 7  — 회귀 테스트 + 마무리
 - **모바일 break**: 768px 이하 → 사이드바가 상단으로
 
 ### 상태
-- ✅ **Phase 1: 완료 (2026-06-17)** — `src/styles/global.css` 에 토큰 적용 + Pretendard CDN 임포트. `redesign/phase-1-tokens` 브랜치
-- Phase 2~7: 미진행
+- ✅ **Phase 1: 완료 (2026-06-17, 메인 머지)** — `src/styles/global.css` 에 토큰 적용 + Pretendard CDN 임포트
+- 🔧 **Phase 2: 진행 중 (2026-06-17)** — 헤더 재구성 + 시리즈/플레이그라운드 라우트 생성. `redesign/phase-2-header` 브랜치
+- Phase 3~7: 미진행
 
 ### Phase 1 적용 내역
 - 라이트/다크 토큰 모두 새 값으로 교체
@@ -186,3 +210,14 @@ Phase 7  — 회귀 테스트 + 마무리
 - 데스크탑(768px+) 베이스 폰트 16px → 17px
 - 코드 블록은 기존 Google Sans Code + 시스템 mono 폴백 명시
 - 빌드 통과 (`astro check` 0 errors, `astro build` Complete)
+- Phase 1.1: 다크모드 액센트 보정 (결정 8 참조)
+
+### Phase 2 적용 내역 (진행 중)
+- `src/components/Header.astro` 재구성:
+  - 좌측 로고: **favicon SVG 만** (사이트 제목 텍스트는 제거 — 작성자 요청). 36×36 크기, 다크모드에서 자동 반전. `aria-label`/`title` 에 사이트명 명시로 접근성 확보
+  - 탭: `포스트` / `시리즈` / `플레이그라운드` / `태그` / 🔍 / 🌙 (한국어 라벨)
+  - About / Archives 항목은 nav 에서 제외 (About 은 추후 사이드바, Archives 는 미사용)
+  - 모바일 햄버거 메뉴 동작 유지 (ViewTransition `astro:after-swap` 핸들러 보존)
+- `src/pages/series/index.astro` 신규: 시리즈 인덱스 (현재 "용어정리" 1개, 태그 기반 글 자동 그룹핑)
+- `src/pages/playground/index.astro` 신규: 플레이그라운드 인덱스 (UI / DB 2개 하드코딩)
+- 빌드 통과, `/series` 와 `/playground` 정상 생성
