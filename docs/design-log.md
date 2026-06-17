@@ -203,8 +203,20 @@ Phase 7  — 회귀 테스트 + 마무리
 - ✅ **Phase 2: 완료 (2026-06-17, 메인 머지)** — 헤더 재구성 + 시리즈/플레이그라운드 라우트
 - ✅ **Phase 3: 완료 (2026-06-17, 메인 머지)** — 사이드바 + 2컬럼 레이아웃 + Footer SNS 제거
 - ✅ **Phase 4: 완료 (2026-06-17, 메인 머지)** — 포스트 카드 디자인 (간격 여유)
-- 🔧 **Phase 5: 진행 중 (2026-06-17)** — 글 본문 + 맨위/맨아래 버튼. `redesign/phase-5-post-body` 브랜치
-- Phase 6~7: 미진행
+- ✅ **Phase 5: 완료 (2026-06-17, 메인 머지)** — 스크롤 버튼(맨위/맨아래) + prev/next 카드 폴리시
+- 🔧 **Phase 6: 진행 중 (2026-06-17)** — 시리즈/플레이그라운드 인덱스 폴리시. `redesign/phase-6-index-polish` 브랜치
+- Phase 7: 미진행
+
+### Phase 6 적용 내역 (진행 중)
+- `src/pages/series/index.astro` 재설계:
+  - 시리즈 hero (제목·설명 강조)
+  - 시리즈 헤더에 **글 수 배지** ("2편") + **기간 표시** ("2026.06 ~ 2026.06")
+  - 글 목록: 순번(01, 02...) + 제목 + 설명. hover 시 accent 배경
+- `src/pages/playground/index.astro` 재설계:
+  - playground hero (제목·설명 강조)
+  - 카드: 보더 14px 라운드 + 우측 상단 "열기 →" CTA + 섹션 태그 칩 (예: "정규화", "인덱스 B-tree") + 관련 글 표기
+  - hover 시 accent 보더 + translate + 그림자
+- 빌드 통과
 
 ### Phase 5 적용 내역 (진행 중)
 - 신규: `src/components/ScrollButtons.astro` — 맨위(↑) / 맨아래(↓) 두 버튼이 우측 하단에 fixed

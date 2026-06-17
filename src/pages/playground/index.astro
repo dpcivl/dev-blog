@@ -13,6 +13,7 @@ const PLAYGROUNDS = [
       "버튼 상태(default/hover/active/disabled/loading), 애니메이션 property·duration·easing, 모달/토스트/툴팁을 직접 호버·클릭으로 체험.",
     relatedPost: "ui-vocabulary-for-vibe-coding",
     relatedPostTitle: "바이브코딩을 위한 UI 어휘 정리",
+    sections: ["버튼 상태", "위계", "input/card/modal/toast", "애니메이션", "duration", "easing"],
   },
   {
     title: "DB 용어 playground",
@@ -21,6 +22,7 @@ const PLAYGROUNDS = [
       "정규화 Update Anomaly, 1:N·N:M 관계, B-tree 검색 단계, 트랜잭션 rollback, Dirty Read, expand-and-contract 마이그레이션을 시뮬레이션.",
     relatedPost: "db-vocabulary-for-vibe-coding",
     relatedPostTitle: "바이브코딩을 위한 DB · 데이터 모델링 어휘",
+    sections: ["정규화", "관계", "인덱스 B-tree", "트랜잭션", "격리 수준", "마이그레이션"],
   },
 ];
 ---
@@ -30,31 +32,148 @@ const PLAYGROUNDS = [
   <div class="page-shell page-grid">
     <Sidebar />
     <main id="main-content">
-    <section class="pt-8 pb-6 border-b border-border">
-      <h1 class="my-4 text-4xl font-bold sm:my-8 sm:text-5xl">플레이그라운드</h1>
-      <p>
-        용어 정리 글의 부록으로 만든 인터랙티브 데모. 글로만 보면 추상적인 개념을
-        직접 만져보면서 익힐 수 있습니다.
-      </p>
-    </section>
+      <section class="pg-hero">
+        <h1>플레이그라운드</h1>
+        <p>
+          용어 정리 글의 부록으로 만든 인터랙티브 데모. 글로만 보면 추상적인 개념을
+          직접 만져보면서 익힐 수 있습니다.
+        </p>
+      </section>
 
-    <section class="pt-12 pb-6 grid gap-5 sm:grid-cols-2">
-      {
-        PLAYGROUNDS.map(p => (
-          <a
-            href={p.href}
-            class="block border border-border rounded-lg p-5 transition hover:border-accent hover:-translate-y-0.5"
-          >
-            <h2 class="text-xl font-semibold mb-2">{p.title}</h2>
-            <p class="text-sm opacity-90">{p.description}</p>
-            <p class="text-xs mt-3 opacity-70">
-              관련 글: <span class="text-accent">{p.relatedPostTitle}</span>
-            </p>
-          </a>
-        ))
-      }
-    </section>
+      <section class="pg-grid">
+        {
+          PLAYGROUNDS.map(p => (
+            <a href={p.href} class="pg-card group">
+              <div class="pg-card-header">
+                <h2 class="pg-card-title group-hover:text-accent">{p.title}</h2>
+                <span class="pg-card-cta">열기 →</span>
+              </div>
+              <p class="pg-card-desc">{p.description}</p>
+              <div class="pg-card-sections">
+                {p.sections.map(s => (
+                  <span class="pg-tag">{s}</span>
+                ))}
+              </div>
+              <div class="pg-card-related">
+                관련 글: <span>{p.relatedPostTitle}</span>
+              </div>
+            </a>
+          ))
+        }
+      </section>
     </main>
   </div>
   <Footer />
 </Layout>
+
+<style>
+  .pg-hero {
+    padding: 2rem 0 1.5rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .pg-hero h1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem 0;
+  }
+  .pg-hero p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  @media (min-width: 768px) {
+    .pg-hero h1 {
+      font-size: 2.75rem;
+    }
+  }
+
+  .pg-grid {
+    display: grid;
+    gap: 1.25rem;
+    padding-top: 2rem;
+  }
+  @media (min-width: 768px) {
+    .pg-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .pg-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    text-decoration: none;
+    color: inherit;
+    background: var(--surface);
+    transition:
+      border-color 0.18s ease,
+      transform 0.15s ease,
+      box-shadow 0.18s ease;
+  }
+  .pg-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.12);
+  }
+
+  .pg-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .pg-card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+    transition: color 0.15s ease;
+  }
+  .pg-card-cta {
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+    opacity: 0.7;
+    transition: opacity 0.15s ease;
+    flex: none;
+  }
+  .pg-card:hover .pg-card-cta {
+    opacity: 1;
+  }
+
+  .pg-card-desc {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    opacity: 0.85;
+  }
+
+  .pg-card-sections {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.25rem;
+  }
+  .pg-tag {
+    display: inline-block;
+    padding: 0.12rem 0.5rem;
+    background: var(--accent-bg);
+    color: var(--accent);
+    font-size: 0.72rem;
+    font-weight: 500;
+    border-radius: 999px;
+  }
+
+  .pg-card-related {
+    font-size: 0.75rem;
+    opacity: 0.6;
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px dashed var(--border);
+  }
+  .pg-card-related span {
+    color: var(--accent);
+  }
+</style>

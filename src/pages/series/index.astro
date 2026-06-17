@@ -14,7 +14,6 @@ const SERIES = [
     description:
       "AI에게 정확히 시키기 위한 영역별 어휘 정리. 본문 + 인터랙티브 playground 패턴으로 진행 중.",
     tag: "용어정리",
-    color: "vocab",
   },
 ];
 
@@ -29,8 +28,16 @@ const seriesWithPosts = SERIES.map(s => {
         new Date(a.data.pubDatetime).getTime() -
         new Date(b.data.pubDatetime).getTime()
     );
-  return { ...s, posts: series_posts };
+  const firstDate = series_posts[0]?.data.pubDatetime;
+  const lastDate = series_posts[series_posts.length - 1]?.data.pubDatetime;
+  return { ...s, posts: series_posts, firstDate, lastDate };
 });
+
+function formatDate(d?: Date) {
+  if (!d) return "";
+  const date = new Date(d);
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}`;
+}
 ---
 
 <Layout title={`시리즈 | ${SITE.title}`}>
@@ -38,47 +45,173 @@ const seriesWithPosts = SERIES.map(s => {
   <div class="page-shell page-grid">
     <Sidebar />
     <main id="main-content">
-    <section class="pt-8 pb-6 border-b border-border">
-      <h1 class="my-4 text-4xl font-bold sm:my-8 sm:text-5xl">시리즈</h1>
-      <p>
-        한 주제를 여러 편으로 나눠 정리한 글 묶음. 처음부터 차례로 읽어도 좋고,
-        궁금한 편만 골라 봐도 됩니다.
-      </p>
-    </section>
+      <section class="series-hero">
+        <h1>시리즈</h1>
+        <p>
+          한 주제를 여러 편으로 나눠 정리한 글 묶음. 처음부터 차례로 읽어도 좋고,
+          궁금한 편만 골라 봐도 됩니다.
+        </p>
+      </section>
 
-    {
-      seriesWithPosts.map(s => (
-        <section class="pt-12 pb-6">
-          <h2 class="text-2xl font-semibold tracking-wide">{s.title}</h2>
-          <p class="text-muted mt-1">{s.description}</p>
-          <ol class="mt-4 ms-4 list-decimal space-y-2">
-            {s.posts.map(p => (
-              <li>
-                <a
-                  href={`/posts/${p.id}/`}
-                  class="text-accent decoration-dashed hover:underline"
-                >
-                  {p.data.title}
-                </a>
-                <p class="text-sm opacity-75">{p.data.description}</p>
-              </li>
-            ))}
-          </ol>
-          {s.posts.length === 0 && (
-            <p class="text-muted">아직 발행된 글이 없습니다.</p>
-          )}
-        </section>
-      ))
-    }
+      {
+        seriesWithPosts.map(s => (
+          <section class="series-block">
+            <div class="series-header">
+              <h2 class="series-title">{s.title}</h2>
+              <span class="series-badge">{s.posts.length}편</span>
+            </div>
+            <p class="series-desc">{s.description}</p>
+            {s.firstDate && (
+              <div class="series-period">
+                {formatDate(s.firstDate)}
+                {s.posts.length > 1 && ` ~ ${formatDate(s.lastDate)}`}
+              </div>
+            )}
 
-    {
-      SERIES.length === 0 && (
-        <section class="pt-12 pb-12 text-center opacity-75">
-          <p>아직 등록된 시리즈가 없습니다.</p>
-        </section>
-      )
-    }
+            <ol class="series-list">
+              {s.posts.map((p, idx) => (
+                <li>
+                  <a href={`/posts/${p.id}/`} class="series-item group">
+                    <span class="series-idx">{String(idx + 1).padStart(2, "0")}</span>
+                    <div class="series-item-body">
+                      <div class="series-item-title group-hover:text-accent">
+                        {p.data.title}
+                      </div>
+                      <div class="series-item-desc">{p.data.description}</div>
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </ol>
+            {s.posts.length === 0 && (
+              <p class="series-empty">아직 발행된 글이 없습니다.</p>
+            )}
+          </section>
+        ))
+      }
+
+      {
+        SERIES.length === 0 && (
+          <section class="series-empty-state">
+            <p>아직 등록된 시리즈가 없습니다.</p>
+          </section>
+        )
+      }
     </main>
   </div>
   <Footer />
 </Layout>
+
+<style>
+  .series-hero {
+    padding: 2rem 0 1.5rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .series-hero h1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem 0;
+  }
+  .series-hero p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  @media (min-width: 768px) {
+    .series-hero h1 {
+      font-size: 2.75rem;
+    }
+  }
+
+  .series-block {
+    padding: 2.5rem 0;
+    border-bottom: 1px dashed var(--border);
+  }
+  .series-block:last-child {
+    border-bottom: none;
+  }
+
+  .series-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .series-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+  }
+  .series-badge {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    background: var(--accent-bg);
+    color: var(--accent);
+    font-size: 0.78rem;
+    font-weight: 600;
+    border-radius: 999px;
+  }
+  .series-desc {
+    margin: 0.5rem 0 0.4rem 0;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .series-period {
+    font-size: 0.8rem;
+    opacity: 0.6;
+    margin-bottom: 1rem;
+  }
+
+  .series-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .series-item {
+    display: flex;
+    gap: 1rem;
+    padding: 0.85rem 0.875rem;
+    margin: 0 -0.875rem;
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    transition: background-color 0.15s ease;
+  }
+  .series-item:hover {
+    background-color: var(--accent-bg);
+  }
+  .series-idx {
+    flex: none;
+    font-family: ui-monospace, monospace;
+    font-size: 0.78rem;
+    color: var(--accent);
+    font-weight: 700;
+    padding-top: 0.15rem;
+    opacity: 0.7;
+  }
+  .series-item-body {
+    flex: 1;
+    min-width: 0;
+  }
+  .series-item-title {
+    font-weight: 500;
+    line-height: 1.45;
+    transition: color 0.15s ease;
+  }
+  .series-item-desc {
+    font-size: 0.85rem;
+    opacity: 0.7;
+    line-height: 1.55;
+    margin-top: 0.2rem;
+  }
+  .series-empty,
+  .series-empty-state {
+    color: var(--muted);
+    text-align: center;
+    padding: 3rem 0;
+  }
+</style>
