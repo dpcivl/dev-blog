@@ -13,21 +13,72 @@ const { variant: Heading = "h2", id, data, filePath } = Astro.props;
 const { title, description, ...props } = data;
 ---
 
-<li class="my-6">
-  <a
-    href={getPath(id, filePath)}
-    class:list={[
-      "inline-block text-lg font-medium text-accent",
-      "decoration-dashed underline-offset-4 hover:underline",
-      "focus-visible:no-underline focus-visible:underline-offset-0",
-    ]}
-  >
+<li class="post-card-item">
+  <a href={getPath(id, filePath)} class="post-card-link group">
     <Heading
+      class="post-card-title"
       style={{ viewTransitionName: slugifyStr(title.replaceAll(".", "-")) }}
     >
       {title}
     </Heading>
+    <div class="post-card-meta">
+      <Datetime {...props} />
+    </div>
+    <p class="post-card-desc">{description}</p>
   </a>
-  <Datetime {...props} />
-  <p>{description}</p>
 </li>
+
+<style>
+  .post-card-item {
+    list-style: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .post-card-item:last-child {
+    border-bottom: none;
+  }
+
+  .post-card-link {
+    display: block;
+    padding: 1.25rem 0.875rem;
+    margin: 0 -0.875rem;
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    transition:
+      background-color 0.18s ease,
+      transform 0.15s ease;
+  }
+  .post-card-link:hover {
+    background-color: var(--accent-bg);
+  }
+
+  .post-card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--foreground);
+    margin: 0 0 0.5rem 0;
+    transition: color 0.15s ease;
+  }
+  .group:hover .post-card-title {
+    color: var(--accent);
+  }
+
+  .post-card-meta {
+    font-size: 0.8rem;
+    opacity: 0.65;
+    margin-bottom: 0.75rem;
+  }
+
+  .post-card-desc {
+    margin: 0;
+    opacity: 0.85;
+    line-height: 1.65;
+  }
+
+  @media (min-width: 768px) {
+    .post-card-title {
+      font-size: 1.3rem;
+    }
+  }
+</style>
