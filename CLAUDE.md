@@ -15,11 +15,16 @@
 
 ### 절차
 
-1. **이미지 자산 정리**
-   - inbox에 첨부된 이미지(보통 `src/image*.png`처럼 VSCode 붙여넣기 기본 경로에 있음)를 찾는다.
+1. **이미지 / 영상 자산 정리**
+   - inbox 나 scratch 에 첨부된 이미지(보통 `image*.png`) / 영상(`*.mp4`) 을 찾는다.
    - 포스트 슬러그(slug) 폴더로 이동: `public/assets/posts/<slug>/`
-   - 파일명을 내용을 알 수 있게 변경: 예) `01-screenshot-before.png`, `02-after-fix.png`
+   - 파일명을 내용을 알 수 있게 변경: 예) `01-screenshot-before.png`, `05-demo.mp4`
    - 마크다운에서는 절대 경로로 참조: `/assets/posts/<slug>/<filename>.png`
+   - **영상 임베드는 반드시 한 줄로** (마크다운 파서가 multi-line HTML 태그를 텍스트로 escape 함):
+     ```html
+     <video src="/assets/posts/<slug>/<file>.mp4" autoplay muted loop playsinline width="100%"></video>
+     ```
+   - 영상 placeholder 컨벤션: 작성자가 `<여기에 <파일명> 영상>` 형태로 위치 지정하면 자동 인식 + 치환
 
 2. **포스트 작성** ([src/data/blog/<slug>.md](src/data/blog/))
    - frontmatter 필수 필드 ([src/content.config.ts](src/content.config.ts) 참고):

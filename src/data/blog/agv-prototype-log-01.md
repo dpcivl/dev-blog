@@ -68,14 +68,7 @@ OS 종류 다시 확인 후 진행.
 
 전원 연결 직후 — **처음에는 녹색 LED 가 깜빡이지도 않고 그냥 켜졌다.** 뭔가 이상해서 한번 전원 빼고 재시도. 두 번째엔 정상적으로 깜빡였다.
 
-<video
-  src="/assets/posts/agv-prototype-log-01/05-rpi5-boot-led-blink.mp4"
-  autoplay
-  muted
-  loop
-  playsinline
-  width="100%"
-></video>
+<video src="/assets/posts/agv-prototype-log-01/05-rpi5-boot-led-blink.mp4" autoplay muted loop playsinline width="100%"></video>
 
 LED 깜빡임이 끝난 후 부팅이 완료됐다고 판단해서 SSH 연결 시도. 그런데 또 막힘.
 
