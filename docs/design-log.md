@@ -159,5 +159,13 @@ Phase 7  — 회귀 테스트 + 마무리
 - **모바일 break**: 768px 이하 → 사이드바가 상단으로
 
 ### 상태
-- Phase 1: 진행 예정 (오늘 시작)
+- ✅ **Phase 1: 완료 (2026-06-17)** — `src/styles/global.css` 에 토큰 적용 + Pretendard CDN 임포트. `redesign/phase-1-tokens` 브랜치
 - Phase 2~7: 미진행
+
+### Phase 1 적용 내역
+- 라이트/다크 토큰 모두 새 값으로 교체
+- Pretendard Variable (동적 서브셋) 본문 폰트로 적용
+- 본문 줄간격 1.7, 폰트 feature `ss06`(한글 세로 자간) + `tnum`(숫자 정렬) 활성화
+- 데스크탑(768px+) 베이스 폰트 16px → 17px
+- 코드 블록은 기존 Google Sans Code + 시스템 mono 폴백 명시
+- 빌드 통과 (`astro check` 0 errors, `astro build` Complete)

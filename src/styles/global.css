@@ -1,32 +1,55 @@
 @import "tailwindcss";
 @import "./typography.css";
 
+/* Pretendard — 본문/헤딩용 한·영 모던 폰트. CDN 동적 서브셋(필요한 글자만 로드) */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
+/*
+ * ===== 디자인 토큰 (라이트 모드) =====
+ * docs/design-log.md 의 "Current Design Tokens" 참고
+ */
 :root,
 html[data-theme="light"] {
-  --background: #fdfdfd;
-  --foreground: #282728;
-  --accent: #006cac;
-  --muted: #e6e6e6;
-  --border: #ece9e9;
+  --background: #fafafa;          /* 본문 배경 */
+  --surface: #ffffff;             /* 카드, 사이드바 */
+  --foreground: #1a1a1a;          /* 헤딩 / 본문 텍스트 */
+  --muted: #6b7280;               /* 메타 정보, 캡션 */
+  --border: #e5e5e5;
+  --accent: #6a5acd;              /* 링크/버튼 — 슬레이트블루 (가독성 확보) */
+  --accent-bg: #d8d4ea;           /* 태그 배경, hover — 쿼츠 톤 */
 }
 
+/* ===== 디자인 토큰 (다크 모드) ===== */
 html[data-theme="dark"] {
-  --background: #212737;
-  --foreground: #eaedf3;
-  --accent: #ff6b01;
-  --muted: #343f60;
-  --border: #ab4b08;
+  --background: #0f1115;          /* 짙은 네이비-블랙 (순흑 X) */
+  --surface: #1a1d23;             /* 카드 */
+  --foreground: #e8e8e8;          /* 헤딩 / 본문 */
+  --muted: #9ca3af;               /* 메타 정보 */
+  --border: #2a2e35;
+  --accent: #d8d4ea;              /* 쿼츠 그대로 — 어두운 배경 위 명도 대비 충분 */
+  --accent-bg: rgba(216, 212, 234, 0.12);  /* 은은한 호버/태그 배경 */
 }
 
 @theme inline {
-  --font-app: var(--font-google-sans-code);
+  /* 본문/헤딩 폰트 — Pretendard */
+  --font-sans:
+    "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
+    system-ui, "Apple SD Gothic Neo", "Malgun Gothic", "Helvetica Neue", Arial,
+    sans-serif;
+  /* 코드 블록 폰트 — 기존 Google Sans Code 유지 */
+  --font-code: var(--font-google-sans-code);
+  /* 본문 기본 폰트는 Pretendard */
+  --font-app: var(--font-sans);
+
   --color-background: var(--background);
+  --color-surface: var(--surface);
   --color-foreground: var(--foreground);
-  --color-accent: var(--accent);
   --color-muted: var(--muted);
   --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-bg: var(--accent-bg);
 }
 
 @layer base {
@@ -37,9 +60,22 @@ html[data-theme="dark"] {
   }
   html {
     @apply overflow-y-scroll scroll-smooth;
+    /* 베이스 크기: 모바일 16px / 데스크탑 17px */
+    font-size: 16px;
+  }
+  @media (min-width: 768px) {
+    html {
+      font-size: 17px;
+    }
   }
   body {
     @apply flex min-h-svh flex-col bg-background font-app text-foreground selection:bg-accent/75 selection:text-background;
+    /* 본문 가독성: 줄간격 여유 */
+    line-height: 1.7;
+    /* Pretendard 의 OpenType 기능: 한글 자간/숫자 정렬 */
+    font-feature-settings:
+      "ss06" on,
+      "tnum" on;
   }
   a,
   button {
@@ -48,6 +84,14 @@ html[data-theme="dark"] {
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;
+  }
+  /* 코드 블록은 명시적으로 mono 폰트 */
+  pre,
+  code,
+  kbd,
+  samp {
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, "SF Mono",
+      Consolas, "Liberation Mono", Menlo, monospace;
   }
 }
 
