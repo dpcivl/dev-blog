@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
+import Sidebar from "@/components/Sidebar.astro";
 import { SITE } from "@/config";
 
 // 시리즈 정의 — 새 시리즈 추가 시 여기에 항목 추가
@@ -34,7 +35,9 @@ const seriesWithPosts = SERIES.map(s => {
 
 <Layout title={`시리즈 | ${SITE.title}`}>
   <Header />
-  <main id="main-content" class="app-layout">
+  <div class="page-shell page-grid">
+    <Sidebar />
+    <main id="main-content">
     <section class="pt-8 pb-6 border-b border-border">
       <h1 class="my-4 text-4xl font-bold sm:my-8 sm:text-5xl">시리즈</h1>
       <p>
@@ -75,6 +78,7 @@ const seriesWithPosts = SERIES.map(s => {
         </section>
       )
     }
-  </main>
+    </main>
+  </div>
   <Footer />
 </Layout>

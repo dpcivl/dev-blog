@@ -199,9 +199,26 @@ Phase 7  — 회귀 테스트 + 마무리
 - **모바일 break**: 768px 이하 → 사이드바가 상단으로
 
 ### 상태
-- ✅ **Phase 1: 완료 (2026-06-17, 메인 머지)** — `src/styles/global.css` 에 토큰 적용 + Pretendard CDN 임포트
-- 🔧 **Phase 2: 진행 중 (2026-06-17)** — 헤더 재구성 + 시리즈/플레이그라운드 라우트 생성. `redesign/phase-2-header` 브랜치
-- Phase 3~7: 미진행
+- ✅ **Phase 1: 완료 (2026-06-17, 메인 머지)** — 토큰 적용 + Pretendard
+- ✅ **Phase 2: 완료 (2026-06-17, 메인 머지)** — 헤더 재구성 + 시리즈/플레이그라운드 라우트
+- 🔧 **Phase 3: 진행 중 (2026-06-17)** — 사이드바 + 2컬럼 레이아웃. `redesign/phase-3-sidebar` 브랜치
+- Phase 4~7: 미진행
+
+### Phase 3 적용 내역 (진행 중)
+- Phase 3.1: 푸터에서 SNS 링크 제거 (사이드바와 중복). `app-layout` → `page-shell` 폭 통일. 카피라이트만 가운데 정렬로 유지.
+- 신규: `src/components/Sidebar.astro` — 프로필 사진(원형) + 박효인/Park Hyoin + 태그라인 + SNS 아이콘
+- 신규 utility: `.page-shell` (max-w-5xl 중앙 정렬) + `.page-grid` (desktop 220px 1fr 그리드)
+- 사이드바 동작: 데스크탑(>=768px) 좌측 sticky / 모바일(<768px) 메인 위에 중앙 정렬 스택
+- 적용 파일:
+  - `src/components/Header.astro`: `app-layout` → `page-shell` (헤더 폭 확장)
+  - `src/layouts/Main.astro`: 사이드바 + 그리드 래핑 (Posts/Tags/Archives/Search 자동 적용)
+  - `src/layouts/AboutLayout.astro`: 동일 패턴 (About 페이지)
+  - `src/layouts/PostDetails.astro`: 동일 패턴 (글 본문)
+  - `src/pages/index.astro`: 사이드바 + 그리드 적용, 기존 hero(인사·소셜 영역) 제거 (사이드바가 흡수)
+  - `src/pages/404.astro`, `series/index.astro`, `playground/index.astro`: 동일 패턴
+- 변경 안 함: `src/pages/portfolio.astro` (unlisted, 별도 레이아웃 유지)
+- 프로필 사진: `public/profile.jpg` 참조. 작성자가 직접 파일 저장 필요
+- 빌드 통과 (`astro check` 0 errors, `astro build` Complete)
 
 ### Phase 1 적용 내역
 - 라이트/다크 토큰 모두 새 값으로 교체
