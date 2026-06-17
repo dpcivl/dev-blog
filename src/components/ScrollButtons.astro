@@ -1,0 +1,134 @@
+---
+import IconArrowNarrowUp from "@/assets/icons/IconArrowNarrowUp.svg";
+import IconArrowNarrowDown from "@/assets/icons/IconArrowNarrowDown.svg";
+---
+
+<div id="scroll-buttons" class="scroll-buttons">
+  <button
+    id="scroll-top-btn"
+    class="scroll-btn"
+    aria-label="맨 위로"
+    title="맨 위로"
+  >
+    <IconArrowNarrowUp class="scroll-btn-icon" />
+  </button>
+  <button
+    id="scroll-bottom-btn"
+    class="scroll-btn"
+    aria-label="맨 아래로"
+    title="맨 아래로"
+  >
+    <IconArrowNarrowDown class="scroll-btn-icon" />
+  </button>
+</div>
+
+<style>
+  .scroll-buttons {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    z-index: 50;
+  }
+  .scroll-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--foreground);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition:
+      opacity 0.25s ease,
+      transform 0.15s ease,
+      color 0.15s ease,
+      background-color 0.15s ease;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .scroll-btn.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .scroll-btn:hover {
+    color: var(--accent);
+    background: var(--accent-bg);
+    transform: translateY(-2px);
+  }
+  .scroll-btn:active {
+    transform: translateY(0);
+  }
+  .scroll-btn-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    stroke: currentColor;
+    fill: transparent;
+    stroke-width: 2;
+  }
+
+  @media (min-width: 768px) {
+    .scroll-buttons {
+      bottom: 2rem;
+      right: 2rem;
+    }
+  }
+</style>
+
+<script is:inline data-astro-rerun>
+  function initScrollButtons() {
+    const topBtn = document.getElementById("scroll-top-btn");
+    const bottomBtn = document.getElementById("scroll-bottom-btn");
+    if (!topBtn || !bottomBtn) return;
+
+    topBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+    bottomBtn.addEventListener("click", () => {
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: "smooth",
+      });
+    });
+
+    function handleScroll() {
+      const root = document.documentElement;
+      const scrollTotal = root.scrollHeight - root.clientHeight;
+      const scrollTop = root.scrollTop;
+      // 페이지가 매우 짧으면 둘 다 숨김
+      if (scrollTotal < 200) {
+        topBtn.classList.remove("is-visible");
+        bottomBtn.classList.remove("is-visible");
+        return;
+      }
+      const percent = scrollTop / scrollTotal;
+      // 맨 위 버튼: 20% 이상 스크롤 시 표시
+      topBtn.classList.toggle("is-visible", percent > 0.2);
+      // 맨 아래 버튼: 95% 미만 위치에서 표시
+      bottomBtn.classList.toggle("is-visible", percent < 0.95);
+    }
+
+    handleScroll();
+
+    let ticking = false;
+    document.addEventListener("scroll", () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+  }
+
+  initScrollButtons();
+
+  // ViewTransition navigation 대응
+  document.addEventListener("astro:after-swap", initScrollButtons);
+</script>

@@ -202,8 +202,22 @@ Phase 7  — 회귀 테스트 + 마무리
 - ✅ **Phase 1: 완료 (2026-06-17, 메인 머지)** — 토큰 적용 + Pretendard
 - ✅ **Phase 2: 완료 (2026-06-17, 메인 머지)** — 헤더 재구성 + 시리즈/플레이그라운드 라우트
 - ✅ **Phase 3: 완료 (2026-06-17, 메인 머지)** — 사이드바 + 2컬럼 레이아웃 + Footer SNS 제거
-- 🔧 **Phase 4: 진행 중 (2026-06-17)** — 포스트 카드 디자인. `redesign/phase-4-cards` 브랜치
-- Phase 5~7: 미진행
+- ✅ **Phase 4: 완료 (2026-06-17, 메인 머지)** — 포스트 카드 디자인 (간격 여유)
+- 🔧 **Phase 5: 진행 중 (2026-06-17)** — 글 본문 + 맨위/맨아래 버튼. `redesign/phase-5-post-body` 브랜치
+- Phase 6~7: 미진행
+
+### Phase 5 적용 내역 (진행 중)
+- 신규: `src/components/ScrollButtons.astro` — 맨위(↑) / 맨아래(↓) 두 버튼이 우측 하단에 fixed
+  - 페이지 20% 이상 스크롤 시 ↑ 표시, 95% 미만일 때 ↓ 표시 (양쪽 조건 충족 시 둘 다 표시)
+  - smooth scroll 동작, 다크/라이트 자동 톤, hover 시 accent 색
+  - 짧은 페이지(<200px scroll) 는 둘 다 숨김
+  - `astro:after-swap` 핸들러 보존 (ViewTransition 네비게이션 대응)
+- 신규 아이콘: `IconArrowNarrowDown.svg`
+- `src/layouts/PostDetails.astro`:
+  - 기존 인라인 `BackToTopButton` 제거 → 페이지 우측 하단 floating `ScrollButtons` 로 대체
+  - Previous/Next Post 버튼을 **카드 스타일** 로 정돈 — border + padding + hover 시 accent 보더 + translate
+  - 라벨 한국어: "이전 글" / "다음 글"
+- 빌드 통과
 
 ### Phase 4 적용 내역 (진행 중)
 - `src/components/Card.astro` 재설계:
