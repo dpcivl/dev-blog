@@ -1,6 +1,7 @@
 ---
 import { SOCIALS } from "@/constants";
 import LinkButton from "./LinkButton.astro";
+import IconRss from "@/assets/icons/IconRss.svg";
 ---
 
 <aside class="sidebar">
@@ -31,6 +32,14 @@ import LinkButton from "./LinkButton.astro";
           </LinkButton>
         ))
       }
+      <LinkButton
+        href="/rss.xml"
+        title="RSS 피드 구독"
+        class="sidebar-social-link"
+      >
+        <IconRss class="sidebar-social-icon" />
+        <span class="sr-only">RSS 피드 구독</span>
+      </LinkButton>
     </div>
   </div>
 </aside>
