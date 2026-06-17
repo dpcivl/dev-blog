@@ -2,6 +2,7 @@
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
+import { SITE } from "@/config";
 
 const PLAYGROUNDS = [
   {
@@ -23,7 +24,7 @@ const PLAYGROUNDS = [
 ];
 ---
 
-<Layout title={`플레이그라운드 | 에챠피의 기록 연습`}>
+<Layout title={`플레이그라운드 | ${SITE.title}`}>
   <Header />
   <main id="main-content" class="app-layout">
     <section class="pt-8 pb-6 border-b border-border">
