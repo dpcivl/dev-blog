@@ -50,18 +50,17 @@ const NAV_ITEMS = [
   >
     <a
       href="/"
-      class="absolute py-1 inline-flex items-center gap-2 text-xl leading-8 font-semibold whitespace-nowrap sm:static sm:my-auto sm:text-2xl sm:leading-none"
-      aria-label="홈으로"
+      class="absolute py-1 inline-flex items-center sm:static sm:my-auto"
+      aria-label={SITE.title}
+      title={SITE.title}
     >
       <img
         src="/favicon.svg"
-        alt=""
-        width="28"
-        height="28"
+        alt={SITE.title}
+        width="36"
+        height="36"
         class="dark:invert"
-        aria-hidden="true"
       />
-      <span>{SITE.title}</span>
     </a>
     <nav
       id="nav-menu"

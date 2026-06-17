@@ -191,7 +191,7 @@ Phase 7  — 회귀 테스트 + 마무리
 
 ### Phase 2 적용 내역 (진행 중)
 - `src/components/Header.astro` 재구성:
-  - 좌측 로고에 favicon SVG 추가 (텍스트 + 아이콘 조합)
+  - 좌측 로고: **favicon SVG 만** (사이트 제목 텍스트는 제거 — 작성자 요청). 36×36 크기, 다크모드에서 자동 반전. `aria-label`/`title` 에 사이트명 명시로 접근성 확보
   - 탭: `포스트` / `시리즈` / `플레이그라운드` / `태그` / 🔍 / 🌙 (한국어 라벨)
   - About / Archives 항목은 nav 에서 제외 (About 은 추후 사이드바, Archives 는 미사용)
   - 모바일 햄버거 메뉴 동작 유지 (ViewTransition `astro:after-swap` 핸들러 보존)
