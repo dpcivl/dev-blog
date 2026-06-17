@@ -2,6 +2,7 @@
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
+import Sidebar from "@/components/Sidebar.astro";
 import { SITE } from "@/config";
 
 const PLAYGROUNDS = [
@@ -26,7 +27,9 @@ const PLAYGROUNDS = [
 
 <Layout title={`플레이그라운드 | ${SITE.title}`}>
   <Header />
-  <main id="main-content" class="app-layout">
+  <div class="page-shell page-grid">
+    <Sidebar />
+    <main id="main-content">
     <section class="pt-8 pb-6 border-b border-border">
       <h1 class="my-4 text-4xl font-bold sm:my-8 sm:text-5xl">플레이그라운드</h1>
       <p>
@@ -51,6 +54,7 @@ const PLAYGROUNDS = [
         ))
       }
     </section>
-  </main>
+    </main>
+  </div>
   <Footer />
 </Layout>

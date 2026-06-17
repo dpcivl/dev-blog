@@ -103,6 +103,22 @@ html[data-theme="dark"] {
   @apply mx-auto w-full max-w-app px-4;
 }
 
+/* Phase 3 — 사이드바 + 메인 2컬럼 페이지 쉘 */
+@utility page-shell {
+  @apply mx-auto w-full max-w-5xl px-4;
+}
+
+@utility page-grid {
+  @apply grid grid-cols-1 gap-0;
+}
+
+@media (min-width: 768px) {
+  .page-grid {
+    grid-template-columns: 220px 1fr;
+    gap: 2.5rem;
+  }
+}
+
 .active-nav {
   @apply underline decoration-wavy decoration-2 underline-offset-8;
 }
