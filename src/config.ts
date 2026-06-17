@@ -1,10 +1,10 @@
 export const SITE = {
-  website: "https://astro-paper.pages.dev/", // replace this with your deployed domain
+  website: "https://parkhyo.in/",
   author: "박효인",
   profile: "https://github.com/dpcivl",
   desc: "학습 기록과 개발 경험을 정리하는 공간",
   title: "Park Hyoin",
-  ogImage: "astropaper-og.jpg",
+  ogImage: "",  // 빈 값 → src/pages/og.png.ts 의 동적 생성 사용
   lightAndDarkMode: true,
   postPerIndex: 4,
   postPerPage: 4,

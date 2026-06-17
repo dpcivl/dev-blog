@@ -98,6 +98,22 @@
 
 긴 글(NDT 글 같은) 에서 네비 편의성. 우측 하단 fixed floating button.
 
+#### 결정 10 — OG 이미지: 동적 생성 + 도메인 정렬 (2026-06-17, 1차 리디자인 후 폴리시)
+
+**상황**: 링크 공유 시 미리보기(OG 이미지) 가 AstroPaper 템플릿 홍보 이미지로 나옴. 작성자가 발견.
+
+**원인**:
+- `SITE.ogImage = "astropaper-og.jpg"` → 기본 OG 이미지를 강제 사용
+- `SITE.website = "https://astro-paper.pages.dev/"` → 메타 태그의 도메인이 잘못됨
+
+**변경**:
+- `SITE.ogImage = ""` → `Layout.astro` 의 fallback `/og.png` (동적 생성) 활성화
+- `SITE.website = "https://parkhyo.in/"` → 실제 도메인으로 교체
+- `src/utils/loadGoogleFont.ts`: OG 이미지 생성용 폰트를 `IBM Plex Mono` → **`Noto Sans KR`** 로 변경 (한국어 description 렌더링)
+- `public/astropaper-og.jpg` 삭제 (미사용)
+
+**결과**: 동적 OG 이미지가 `SITE.title` + `SITE.desc` + `SITE.website` 기반으로 자동 생성. 향후 사이트 정보 변경 시 OG도 자동 동기화. 링크 공유 시 "Park Hyoin / 학습 기록과 개발 경험을 정리하는 공간 / parkhyo.in" 이 보임.
+
 #### 결정 9 — 사이트 브랜드명: "Park Hyoin" (영문)
 
 **변경**: `SITE.title` 을 `"에챠피의 기록 연습"` → `"Park Hyoin"` 로 변경.
