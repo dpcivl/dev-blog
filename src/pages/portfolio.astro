@@ -27,6 +27,12 @@ const work = sorted.filter(p => p.data.type === "work");
 
 const hasAny =
   inProgress.length + completed.length + paused.length + work.length > 0;
+
+const lastUpdated = new Date().toLocaleDateString("ko-KR", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
 ---
 
 <Layout title={`포트폴리오 | ${SITE.title}`} noIndex={true}>
@@ -42,6 +48,9 @@ const hasAny =
       <p class="mt-3 text-sm opacity-75">
         각 카드는 관련 블로그 글로 연결됩니다. 자세한 사고 과정과 트러블슈팅은 본문 글에서 확인하세요.
         더 자세한 자기소개는 <a href="/about" class="underline decoration-dashed underline-offset-4 hover:text-accent">About 페이지</a>에서 볼 수 있습니다.
+      </p>
+      <p class="mt-2 text-xs opacity-60">
+        마지막 업데이트: {lastUpdated}
       </p>
     </section>
 
