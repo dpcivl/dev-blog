@@ -3,7 +3,7 @@ title: "DigIntoIt — 게이미피케이션 챌린지 트래커 (중단)"
 type: side
 status: paused
 period: "2026-04-23 ~ 2026-05-14"
-role: "1인 개발"
+role: "1인 개발 · AI 페어 프로그래밍"
 techStack:
   - Flutter
   - Dart

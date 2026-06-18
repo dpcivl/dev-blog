@@ -3,7 +3,7 @@ title: "개인 블로그 인프라 (parkhyo.in)"
 type: side
 status: in-progress
 period: "2026-05-05 ~"
-role: "디자인 결정 직접 / 구현 Claude Code 협업"
+role: "1인 설계·운영 · AI 페어 프로그래밍"
 techStack:
   - Astro 5
   - Tailwind CSS 4

@@ -3,7 +3,7 @@ title: "AGV 자율주행 프로토타입"
 type: side
 status: in-progress
 period: "2026-06 ~"
-role: "1인 개발"
+role: "1인 개발 · AI 페어 프로그래밍"
 techStack:
   - Raspberry Pi 5
   - STM32 F407

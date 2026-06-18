@@ -3,7 +3,7 @@ title: "OneSmallThing — 성취 전용 일기"
 type: side
 status: in-progress
 period: "2026-06-15 ~"
-role: "1인 개발 (Dogfooding)"
+role: "1인 개발 (Dogfooding) · AI 페어 프로그래밍"
 techStack:
   - Next.js
   - PWA

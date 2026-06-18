@@ -3,7 +3,7 @@ title: "EdgeBook — 데이트레이딩 포지션 사이저 & 손익 트래커"
 type: side
 status: in-progress
 period: "2026-06-08 ~"
-role: "1인 개발 (Dogfooding 중)"
+role: "1인 개발 (Dogfooding 중) · AI 페어 프로그래밍"
 techStack:
   - HTML (단일 파일)
   - Vanilla JavaScript
