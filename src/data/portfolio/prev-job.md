@@ -19,7 +19,7 @@ techStack:
   - GD32
   - PlatformIO
   - LVGL
-description: "환경 계측 IoT · 엣지 AI · IoT 통신 R&D 를 한 회사에서 HW → SW 로 옮겨가며 담당. 강우량계 데이터로거 HW·SW, 화재 감지 엣지 AI 통합, LoRa 통신 적합성 테스트, 마을방송 수신기 펌웨어 등 5개 프로젝트 수행."
+description: "환경 계측 IoT · 엣지 AI · IoT 통신 R&D 를 한 회사에서 HW → SW 로 옮겨가며 담당. 강우량계 데이터로거 HW·SW, 별도 개발보드 기반 화재 감지 엣지 AI 연구, LoRa 통신 적합성 테스트, 마을방송 수신기 펌웨어 등 5개 프로젝트 수행."
 gallery:
   - "/assets/portfolio/prev-job/01-fire-detection-car.png"
   - "/assets/portfolio/prev-job/02-fire-detection-house.png"
