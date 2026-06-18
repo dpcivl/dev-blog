@@ -53,6 +53,17 @@ const hasAny =
     }
 
     {
+      work.length > 0 && (
+        <section class="pt-12 pb-6">
+          <h2 class="text-2xl font-semibold tracking-wide mb-6">경력</h2>
+          <div class="flex flex-col gap-5">
+            {work.map(project => <WorkCard project={project} />)}
+          </div>
+        </section>
+      )
+    }
+
+    {
       inProgress.length > 0 && (
         <section class="pt-12 pb-6">
           <h2 class="text-2xl font-semibold tracking-wide mb-6">
@@ -86,17 +97,6 @@ const hasAny =
           </h2>
           <div class="grid gap-5 sm:grid-cols-2">
             {paused.map(project => <ProjectCard project={project} />)}
-          </div>
-        </section>
-      )
-    }
-
-    {
-      work.length > 0 && (
-        <section class="pt-12 pb-6">
-          <h2 class="text-2xl font-semibold tracking-wide mb-6">경력</h2>
-          <div class="flex flex-col gap-5">
-            {work.map(project => <WorkCard project={project} />)}
           </div>
         </section>
       )
