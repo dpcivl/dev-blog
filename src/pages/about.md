@@ -17,7 +17,7 @@ title: "About"
 
 - **AGV 자율주행 프로토타입** — 라즈베리파이 5 + STM32 + ROS2 + RS485 조합. 빌드 일지를 [시리즈로 진행 중](/series).
 - **Claude API · AI Agent 학습** — 멀티턴 · Tool Use · Prompt Caching · Vision 등 직접 실험하면서 [관련 글](/tags/claude-api) 누적 중.
-- **성취 전용 일기 서비스 (Dogfooding 진행 중)** — 완벽주의 성향에서 자주 보이는 "1등 아니면 0점" 패턴을 거꾸로 — **잘한 것만 기록하는 일기 앱**. 본인의 [완벽주의 회고](/posts/perfectionism-as-a-tool-vertical-slice-development) 에서 출발한 제품. Supabase Edge Functions (Deno) + Flutter 스택.
+- **OneSmallThing — 성취 전용 일기 (Dogfooding 진행 중)** — 완벽주의 성향에서 자주 보이는 "1등 아니면 0점" 패턴을 거꾸로 — **잘한 것만 기록하는 일기 앱**. 본인의 [완벽주의 회고](/posts/perfectionism-as-a-tool-vertical-slice-development) 에서 출발한 제품. **Next.js (PWA) + Supabase Edge Functions (Deno)** 스택.
 - **블로그 인프라 자체** — Astro + Tailwind 4 로 7 Phase 모던 리디자인을 직접 설계·구현. 이 페이지를 포함해 모든 페이지가 그 결과물.
 
 ## 관심 분야
