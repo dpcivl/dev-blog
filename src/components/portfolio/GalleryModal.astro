@@ -105,8 +105,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
     min-height: 0;
+    position: relative;
   }
 
   .gallery-stage img {
@@ -117,21 +117,33 @@
   }
 
   .gallery-nav {
-    background: rgba(255, 255, 255, 0.08);
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.55);
     color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 50%;
     width: 2.75rem;
     height: 2.75rem;
     font-size: 1.75rem;
     line-height: 1;
     cursor: pointer;
-    flex-shrink: 0;
     transition: background 0.15s ease;
+    backdrop-filter: blur(4px);
+  }
+
+  .gallery-prev {
+    left: 0.5rem;
+  }
+
+  .gallery-next {
+    right: 0.5rem;
   }
 
   .gallery-nav:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.8);
   }
 
   .gallery-nav:disabled {
