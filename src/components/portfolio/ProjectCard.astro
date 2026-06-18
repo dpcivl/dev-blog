@@ -6,8 +6,21 @@ type Props = {
 };
 
 const { project } = Astro.props;
-const { title, period, role, techStack, description, relatedPosts, links } =
-  project.data;
+const {
+  title,
+  period,
+  role,
+  techStack,
+  description,
+  gallery,
+  relatedPosts,
+  links,
+} = project.data;
+const hasFooter =
+  gallery.length > 0 ||
+  relatedPosts.length > 0 ||
+  !!links?.github ||
+  !!links?.demo;
 ---
 
 <article class="card">
@@ -43,8 +56,19 @@ const { title, period, role, techStack, description, relatedPosts, links } =
   </dl>
 
   {
-    (relatedPosts.length > 0 || links?.github || links?.demo) && (
+    hasFooter && (
       <div class="card-links">
+        {gallery.length > 0 && (
+          <button
+            type="button"
+            class="related-link gallery-trigger"
+            data-gallery-trigger
+            data-gallery-images={JSON.stringify(gallery)}
+            data-gallery-title={title}
+          >
+            📷 사진 보기 ({gallery.length})
+          </button>
+        )}
         {relatedPosts.map(slug => (
           <a class="related-link" href={`/posts/${slug}`}>
             관련 글 →

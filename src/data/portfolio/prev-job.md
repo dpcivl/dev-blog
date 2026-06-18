@@ -10,7 +10,7 @@ techStack:
   - Python
   - JavaScript
   - MQTT
-  - PyTorch
+  - TensorFlow Lite
   - Roboflow
   - iMX8M Plus
   - iMX93
@@ -20,7 +20,10 @@ techStack:
   - PlatformIO
   - LVGL
 description: "환경 계측 IoT · 엣지 AI · IoT 통신 R&D 를 한 회사에서 HW → SW 로 옮겨가며 담당. 강우량계 데이터로거 HW·SW, 화재 감지 엣지 AI 통합, LoRa 통신 적합성 테스트, 마을방송 수신기 펌웨어 등 5개 프로젝트 수행."
-cover: "/assets/portfolio/prev-job/fire-detection-result.png"
+gallery:
+  - "/assets/portfolio/prev-job/01-fire-detection-car.png"
+  - "/assets/portfolio/prev-job/02-fire-detection-house.png"
+  - "/assets/portfolio/prev-job/03-map-results.png"
 responsibilities:
   - "강우량계 데이터로거 HW — 전원부 발열 칩 교체 (데이터시트 레퍼런스 적용) 로 발열 문제 해결, 생산팀 양산 이전 완료 (영업 부진으로 양산 단계까지는 미진행)"
   - "강우량계 데이터로거 SW — 0.3초 polling 기반 bounce 검출 로직을 스레딩 기반으로 교체, MQTT 구조 파악 후 JS 코드 수정으로 대시보드↔로거 값 동기화 이슈 해결, 10분 단위 강우량 데이터 항목 신규 추가"

@@ -37,6 +37,7 @@ const portfolio = defineCollection({
       techStack: z.array(z.string()).default([]),
       description: z.string(),
       cover: z.string().optional(), // public/ 절대 경로 (예: /assets/portfolio/<slug>/cover.png)
+      gallery: z.array(z.string()).default([]), // 카드 클릭 시 모달에 띄울 이미지 경로들
       relatedPosts: z.array(z.string()).default([]), // blog slugs
       responsibilities: z.array(z.string()).default([]),
       outcomes: z.array(z.string()).default([]),

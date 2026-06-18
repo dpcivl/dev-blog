@@ -5,6 +5,7 @@ import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import ProjectCard from "@/components/portfolio/ProjectCard.astro";
 import WorkCard from "@/components/portfolio/WorkCard.astro";
+import GalleryModal from "@/components/portfolio/GalleryModal.astro";
 import { SITE } from "@/config";
 
 const projects = await getCollection("portfolio");
@@ -103,6 +104,7 @@ const hasAny =
     }
   </main>
   <Footer />
+  <GalleryModal />
 </Layout>
 
 <style is:global>
@@ -202,5 +204,13 @@ const hasAny =
 
   .related-link:hover {
     text-decoration-style: solid;
+  }
+
+  button.related-link.gallery-trigger {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
   }
 </style>

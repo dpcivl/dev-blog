@@ -13,6 +13,7 @@ const {
   company,
   techStack,
   description,
+  gallery,
   responsibilities,
   outcomes,
 } = project.data;
@@ -85,4 +86,20 @@ const {
       )
     }
   </dl>
+
+  {
+    gallery.length > 0 && (
+      <div class="card-links">
+        <button
+          type="button"
+          class="related-link gallery-trigger"
+          data-gallery-trigger
+          data-gallery-images={JSON.stringify(gallery)}
+          data-gallery-title={title}
+        >
+          📷 사진 보기 ({gallery.length})
+        </button>
+      </div>
+    )
+  }
 </article>

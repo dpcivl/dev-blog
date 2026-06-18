@@ -1,5 +1,5 @@
 ---
-title: "데이트레이딩 포지션 사이저 & 손익 트래커"
+title: "EdgeBook — 데이트레이딩 포지션 사이저 & 손익 트래커"
 type: side
 status: in-progress
 period: "2026-06-08 ~"

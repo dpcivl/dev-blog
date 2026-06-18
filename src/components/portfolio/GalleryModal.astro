@@ -1,0 +1,249 @@
+---
+
+---
+
+<dialog
+  id="portfolio-gallery"
+  class="gallery-dialog"
+  aria-labelledby="gallery-title"
+>
+  <div class="gallery-frame">
+    <header class="gallery-header">
+      <h3 id="gallery-title" class="gallery-title"></h3>
+      <button
+        type="button"
+        class="gallery-close"
+        aria-label="갤러리 닫기"
+        data-gallery-close>×</button>
+    </header>
+
+    <div class="gallery-stage">
+      <button
+        type="button"
+        class="gallery-nav gallery-prev"
+        aria-label="이전 이미지"
+        data-gallery-prev>‹</button>
+      <img id="gallery-image" alt="" />
+      <button
+        type="button"
+        class="gallery-nav gallery-next"
+        aria-label="다음 이미지"
+        data-gallery-next>›</button>
+    </div>
+
+    <footer class="gallery-footer">
+      <span id="gallery-counter" class="gallery-counter"></span>
+    </footer>
+  </div>
+</dialog>
+
+<style is:global>
+  .gallery-dialog {
+    border: none;
+    padding: 0;
+    background: transparent;
+    max-width: 100vw;
+    max-height: 100vh;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    color: #fff;
+  }
+
+  .gallery-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.88);
+  }
+
+  .gallery-dialog[open] {
+    display: flex;
+  }
+
+  .gallery-frame {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    padding: 1rem 1.25rem;
+    box-sizing: border-box;
+  }
+
+  .gallery-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .gallery-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    opacity: 0.9;
+  }
+
+  .gallery-close {
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .gallery-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .gallery-stage {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    min-height: 0;
+  }
+
+  .gallery-stage img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 6px;
+  }
+
+  .gallery-nav {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: 1.75rem;
+    line-height: 1;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s ease;
+  }
+
+  .gallery-nav:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .gallery-nav:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .gallery-footer {
+    margin-top: 0.75rem;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .gallery-counter {
+    font-size: 0.85rem;
+    opacity: 0.7;
+  }
+</style>
+
+<script>
+  function initGalleryModal() {
+    const dialog = document.getElementById(
+      "portfolio-gallery"
+    ) as HTMLDialogElement | null;
+    if (!dialog) return;
+
+    const img = dialog.querySelector<HTMLImageElement>("#gallery-image");
+    const title = dialog.querySelector<HTMLHeadingElement>("#gallery-title");
+    const counter = dialog.querySelector<HTMLSpanElement>("#gallery-counter");
+    const prevBtn = dialog.querySelector<HTMLButtonElement>(
+      "[data-gallery-prev]"
+    );
+    const nextBtn = dialog.querySelector<HTMLButtonElement>(
+      "[data-gallery-next]"
+    );
+    const closeBtn = dialog.querySelector<HTMLButtonElement>(
+      "[data-gallery-close]"
+    );
+    if (!img || !title || !counter || !prevBtn || !nextBtn || !closeBtn) return;
+
+    let images: string[] = [];
+    let index = 0;
+
+    function render() {
+      if (!images.length) return;
+      img!.src = images[index];
+      counter!.textContent = `${index + 1} / ${images.length}`;
+      prevBtn!.disabled = index === 0;
+      nextBtn!.disabled = index === images.length - 1;
+    }
+
+    function open(rawImages: string, label: string) {
+      try {
+        images = JSON.parse(rawImages);
+      } catch {
+        images = [];
+      }
+      if (!images.length) return;
+      index = 0;
+      title!.textContent = label;
+      render();
+      dialog!.showModal();
+    }
+
+    function close() {
+      dialog!.close();
+    }
+
+    // 카드의 "사진 보기" 버튼 클릭
+    document.addEventListener("click", (e) => {
+      const target = (e.target as HTMLElement)?.closest<HTMLButtonElement>(
+        "[data-gallery-trigger]"
+      );
+      if (target) {
+        e.preventDefault();
+        const data = target.dataset.galleryImages || "[]";
+        const label = target.dataset.galleryTitle || "";
+        open(data, label);
+      }
+    });
+
+    prevBtn.addEventListener("click", () => {
+      if (index > 0) {
+        index--;
+        render();
+      }
+    });
+    nextBtn.addEventListener("click", () => {
+      if (index < images.length - 1) {
+        index++;
+        render();
+      }
+    });
+    closeBtn.addEventListener("click", close);
+
+    // 백드롭 클릭 시 닫기
+    dialog.addEventListener("click", (e) => {
+      if (e.target === dialog) close();
+    });
+
+    // 키보드 ←/→
+    dialog.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft" && index > 0) {
+        index--;
+        render();
+      } else if (e.key === "ArrowRight" && index < images.length - 1) {
+        index++;
+        render();
+      }
+    });
+  }
+
+  initGalleryModal();
+  document.addEventListener("astro:after-swap", initGalleryModal);
+</script>
