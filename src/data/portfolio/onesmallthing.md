@@ -11,7 +11,7 @@ techStack:
   - Supabase Edge Functions
   - Deno
   - Supabase Auth (OAuth)
-description: "'1등 아니면 0점' 채점을 거꾸로 — 잘한 것만 기록하는 일기 앱. 완벽주의 회고에서 출발한 제품. 현재 Dogfooding 단계."
+description: "완벽주의 성향에서 자주 보이는 '1등 아니면 0점' 패턴을 거꾸로 — 잘한 것만 기록하는 일기 앱. 본인의 완벽주의 회고에서 출발한 제품으로, 부서별 Claude Code 세션을 운영해 멀티 세션 바이브코딩 방식으로 개발 중. 현재 Dogfooding (본인 사용) 단계."
 relatedPosts:
   - perfectionism-as-a-tool-vertical-slice-development
 order: 25

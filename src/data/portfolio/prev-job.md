@@ -19,7 +19,7 @@ techStack:
   - GD32
   - PlatformIO
   - LVGL
-description: "환경 계측 IoT · 엣지 AI · IoT 통신 R&D 회사에서 임베디드 HW → SW 트랙으로 옮겨가며 5개 프로젝트 담당."
+description: "환경 계측 IoT · 엣지 AI · IoT 통신 R&D 를 한 회사에서 HW → SW 로 옮겨가며 담당. 강우량계 데이터로거 HW·SW, 화재 감지 엣지 AI 통합, LoRa 통신 적합성 테스트, 마을방송 수신기 펌웨어 등 5개 프로젝트 수행."
 cover: "/assets/portfolio/prev-job/fire-detection-result.png"
 responsibilities:
   - "강우량계 데이터로거 HW — 전원부 발열 칩 교체 (데이터시트 레퍼런스 적용) 로 발열 문제 해결, 생산팀 양산 이전 완료 (영업 부진으로 양산 단계까지는 미진행)"

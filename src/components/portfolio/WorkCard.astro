@@ -13,50 +13,76 @@ const {
   company,
   techStack,
   description,
-  cover,
   responsibilities,
   outcomes,
 } = project.data;
 ---
 
 <article class="card">
-  {
-    cover && typeof cover === "string" && (
-      <img src={cover} alt={title} class="card-cover" loading="lazy" />
-    )
-  }
-  <h3 class="text-xl font-semibold mb-1">{title}</h3>
-  <div class="meta">
-    {company && <><span>{company}</span><span class="meta-sep">·</span></>}
-    <span>{period}</span>
-    {role && <><span class="meta-sep">·</span><span>{role}</span></>}
-  </div>
-  {
-    techStack.length > 0 && (
-      <div class="mb-2">
-        {techStack.map(t => <span class="tech-badge">{t}</span>)}
-      </div>
-    )
-  }
-  <p class="mb-2">{description}</p>
-  {
-    responsibilities.length > 0 && (
-      <div class="mt-3">
-        <div class="text-sm font-semibold mb-1 opacity-80">담당 업무</div>
-        <ul class="text-sm list-disc list-inside opacity-90">
-          {responsibilities.map(r => <li>{r}</li>)}
-        </ul>
-      </div>
-    )
-  }
-  {
-    outcomes.length > 0 && (
-      <div class="mt-3">
-        <div class="text-sm font-semibold mb-1 opacity-80">성과</div>
-        <ul class="text-sm list-disc list-inside opacity-90">
-          {outcomes.map(o => <li>{o}</li>)}
-        </ul>
-      </div>
-    )
-  }
+  <h3 class="text-xl font-semibold mb-4">{title}</h3>
+
+  <dl class="card-fields">
+    {
+      company && (
+        <div class="field-row">
+          <dt>회사</dt>
+          <dd>{company}</dd>
+        </div>
+      )
+    }
+    <div class="field-row">
+      <dt>기간</dt>
+      <dd>{period}</dd>
+    </div>
+    {
+      role && (
+        <div class="field-row">
+          <dt>역할</dt>
+          <dd>{role}</dd>
+        </div>
+      )
+    }
+    {
+      techStack.length > 0 && (
+        <div class="field-row">
+          <dt>기술 스택</dt>
+          <dd>
+            {techStack.map(t => <span class="tech-badge">{t}</span>)}
+          </dd>
+        </div>
+      )
+    }
+    <div class="field-row">
+      <dt>설명</dt>
+      <dd>{description}</dd>
+    </div>
+    {
+      responsibilities.length > 0 && (
+        <div class="field-row">
+          <dt>담당 업무</dt>
+          <dd>
+            <ul class="bullet-list">
+              {responsibilities.map(r => (
+                <li>{r}</li>
+              ))}
+            </ul>
+          </dd>
+        </div>
+      )
+    }
+    {
+      outcomes.length > 0 && (
+        <div class="field-row">
+          <dt>성과</dt>
+          <dd>
+            <ul class="bullet-list">
+              {outcomes.map(o => (
+                <li>{o}</li>
+              ))}
+            </ul>
+          </dd>
+        </div>
+      )
+    }
+  </dl>
 </article>

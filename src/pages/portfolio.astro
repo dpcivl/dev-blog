@@ -69,7 +69,7 @@ const hasAny =
           <h2 class="text-2xl font-semibold tracking-wide mb-6">
             진행 중인 프로젝트
           </h2>
-          <div class="grid gap-5 sm:grid-cols-2">
+          <div class="flex flex-col gap-5">
             {inProgress.map(project => <ProjectCard project={project} />)}
           </div>
         </section>
@@ -82,7 +82,7 @@ const hasAny =
           <h2 class="text-2xl font-semibold tracking-wide mb-6">
             완성된 사이드 프로젝트
           </h2>
-          <div class="grid gap-5 sm:grid-cols-2">
+          <div class="flex flex-col gap-5">
             {completed.map(project => <ProjectCard project={project} />)}
           </div>
         </section>
@@ -95,7 +95,7 @@ const hasAny =
           <h2 class="text-2xl font-semibold tracking-wide mb-6">
             일시 중단된 사이드 프로젝트
           </h2>
-          <div class="grid gap-5 sm:grid-cols-2">
+          <div class="flex flex-col gap-5">
             {paused.map(project => <ProjectCard project={project} />)}
           </div>
         </section>
@@ -121,35 +121,72 @@ const hasAny =
   .card {
     border: 1px solid var(--color-border);
     border-radius: 8px;
-    padding: 1.25rem;
-    transition:
-      border-color 0.15s ease,
-      transform 0.15s ease;
+    padding: 1.5rem;
+    transition: border-color 0.15s ease;
     background: var(--color-background);
   }
 
   .card:hover {
     border-color: var(--color-accent);
-    transform: translateY(-2px);
   }
 
-  .card-cover {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 6px;
-    margin-bottom: 0.75rem;
+  .card-fields {
+    margin: 0;
   }
 
-  .meta {
+  .card-fields .field-row {
+    display: grid;
+    grid-template-columns: 6rem 1fr;
+    gap: 1.25rem;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid var(--color-border);
+    align-items: start;
+  }
+
+  .card-fields .field-row:first-child {
+    padding-top: 0;
+  }
+
+  .card-fields .field-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .card-fields dt {
+    font-weight: 600;
+    opacity: 0.6;
     font-size: 0.85rem;
-    opacity: 0.75;
-    margin-bottom: 0.5rem;
+    padding-top: 0.1rem;
   }
 
-  .meta-sep {
-    margin: 0 0.4rem;
-    opacity: 0.5;
+  .card-fields dd {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .bullet-list {
+    margin: 0;
+    padding-left: 1.1rem;
+    list-style: disc;
+  }
+
+  .bullet-list li {
+    margin-bottom: 0.35rem;
+    line-height: 1.55;
+  }
+
+  .bullet-list li:last-child {
+    margin-bottom: 0;
+  }
+
+  .card-links {
+    margin-top: 1rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
   }
 
   .related-link {

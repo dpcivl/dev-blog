@@ -6,68 +6,71 @@ type Props = {
 };
 
 const { project } = Astro.props;
-const {
-  title,
-  period,
-  role,
-  techStack,
-  description,
-  cover,
-  relatedPosts,
-  links,
-} = project.data;
+const { title, period, role, techStack, description, relatedPosts, links } =
+  project.data;
 ---
 
 <article class="card">
+  <h3 class="text-xl font-semibold mb-4">{title}</h3>
+
+  <dl class="card-fields">
+    <div class="field-row">
+      <dt>기간</dt>
+      <dd>{period}</dd>
+    </div>
+    {
+      role && (
+        <div class="field-row">
+          <dt>역할</dt>
+          <dd>{role}</dd>
+        </div>
+      )
+    }
+    {
+      techStack.length > 0 && (
+        <div class="field-row">
+          <dt>기술 스택</dt>
+          <dd>
+            {techStack.map(t => <span class="tech-badge">{t}</span>)}
+          </dd>
+        </div>
+      )
+    }
+    <div class="field-row">
+      <dt>설명</dt>
+      <dd>{description}</dd>
+    </div>
+  </dl>
+
   {
-    cover && typeof cover === "string" && (
-      <img src={cover} alt={title} class="card-cover" loading="lazy" />
-    )
-  }
-  <h3 class="text-xl font-semibold mb-1">{title}</h3>
-  <div class="meta">
-    <span>{period}</span>
-    {role && <><span class="meta-sep">·</span><span>{role}</span></>}
-  </div>
-  {
-    techStack.length > 0 && (
-      <div class="mb-2">
-        {techStack.map(t => <span class="tech-badge">{t}</span>)}
+    (relatedPosts.length > 0 || links?.github || links?.demo) && (
+      <div class="card-links">
+        {relatedPosts.map(slug => (
+          <a class="related-link" href={`/posts/${slug}`}>
+            관련 글 →
+          </a>
+        ))}
+        {links?.github && (
+          <a
+            class="related-link"
+            href={links.github}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GitHub →
+          </a>
+        )}
+        {links?.demo && (
+          <a
+            class="related-link"
+            href={links.demo}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Live →
+          </a>
+        )}
       </div>
     )
   }
-  <p class="mb-2">{description}</p>
-  <div class="flex flex-wrap items-center">
-    {
-      relatedPosts.map(slug => (
-        <a class="related-link" href={`/posts/${slug}`}>
-          관련 글 →
-        </a>
-      ))
-    }
-    {
-      links?.github && (
-        <a
-          class="related-link"
-          href={links.github}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          GitHub →
-        </a>
-      )
-    }
-    {
-      links?.demo && (
-        <a
-          class="related-link"
-          href={links.demo}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Live →
-        </a>
-      )
-    }
-  </div>
 </article>
