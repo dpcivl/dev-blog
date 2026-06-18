@@ -36,7 +36,7 @@ const portfolio = defineCollection({
       company: z.string().optional(), // "이전 직장" by convention for work entries
       techStack: z.array(z.string()).default([]),
       description: z.string(),
-      cover: image().or(z.string()).optional(),
+      cover: z.string().optional(), // public/ 절대 경로 (예: /assets/portfolio/<slug>/cover.png)
       relatedPosts: z.array(z.string()).default([]), // blog slugs
       responsibilities: z.array(z.string()).default([]),
       outcomes: z.array(z.string()).default([]),
