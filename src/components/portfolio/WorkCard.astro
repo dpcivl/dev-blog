@@ -13,12 +13,18 @@ const {
   company,
   techStack,
   description,
+  cover,
   responsibilities,
   outcomes,
 } = project.data;
 ---
 
 <article class="card">
+  {
+    cover && typeof cover === "string" && (
+      <img src={cover} alt={title} class="card-cover" loading="lazy" />
+    )
+  }
   <h3 class="text-xl font-semibold mb-1">{title}</h3>
   <div class="meta">
     {company && <><span>{company}</span><span class="meta-sep">·</span></>}

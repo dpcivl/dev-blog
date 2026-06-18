@@ -19,9 +19,13 @@ const inProgress = sorted.filter(
 const completed = sorted.filter(
   p => p.data.type === "side" && p.data.status === "completed"
 );
+const paused = sorted.filter(
+  p => p.data.type === "side" && p.data.status === "paused"
+);
 const work = sorted.filter(p => p.data.type === "work");
 
-const hasAny = inProgress.length + completed.length + work.length > 0;
+const hasAny =
+  inProgress.length + completed.length + paused.length + work.length > 0;
 ---
 
 <Layout title={`포트폴리오 | ${SITE.title}`} noIndex={true}>
@@ -69,6 +73,19 @@ const hasAny = inProgress.length + completed.length + work.length > 0;
           </h2>
           <div class="grid gap-5 sm:grid-cols-2">
             {completed.map(project => <ProjectCard project={project} />)}
+          </div>
+        </section>
+      )
+    }
+
+    {
+      paused.length > 0 && (
+        <section class="pt-12 pb-6">
+          <h2 class="text-2xl font-semibold tracking-wide mb-6">
+            일시 중단된 사이드 프로젝트
+          </h2>
+          <div class="grid gap-5 sm:grid-cols-2">
+            {paused.map(project => <ProjectCard project={project} />)}
           </div>
         </section>
       )
