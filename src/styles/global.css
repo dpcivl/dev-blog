@@ -123,6 +123,57 @@ html[data-theme="dark"] {
   @apply underline decoration-wavy decoration-2 underline-offset-8;
 }
 
+/* CTA box — About 페이지 등에서 핵심 액션 모음 (포트폴리오 / GitHub / 이메일 등) */
+.cta-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1.75rem 0 2.25rem;
+  padding: 1.25rem;
+  background: var(--color-accent-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+
+.cta-box .cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.1rem;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  text-decoration: none !important;
+  color: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.cta-box .cta-btn:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-1px);
+}
+
+.cta-box .cta-btn.cta-primary {
+  background: var(--color-accent);
+  color: var(--color-background);
+  border-color: var(--color-accent);
+  font-weight: 600;
+}
+
+.cta-box .cta-btn.cta-primary:hover {
+  opacity: 0.92;
+}
+
+.cta-box .cta-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
 /* Source: https://piccalil.li/blog/a-more-modern-css-reset/ */
 /* Anything that has been anchored to should have extra scroll margin */
 :target {

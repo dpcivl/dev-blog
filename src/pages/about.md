@@ -5,13 +5,26 @@ title: "About"
 
 **박효인** 입니다. **임베디드 HW 1년 / 임베디드 SW 2년 2개월** 의 실무 경험을 바탕으로, 현재는 **엣지 AI · 스마트 팩토리 · AI Agent** 영역으로 폭을 넓혀가는 중입니다.
 
+<div class="cta-box">
+  <a href="/portfolio" class="cta-btn cta-primary">
+    <span class="cta-icon">📁</span>
+    <span>포트폴리오 보기</span>
+  </a>
+  <a href="https://github.com/dpcivl" target="_blank" rel="noopener noreferrer" class="cta-btn">
+    <span class="cta-icon">💻</span>
+    <span>GitHub</span>
+  </a>
+  <a href="mailto:dpcivl713@gmail.com" class="cta-btn">
+    <span class="cta-icon">📧</span>
+    <span>이메일</span>
+  </a>
+</div>
+
 ## 경력 흐름
 
 문과 출신으로 **임베디드 하드웨어 설계**(OrCAD · PCB 테스트·디버깅) 로 커리어를 시작했고, 진로 확장을 위해 **C 언어를 독학** 하고 정보처리산업기사 자격을 취득했습니다.
 
 이후 회사의 임베디드 SW 코드를 읽기 위해 Python 도 공부했고, 기존 SW 개발자 퇴사를 계기로 **임베디드 SW 유지보수**를 이어받았습니다. 그 위에서 회사의 **엣지 AI 프로젝트** (개발보드에서의 객체 인식 · 화재 감시 모델 전이학습) 에 합류해, **모델을 임베디드 보드에서 실시간 추론하는 통합 작업**을 담당했습니다.
-
-> 이 트랙은 [NDT 결함 분류 실습 글](/posts/ndt-defect-classification-pytorch-resnet18) 에서 PyTorch + ResNet18 전이학습 + Grad-CAM 분석으로 다시 한 번 정리한 적이 있습니다.
 
 ## 지금 하고 있는 것
 
