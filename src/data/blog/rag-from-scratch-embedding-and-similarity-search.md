@@ -21,15 +21,15 @@ featured: true
 
 대충 다이어그램으로 정리하면:
 
-![RAG 핵심 아이디어 다이어그램 1 — 문서 임베딩 + 질문 임베딩 + 검색](/assets/posts/rag-from-scratch-embedding-and-similarity-search/01-rag-concept-1.png)
-
-![RAG 핵심 아이디어 다이어그램 2 — 검색된 문서를 컨텍스트로 LLM에 주입](/assets/posts/rag-from-scratch-embedding-and-similarity-search/02-rag-concept-2.png)
+![RAG 핵심 아이디어 다이어그램 — 문서 임베딩 + 질문 임베딩 + 검색 + 컨텍스트 주입](/assets/posts/rag-from-scratch-embedding-and-similarity-search/01-rag-concept-1.png)
 
 핵심은 **"LLM이 모르는 문서를 외부에서 검색해서 컨텍스트로 같이 넣어준다"**. 그 검색의 단위가 텍스트의 의미를 압축한 **벡터(임베딩)** 이고, 비교는 **코사인 유사도** 로 한다.
 
 ## OpenAI API 키 발급 — Anthropic 은 임베딩 모델 없음
 
 RAG 학습을 위해 **OpenAI API 키를 발급** 했다. Anthropic 토큰은 이미 결제했지만 **임베딩 관련은 OpenAI 의 `text-embedding-3-small` 이 가성비 표준** 이라고 한다.
+
+![OpenAI 대시보드 — 결제 $5 크레딧 추가 완료 후 사용량 0 상태](/assets/posts/rag-from-scratch-embedding-and-similarity-search/02-openai-dashboard.png)
 
 - **OpenAI 임베딩 = 시장 표준** (가장 많이 쓰이는 모델)
 - `text-embedding-3-small`: **1M 토큰 당 $0.02**
