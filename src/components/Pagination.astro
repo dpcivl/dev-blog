@@ -3,41 +3,152 @@ import type { Page } from "astro";
 import type { CollectionEntry } from "astro:content";
 import IconArrowLeft from "@/assets/icons/IconArrowLeft.svg";
 import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
-import LinkButton from "./LinkButton.astro";
 
 type Props = {
   page: Page<CollectionEntry<"blog">>;
 };
 
 const { page } = Astro.props;
+
+const { currentPage, lastPage } = page;
+
+// 현재 URL pathname 에서 페이지 번호 제거 → base path 추출
+// 예: "/posts/3" → "/posts", "/tags/foo/2" → "/tags/foo"
+const currentPathname = Astro.url.pathname.replace(/\/$/, "");
+const basePath =
+  currentPage === 1
+    ? currentPathname
+    : currentPathname.replace(new RegExp(`/${currentPage}$`), "");
+
+function pageHref(n: number): string {
+  return n === 1 ? `${basePath}/` : `${basePath}/${n}/`;
+}
+
+// 표시할 페이지 번호 리스트 (양 끝 + 현재 주변 ±1)
+type Item = number | "ellipsis-left" | "ellipsis-right";
+
+function buildPageList(current: number, total: number): Item[] {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+
+  const items: Item[] = [1];
+
+  if (current > 3) items.push("ellipsis-left");
+
+  const start = Math.max(2, current - 1);
+  const end = Math.min(total - 1, current + 1);
+  for (let i = start; i <= end; i++) {
+    items.push(i);
+  }
+
+  if (current < total - 2) items.push("ellipsis-right");
+
+  items.push(total);
+  return items;
+}
+
+const pageList = buildPageList(currentPage, lastPage);
 ---
 
 {
-  page.lastPage > 1 && (
+  lastPage > 1 && (
     <nav
-      class="mt-auto mb-8 flex justify-center"
+      class="pagination mt-auto mb-8 flex flex-wrap items-center justify-center gap-1.5"
       role="navigation"
       aria-label="Pagination Navigation"
     >
-      <LinkButton
-        disabled={!page.url.prev}
-        href={page.url.prev as string}
-        class:list={["me-4 select-none", { "opacity-50": !page.url.prev }]}
-        aria-label="Goto Previous Page"
+      <a
+        href={page.url.prev || "#"}
+        class:list={[
+          "page-nav",
+          { "is-disabled": !page.url.prev },
+        ]}
+        aria-label="이전 페이지"
+        aria-disabled={!page.url.prev}
       >
         <IconArrowLeft class="inline-block rtl:rotate-180" />
-        Prev
-      </LinkButton>
-      {page.currentPage} / {page.lastPage}
-      <LinkButton
-        disabled={!page.url.next}
-        href={page.url.next as string}
-        class:list={["ms-4 select-none", { "opacity-50": !page.url.next }]}
-        aria-label="Goto Next Page"
+        <span class="sr-only">이전</span>
+      </a>
+
+      {pageList.map(item =>
+        item === "ellipsis-left" || item === "ellipsis-right" ? (
+          <span class="page-ellipsis" aria-hidden="true">
+            …
+          </span>
+        ) : item === currentPage ? (
+          <span class="page-num is-current" aria-current="page">
+            {item}
+          </span>
+        ) : (
+          <a href={pageHref(item)} class="page-num" aria-label={`${item} 페이지로 이동`}>
+            {item}
+          </a>
+        )
+      )}
+
+      <a
+        href={page.url.next || "#"}
+        class:list={[
+          "page-nav",
+          { "is-disabled": !page.url.next },
+        ]}
+        aria-label="다음 페이지"
+        aria-disabled={!page.url.next}
       >
-        Next
+        <span class="sr-only">다음</span>
         <IconArrowRight class="inline-block rtl:rotate-180" />
-      </LinkButton>
+      </a>
     </nav>
   )
 }
+
+<style is:global>
+  .pagination .page-num,
+  .pagination .page-nav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.25rem;
+    height: 2.25rem;
+    padding: 0 0.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition:
+      border-color 0.15s ease,
+      background 0.15s ease,
+      color 0.15s ease;
+  }
+
+  .pagination a.page-num:hover,
+  .pagination a.page-nav:not(.is-disabled):hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .pagination .page-num.is-current {
+    background: var(--color-accent);
+    color: var(--color-background);
+    border-color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  .pagination .page-nav.is-disabled {
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .pagination .page-ellipsis {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.75rem;
+    height: 2.25rem;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+</style>
