@@ -1,0 +1,770 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API 설계 playground — Park Hyoin</title>
+    <meta
+      name="description"
+      content="API 설계 어휘 정리 글에서 다룬 REST, 상태 코드, 멱등성, 페이지네이션, 인증/인가, CORS 를 직접 클릭하고 입력하면서 익혀볼 수 있는 playground."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      :root {
+        --bg: #fafafa;
+        --surface: #ffffff;
+        --border: #e5e5e5;
+        --text: #1a1a1a;
+        --text-muted: #666666;
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --danger: #dc2626;
+        --danger-dark: #991b1b;
+        --success: #16a34a;
+        --warning: #d97706;
+        --code-bg: #f4f4f5;
+        --code-text: #18181b;
+        --highlight: #fef3c7;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans,
+          Ubuntu, Cantarell, "Helvetica Neue", "Apple SD Gothic Neo",
+          "Noto Sans KR", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        max-width: 1200px;
+        margin: 0 auto;
+        gap: 2rem;
+        padding: 2rem 1.5rem;
+      }
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+          padding: 1rem;
+          gap: 1rem;
+        }
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 2rem;
+        align-self: start;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.25rem;
+      }
+      .sidebar h2 {
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        margin: 0 0 0.75rem 0;
+      }
+      .sidebar nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+      .sidebar a {
+        color: var(--text);
+        text-decoration: none;
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        transition: background 0.15s ease;
+      }
+      .sidebar a:hover { background: var(--code-bg); }
+      .sidebar .back-link {
+        display: block;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+        color: var(--primary);
+        font-size: 0.875rem;
+      }
+
+      .content { min-width: 0; }
+      header.page-header { margin-bottom: 2rem; }
+      header.page-header h1 {
+        font-size: 2rem;
+        margin: 0 0 0.5rem 0;
+        font-weight: 700;
+      }
+      header.page-header p {
+        color: var(--text-muted);
+        margin: 0;
+      }
+
+      section.demo {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.75rem;
+        margin-bottom: 1.5rem;
+      }
+      section.demo h2 {
+        font-size: 1.4rem;
+        margin: 0 0 0.5rem 0;
+      }
+      section.demo > p.intro {
+        color: var(--text-muted);
+        margin: 0 0 1.5rem 0;
+      }
+
+      .demo-area {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+      }
+      .label {
+        display: inline-block;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      pre {
+        background: var(--code-bg);
+        color: var(--code-text);
+        padding: 0.9rem 1rem;
+        border-radius: 6px;
+        overflow-x: auto;
+        font-size: 0.85rem;
+        font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+        line-height: 1.5;
+        margin: 0;
+      }
+
+      /* Controls */
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: end;
+        margin-bottom: 1rem;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        min-width: 140px;
+      }
+      .field select,
+      .field input[type="text"] {
+        padding: 0.5rem 0.65rem;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--surface);
+        color: var(--text);
+        font-size: 0.9rem;
+        font-family: inherit;
+      }
+      button.btn {
+        font-family: inherit;
+        font-size: 0.9rem;
+        font-weight: 500;
+        padding: 0.55rem 1.1rem;
+        border-radius: 6px;
+        border: 1px solid var(--primary);
+        cursor: pointer;
+        background: var(--primary);
+        color: white;
+        transition: background 0.15s ease;
+      }
+      button.btn:hover { background: var(--primary-dark); }
+      button.btn.btn-ghost {
+        background: var(--surface);
+        color: var(--text);
+        border-color: var(--border);
+      }
+      button.btn.btn-ghost:hover { background: var(--code-bg); }
+
+      /* 1. REST preview */
+      .rest-preview {
+        background: var(--code-bg);
+        border-radius: 8px;
+        padding: 1rem 1.25rem;
+        margin-top: 0.5rem;
+      }
+      .rest-req {
+        font-family: ui-monospace, monospace;
+        font-size: 1rem;
+      }
+      .rest-req .method {
+        color: var(--primary);
+        font-weight: 700;
+        margin-right: 0.5rem;
+      }
+      .rest-meaning {
+        margin-top: 0.5rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+
+      /* 2. Status codes */
+      .status-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      .status-btn {
+        padding: 0.7rem 0.5rem;
+        border-radius: 6px;
+        font-family: ui-monospace, monospace;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text);
+        transition: transform 0.1s ease, background 0.15s ease;
+      }
+      .status-btn:hover { transform: translateY(-1px); }
+      .status-btn.is-2xx { border-color: var(--success); color: var(--success); }
+      .status-btn.is-4xx { border-color: var(--warning); color: var(--warning); }
+      .status-btn.is-5xx { border-color: var(--danger); color: var(--danger); }
+      .status-btn.is-active { background: var(--primary); color: white; border-color: var(--primary); }
+      .status-detail {
+        padding: 1rem;
+        background: var(--code-bg);
+        border-radius: 8px;
+        min-height: 4rem;
+        font-size: 0.9rem;
+        line-height: 1.6;
+      }
+
+      /* 3. Idempotency */
+      .idem-stage {
+        padding: 1rem;
+        background: var(--code-bg);
+        border-radius: 8px;
+        margin-top: 0.5rem;
+      }
+      .idem-counter strong {
+        color: var(--primary);
+        font-size: 1.1rem;
+      }
+      .idem-state {
+        font-family: ui-monospace, monospace;
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        word-break: break-all;
+      }
+
+      /* 4. Pagination */
+      .pg-compare {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      @media (max-width: 700px) {
+        .pg-compare { grid-template-columns: 1fr; }
+      }
+      .pg-pane {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1rem;
+      }
+      .pg-pane h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 0.95rem;
+        color: var(--primary);
+      }
+      .pg-pane pre {
+        font-size: 0.8rem;
+        min-height: 7rem;
+        white-space: pre-wrap;
+      }
+      .pg-pane-note {
+        margin: 0.5rem 0 0 0;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+      }
+      .pg-pane-note.is-warn {
+        color: var(--warning);
+        font-weight: 600;
+      }
+
+      /* 5. Auth */
+      .auth-result {
+        padding: 1rem;
+        border-radius: 8px;
+        background: var(--code-bg);
+        font-family: ui-monospace, monospace;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+      }
+      .auth-result.is-200 { border-left: 4px solid var(--success); }
+      .auth-result.is-401 { border-left: 4px solid var(--danger); }
+      .auth-result.is-403 { border-left: 4px solid var(--warning); }
+
+      /* 6. CORS */
+      .cors-result {
+        padding: 1rem;
+        border-radius: 8px;
+        background: var(--code-bg);
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+        line-height: 1.6;
+      }
+      .cors-result.is-ok { border-left: 4px solid var(--success); }
+      .cors-result.is-blocked { border-left: 4px solid var(--danger); }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <h2>섹션</h2>
+        <nav>
+          <a href="#rest">REST</a>
+          <a href="#status">상태 코드</a>
+          <a href="#idempotency">멱등성</a>
+          <a href="#pagination">페이지네이션</a>
+          <a href="#auth">인증 / 인가</a>
+          <a href="#cors">CORS</a>
+        </nav>
+        <a class="back-link" href="/posts/api-vocabulary-for-vibe-coding"
+          >← 원문 글로 돌아가기</a
+        >
+      </aside>
+
+      <main class="content">
+        <header class="page-header">
+          <h1>API 설계 playground</h1>
+          <p>
+            원문 글의 어휘 — REST · 상태 코드 · 멱등성 · 페이지네이션 · 인증/인가
+            · CORS 를 직접 입력하고 클릭하면서 익혀볼 수 있는 페이지.
+          </p>
+        </header>
+
+        <!-- 1. REST -->
+        <section class="demo" id="rest">
+          <h2>1. REST — 리소스 + HTTP 메서드</h2>
+          <p class="intro">
+            메서드와 URL 조합으로 어떤 행위를 표현하는지 라이브로 확인. URL 의 마지막이 ID(숫자) 인지 아닌지에 따라 의미가 바뀐다.
+          </p>
+          <div class="demo-area">
+            <div class="controls">
+              <label class="field">
+                메서드
+                <select id="rest-method">
+                  <option>GET</option>
+                  <option>POST</option>
+                  <option>PATCH</option>
+                  <option>PUT</option>
+                  <option>DELETE</option>
+                </select>
+              </label>
+              <label class="field" style="flex: 1; min-width: 200px;">
+                URL
+                <input id="rest-url" type="text" value="/orders/42" />
+              </label>
+            </div>
+            <div class="rest-preview">
+              <div class="rest-req">
+                <span class="method" id="rest-method-out">GET</span>
+                <span id="rest-url-out">/orders/42</span>
+              </div>
+              <div class="rest-meaning" id="rest-meaning">→ orders 1개 조회</div>
+            </div>
+          </div>
+          <pre>// REST 의 핵심 — 명사는 URL, 동사는 HTTP 메서드
+GET    /orders        // 목록 조회
+GET    /orders/42     // 1개 조회
+POST   /orders        // 생성
+PATCH  /orders/42     // 일부 수정
+DELETE /orders/42     // 삭제</pre>
+        </section>
+
+        <!-- 2. Status codes -->
+        <section class="demo" id="status">
+          <h2>2. 상태 코드 — 대역별 의미</h2>
+          <p class="intro">
+            코드 버튼을 클릭하면 의미와 대응 방법이 표시됩니다. 색 = 대역 (초록 2xx / 주황 4xx / 빨강 5xx).
+          </p>
+          <div class="demo-area">
+            <div class="status-grid" id="status-grid"></div>
+            <div class="status-detail" id="status-detail">
+              위의 코드를 클릭해보세요.
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. Idempotency -->
+        <section class="demo" id="idempotency">
+          <h2>3. 멱등성 — 같은 요청 N 번 시뮬레이션</h2>
+          <p class="intro">
+            메서드를 고른 다음 "재시도 한 번 더" 를 눌러보세요. POST 는 호출마다 새 주문이 쌓이고, 멱등 메서드는 결과가 그대로입니다.
+          </p>
+          <div class="demo-area">
+            <div class="controls">
+              <label class="field">
+                메서드
+                <select id="idem-method">
+                  <option value="GET">GET (멱등)</option>
+                  <option value="PUT">PUT (멱등)</option>
+                  <option value="DELETE">DELETE (멱등)</option>
+                  <option value="POST">POST (비멱등)</option>
+                </select>
+              </label>
+              <button class="btn" id="idem-send">재시도 한 번 더</button>
+              <button class="btn btn-ghost" id="idem-reset">초기화</button>
+            </div>
+            <div class="idem-stage">
+              <div class="idem-counter">요청 횟수: <strong id="idem-count">0</strong></div>
+              <div class="idem-state" id="idem-state">서버 상태: orders = []</div>
+            </div>
+          </div>
+          <pre>// POST 는 호출마다 새 리소스 생성 → 결제 두 번 사고 위험
+// 해결: Idempotency-Key 헤더로 같은 요청임을 알려줌
+POST /orders
+Idempotency-Key: a1b2c3-...
+{ "amount": 5000 }</pre>
+        </section>
+
+        <!-- 4. Pagination -->
+        <section class="demo" id="pagination">
+          <h2>4. 페이지네이션 — Offset vs Cursor</h2>
+          <p class="intro">
+            "데이터 1개 추가" 를 누르면 새 주문이 맨 위에 추가됩니다. Offset 은 페이지가 밀려서 중복이 생기고, Cursor 는 기준점이 고정되어 안정적입니다.
+          </p>
+          <div class="demo-area">
+            <div class="controls">
+              <button class="btn" id="pg-add">데이터 1개 추가</button>
+              <button class="btn btn-ghost" id="pg-reset-page">초기화</button>
+            </div>
+            <div class="pg-compare">
+              <div class="pg-pane">
+                <h3>Offset (페이지 2, 3개씩)</h3>
+                <pre id="pg-offset"></pre>
+                <p class="pg-pane-note" id="pg-offset-note">정상</p>
+              </div>
+              <div class="pg-pane">
+                <h3>Cursor (1페이지 마지막 ID 이후 3개)</h3>
+                <pre id="pg-cursor"></pre>
+                <p class="pg-pane-note">기준점 고정 — 안정</p>
+              </div>
+            </div>
+          </div>
+          <pre>// Offset — 페이지 N = 앞 (N-1)*size 개 건너뜀
+GET /orders?limit=3&offset=3
+
+// Cursor — 직전 페이지의 마지막 ID 이후로 N 개
+GET /orders?limit=3&cursor=order_42_2026-06-19T12:00:00Z</pre>
+        </section>
+
+        <!-- 5. Auth -->
+        <section class="demo" id="auth">
+          <h2>5. 인증 (401) vs 인가 (403)</h2>
+          <p class="intro">
+            토큰 상태와 권한 조합에 따라 어떤 상태 코드가 나오는지 직접 확인.
+          </p>
+          <div class="demo-area">
+            <div class="controls">
+              <label class="field">
+                토큰
+                <select id="auth-token">
+                  <option value="none">없음</option>
+                  <option value="invalid">잘못됨</option>
+                  <option value="valid">유효</option>
+                </select>
+              </label>
+              <label class="field">
+                요청 리소스 소유자
+                <select id="auth-owner">
+                  <option value="me">나</option>
+                  <option value="other">남</option>
+                </select>
+              </label>
+              <label class="field">
+                내 역할
+                <select id="auth-role">
+                  <option value="user">user</option>
+                  <option value="admin">admin</option>
+                </select>
+              </label>
+            </div>
+            <div class="auth-result" id="auth-result">결과: 값을 선택하세요.</div>
+          </div>
+          <pre>// 인증 (Authentication) — "누구?"
+// → 토큰 없거나 잘못됨 → 401 Unauthorized
+
+// 인가 (Authorization) — "뭘 할 수 있어?"
+// → 토큰 유효하지만 권한 없음 → 403 Forbidden</pre>
+        </section>
+
+        <!-- 6. CORS -->
+        <section class="demo" id="cors">
+          <h2>6. CORS — 다른 출처일 때 브라우저의 판단</h2>
+          <p class="intro">
+            요청 출처와 서버가 허용한 출처를 비교해서 브라우저가 응답을 통과시킬지 결정합니다. <code>*</code> 면 모든 출처 허용.
+          </p>
+          <div class="demo-area">
+            <div class="controls">
+              <label class="field" style="flex: 1; min-width: 200px;">
+                요청 출처
+                <input id="cors-origin" type="text" value="https://my-app.com" />
+              </label>
+              <label class="field" style="flex: 1; min-width: 200px;">
+                서버 Allow-Origin
+                <input id="cors-allow" type="text" value="https://my-app.com" />
+              </label>
+            </div>
+            <div class="cors-result" id="cors-result">결과: —</div>
+          </div>
+          <pre>// 서버 응답 헤더로 허용 출처 알림
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: https://my-app.com
+
+// 브라우저: 응답은 도착했지만 출처 안 맞으면 JS 에 전달 X</pre>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      // ============ 1. REST ============
+      (function () {
+        const m = document.getElementById("rest-method");
+        const u = document.getElementById("rest-url");
+        const mOut = document.getElementById("rest-method-out");
+        const uOut = document.getElementById("rest-url-out");
+        const meaning = document.getElementById("rest-meaning");
+
+        function update() {
+          const method = m.value;
+          const url = u.value.trim() || "/";
+          mOut.textContent = method;
+          uOut.textContent = url;
+
+          const hasId = /\/\d+$/.test(url);
+          const collection = url.split("/").filter(Boolean)[0] || "리소스";
+
+          let result = "";
+          if (method === "GET" && hasId) result = `→ ${collection} 1개 조회`;
+          else if (method === "GET") result = `→ ${collection} 목록 조회`;
+          else if (method === "POST") result = `→ ${collection} 새로 생성 (비멱등)`;
+          else if (method === "PATCH" && hasId) result = `→ ${collection} 일부 수정`;
+          else if (method === "PUT" && hasId) result = `→ ${collection} 전체 교체 (멱등)`;
+          else if (method === "DELETE" && hasId) result = `→ ${collection} 삭제 (멱등)`;
+          else result = `→ ID 없는 ${method} 은 보통 컬렉션 전체 대상`;
+          meaning.textContent = result;
+        }
+        m.addEventListener("change", update);
+        u.addEventListener("input", update);
+        update();
+      })();
+
+      // ============ 2. Status codes ============
+      (function () {
+        const data = [
+          { code: 200, band: "2xx", name: "OK", desc: "성공. 본문에 결과가 들어있음." },
+          { code: 201, band: "2xx", name: "Created", desc: "성공 + 새 리소스가 생성됨. 보통 POST 응답." },
+          { code: 204, band: "2xx", name: "No Content", desc: "성공했지만 본문 없음. DELETE 응답에 자주 쓰임." },
+          { code: 400, band: "4xx", name: "Bad Request", desc: "요청 형식이 잘못됨. 클라이언트의 코드를 고쳐야 함." },
+          { code: 401, band: "4xx", name: "Unauthorized", desc: "인증 실패. 토큰이 없거나 잘못됨." },
+          { code: 403, band: "4xx", name: "Forbidden", desc: "인가 실패. 토큰은 유효하나 권한이 없음." },
+          { code: 404, band: "4xx", name: "Not Found", desc: "리소스가 존재하지 않음." },
+          { code: 409, band: "4xx", name: "Conflict", desc: "충돌. 같은 이메일로 가입 시도 같은 경우." },
+          { code: 500, band: "5xx", name: "Internal Server Error", desc: "서버 잘못. 일시적이면 재시도로 풀림." },
+          { code: 503, band: "5xx", name: "Service Unavailable", desc: "서버가 일시적으로 처리 불가." },
+        ];
+        const grid = document.getElementById("status-grid");
+        const detail = document.getElementById("status-detail");
+        data.forEach(function (s) {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.className = "status-btn is-" + s.band;
+          b.textContent = String(s.code);
+          b.addEventListener("click", function () {
+            grid.querySelectorAll(".status-btn").forEach(function (x) {
+              x.classList.remove("is-active");
+            });
+            b.classList.add("is-active");
+            detail.innerHTML = "<strong>" + s.code + " " + s.name + "</strong><br/>" + s.desc;
+          });
+          grid.appendChild(b);
+        });
+      })();
+
+      // ============ 3. Idempotency ============
+      (function () {
+        const method = document.getElementById("idem-method");
+        const send = document.getElementById("idem-send");
+        const reset = document.getElementById("idem-reset");
+        const count = document.getElementById("idem-count");
+        const state = document.getElementById("idem-state");
+        let calls = 0;
+        let orders = [];
+
+        function render() {
+          count.textContent = String(calls);
+          state.textContent = "서버 상태: orders = [" + orders.join(", ") + "]";
+        }
+        function resetAll() {
+          calls = 0;
+          orders = [];
+          render();
+        }
+        send.addEventListener("click", function () {
+          calls++;
+          const m = method.value;
+          if (m === "POST") {
+            const nextId = (orders[orders.length - 1] || 100) + 1;
+            orders.push(nextId);
+          } else if (m === "PUT") {
+            orders = [42];
+          } else if (m === "DELETE") {
+            orders = [];
+          }
+          render();
+        });
+        reset.addEventListener("click", resetAll);
+        resetAll();
+      })();
+
+      // ============ 4. Pagination ============
+      (function () {
+        const add = document.getElementById("pg-add");
+        const reset = document.getElementById("pg-reset-page");
+        const off = document.getElementById("pg-offset");
+        const offNote = document.getElementById("pg-offset-note");
+        const cur = document.getElementById("pg-cursor");
+
+        const initial = [9, 8, 7, 6, 5, 4, 3, 2, 1];
+        let items = initial.slice();
+        let firstPageSnapshot = [];
+        let cursorAfterId = 0;
+
+        function captureFirstPage() {
+          firstPageSnapshot = items.slice(0, 3);
+          cursorAfterId = firstPageSnapshot[firstPageSnapshot.length - 1] || 0;
+        }
+        function render() {
+          const offsetPage2 = items.slice(3, 6);
+          off.textContent =
+            "현재 데이터:\n  [" + items.join(", ") + "]\n\n" +
+            "2페이지 결과 (offset=3, limit=3):\n  [" + offsetPage2.join(", ") + "]";
+
+          const cursorNext = items.filter(function (id) { return id < cursorAfterId; }).slice(0, 3);
+          cur.textContent =
+            "현재 데이터:\n  [" + items.join(", ") + "]\n\n" +
+            "cursor=" + cursorAfterId + " 이후 3개:\n  [" + cursorNext.join(", ") + "]";
+
+          const overlap = offsetPage2.filter(function (id) { return firstPageSnapshot.indexOf(id) !== -1; });
+          if (overlap.length > 0) {
+            offNote.textContent = "⚠ 중복: " + overlap.join(", ") + " (1페이지에서 본 것과 겹침)";
+            offNote.classList.add("is-warn");
+          } else {
+            offNote.textContent = "정상";
+            offNote.classList.remove("is-warn");
+          }
+        }
+        function resetAll() {
+          items = initial.slice();
+          captureFirstPage();
+          render();
+        }
+        add.addEventListener("click", function () {
+          const nextId = (items[0] || 0) + 1;
+          items.unshift(nextId);
+          render();
+        });
+        reset.addEventListener("click", resetAll);
+        resetAll();
+      })();
+
+      // ============ 5. Auth ============
+      (function () {
+        const token = document.getElementById("auth-token");
+        const owner = document.getElementById("auth-owner");
+        const role = document.getElementById("auth-role");
+        const result = document.getElementById("auth-result");
+
+        function evalAuth() {
+          result.classList.remove("is-200", "is-401", "is-403");
+
+          if (token.value === "none" || token.value === "invalid") {
+            result.classList.add("is-401");
+            result.innerHTML =
+              "<strong>401 Unauthorized</strong> — 인증 실패 (토큰 " +
+              (token.value === "none" ? "없음" : "잘못됨") + ")";
+            return;
+          }
+          if (owner.value === "other" && role.value !== "admin") {
+            result.classList.add("is-403");
+            result.innerHTML =
+              "<strong>403 Forbidden</strong> — 인가 실패 (남의 리소스, 일반 user)";
+            return;
+          }
+          result.classList.add("is-200");
+          result.innerHTML =
+            "<strong>200 OK</strong> — 통과 " +
+            (role.value === "admin" ? "(admin 권한)" : "(내 리소스)");
+        }
+        token.addEventListener("change", evalAuth);
+        owner.addEventListener("change", evalAuth);
+        role.addEventListener("change", evalAuth);
+        evalAuth();
+      })();
+
+      // ============ 6. CORS ============
+      (function () {
+        const origin = document.getElementById("cors-origin");
+        const allow = document.getElementById("cors-allow");
+        const result = document.getElementById("cors-result");
+
+        function evalCors() {
+          const o = origin.value.trim();
+          const a = allow.value.trim();
+          result.classList.remove("is-ok", "is-blocked");
+
+          if (!o || !a) {
+            result.textContent = "값을 입력해주세요.";
+            return;
+          }
+          if (a === "*") {
+            result.classList.add("is-ok");
+            result.innerHTML = "✅ <strong>통과</strong> — 서버가 모든 출처 허용 (<code>Allow-Origin: *</code>)";
+            return;
+          }
+          if (o === a) {
+            result.classList.add("is-ok");
+            result.innerHTML = "✅ <strong>통과</strong> — 출처가 허용 목록과 일치";
+          } else {
+            result.classList.add("is-blocked");
+            result.innerHTML =
+              "❌ <strong>브라우저 차단</strong> — 요청 출처(<code>" + o +
+              "</code>)가 Allow-Origin(<code>" + a +
+              "</code>)과 다름. 응답 본문은 도착했지만 브라우저가 자바스크립트에 전달하지 않습니다.";
+          }
+        }
+        origin.addEventListener("input", evalCors);
+        allow.addEventListener("input", evalCors);
+        evalCors();
+      })();
+    </script>
+  </body>
+</html>
