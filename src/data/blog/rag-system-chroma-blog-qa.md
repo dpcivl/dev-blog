@@ -48,11 +48,9 @@ featured: true
 
 ## 2. 블로그 글을 코퍼스로 — glob
 
-따로 학습 기록을 저장한 게 없다. **블로그 글을 데이터로 쓰면 되겠다** 싶었다.
+![Step 2 본인 학습 노트 로딩 가이드 — 파일 위치 확인부터](/assets/posts/rag-system-chroma-blog-qa/02-load-blog-posts.png)
 
-![glob.glob 으로 블로그 .md 파일들을 한 번에 로드](/assets/posts/rag-system-chroma-blog-qa/02-load-blog-posts.png)
-
-`glob.glob` 한 줄로 `.md` 파일 전체 로드.
+따로 학습 기록을 저장한 게 없다. **블로그 글을 데이터로 쓰면 되겠다** 싶었다. `glob.glob` 한 줄로 `.md` 파일 전체 로드.
 
 ![로드된 블로그 파일 목록 확인](/assets/posts/rag-system-chroma-blog-qa/03-blog-files-loaded.png)
 
