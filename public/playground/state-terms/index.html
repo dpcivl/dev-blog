@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>상태 관리 playground — Park Hyoin</title>
+    <meta
+      name="description"
+      content="상태 관리 어휘 정리 글에서 다룬 Client/Server state, Derived 상태, Optimistic Update, Cache Invalidation 을 직접 클릭하면서 익혀볼 수 있는 playground."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      :root {
+        --bg: #fafafa;
+        --surface: #ffffff;
+        --border: #e5e5e5;
+        --text: #1a1a1a;
+        --text-muted: #666666;
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --danger: #dc2626;
+        --danger-dark: #991b1b;
+        --success: #16a34a;
+        --warning: #d97706;
+        --code-bg: #f4f4f5;
+        --code-text: #18181b;
+        --highlight: #fef3c7;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans,
+          Ubuntu, Cantarell, "Helvetica Neue", "Apple SD Gothic Neo",
+          "Noto Sans KR", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        max-width: 1200px;
+        margin: 0 auto;
+        gap: 2rem;
+        padding: 2rem 1.5rem;
+      }
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+          padding: 1rem;
+          gap: 1rem;
+        }
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 2rem;
+        align-self: start;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.25rem;
+      }
+      .sidebar h2 {
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        margin: 0 0 0.75rem 0;
+      }
+      .sidebar nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+      .sidebar a {
+        color: var(--text);
+        text-decoration: none;
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        transition: background 0.15s ease;
+      }
+      .sidebar a:hover { background: var(--code-bg); }
+      .sidebar .back-link {
+        display: block;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+        color: var(--primary);
+        font-size: 0.875rem;
+      }
+
+      .content { min-width: 0; }
+      header.page-header { margin-bottom: 2rem; }
+      header.page-header h1 {
+        font-size: 2rem;
+        margin: 0 0 0.5rem 0;
+        font-weight: 700;
+      }
+      header.page-header p {
+        color: var(--text-muted);
+        margin: 0;
+      }
+
+      section.demo {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.75rem;
+        margin-bottom: 1.5rem;
+      }
+      section.demo h2 {
+        font-size: 1.4rem;
+        margin: 0 0 0.5rem 0;
+      }
+      section.demo > p.intro {
+        color: var(--text-muted);
+        margin: 0 0 1.5rem 0;
+      }
+
+      .demo-area {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+      }
+      .label {
+        display: inline-block;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      pre {
+        background: var(--code-bg);
+        color: var(--code-text);
+        padding: 0.9rem 1rem;
+        border-radius: 6px;
+        overflow-x: auto;
+        font-size: 0.85rem;
+        font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+        line-height: 1.5;
+        margin: 0;
+      }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+      button.btn {
+        font-family: inherit;
+        font-size: 0.9rem;
+        font-weight: 500;
+        padding: 0.55rem 1.1rem;
+        border-radius: 6px;
+        border: 1px solid var(--primary);
+        cursor: pointer;
+        background: var(--primary);
+        color: white;
+        transition: background 0.15s ease;
+      }
+      button.btn:hover { background: var(--primary-dark); }
+      button.btn.btn-ghost {
+        background: var(--surface);
+        color: var(--text);
+        border-color: var(--border);
+      }
+      button.btn.btn-ghost:hover { background: var(--code-bg); }
+      button.btn.btn-danger {
+        background: var(--danger);
+        border-color: var(--danger);
+      }
+      button.btn.btn-danger:hover { background: var(--danger-dark); }
+
+      input[type="text"],
+      input[type="number"] {
+        padding: 0.45rem 0.6rem;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--surface);
+        color: var(--text);
+        font-size: 0.9rem;
+        font-family: inherit;
+      }
+
+      /* 1. Client / Server state */
+      .cs-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      @media (max-width: 700px) {
+        .cs-grid { grid-template-columns: 1fr; }
+      }
+      .cs-pane {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1rem;
+      }
+      .cs-pane h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 0.95rem;
+        color: var(--primary);
+      }
+      .cs-pane .owner {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .cs-status {
+        margin-top: 0.75rem;
+        padding: 0.5rem;
+        background: var(--code-bg);
+        border-radius: 4px;
+        font-family: ui-monospace, monospace;
+        font-size: 0.85rem;
+      }
+
+      /* 2. Derived */
+      .cart-row {
+        display: grid;
+        grid-template-columns: 1fr 100px 80px 60px;
+        gap: 0.5rem;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .cart-row:last-child { border-bottom: none; }
+      .cart-row input { width: 100%; }
+      .cart-row button {
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 0.3rem 0.5rem;
+        cursor: pointer;
+        font-size: 0.85rem;
+      }
+      .cart-row button:hover {
+        background: var(--code-bg);
+      }
+      .cart-total {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: var(--highlight);
+        border-radius: 6px;
+        font-size: 1rem;
+      }
+      .cart-total .derived {
+        color: var(--warning);
+        font-weight: 600;
+      }
+
+      /* 3. Optimistic */
+      .like-btn {
+        font-size: 2rem;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+        transition: transform 0.15s ease;
+      }
+      .like-btn:hover { transform: scale(1.1); }
+      .like-btn.is-liked { color: var(--danger); }
+      .like-state {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+      .like-pane {
+        background: var(--code-bg);
+        padding: 0.75rem;
+        border-radius: 6px;
+        font-family: ui-monospace, monospace;
+        font-size: 0.85rem;
+      }
+      .like-pane.is-rollback {
+        background: rgba(220, 38, 38, 0.1);
+      }
+      .like-pane strong {
+        display: block;
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        margin-bottom: 0.25rem;
+      }
+      .toast {
+        margin-top: 1rem;
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        display: none;
+      }
+      .toast.is-show { display: block; }
+      .toast.is-error {
+        background: rgba(220, 38, 38, 0.1);
+        border-left: 4px solid var(--danger);
+        color: var(--danger-dark);
+      }
+
+      /* 4. Cache invalidation */
+      .cache-stage {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      @media (max-width: 700px) {
+        .cache-stage { grid-template-columns: 1fr; }
+      }
+      .cache-pane {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1rem;
+      }
+      .cache-pane h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 0.95rem;
+      }
+      .cache-pane.is-stale h3 { color: var(--warning); }
+      .cache-pane.is-fresh h3 { color: var(--success); }
+      .cache-state {
+        font-family: ui-monospace, monospace;
+        font-size: 0.85rem;
+        padding: 0.5rem;
+        background: var(--code-bg);
+        border-radius: 4px;
+        min-height: 4rem;
+      }
+      .cache-state.is-stale {
+        background: rgba(217, 119, 6, 0.1);
+        border-left: 3px solid var(--warning);
+      }
+      .cache-meta {
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+      }
+      .trigger-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+        margin-top: 1rem;
+      }
+      .trigger-grid button {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+      }
+      .timer-state {
+        font-family: ui-monospace, monospace;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        text-align: center;
+        margin-top: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <h2>섹션</h2>
+        <nav>
+          <a href="#client-server">Client / Server State</a>
+          <a href="#derived">Derived 상태</a>
+          <a href="#optimistic">Optimistic Update</a>
+          <a href="#cache">Cache Invalidation</a>
+        </nav>
+        <a class="back-link" href="/posts/state-management-vocabulary-for-vibe-coding"
+          >← 원문 글로 돌아가기</a
+        >
+      </aside>
+
+      <main class="content">
+        <header class="page-header">
+          <h1>상태 관리 playground</h1>
+          <p>
+            원문 글의 어휘 — Client/Server State · Derived · Optimistic Update ·
+            Cache Invalidation — 을 직접 입력하고 클릭하면서 익혀보는 페이지.
+          </p>
+        </header>
+
+        <!-- 1. Client / Server -->
+        <section class="demo" id="client-server">
+          <h2>1. Client State vs Server State</h2>
+          <p class="intro">
+            왼쪽은 client state (앱이 주인 — 새로고침 시 사라짐), 오른쪽은 server state (서버가 주인 — 캐시 형태). "페이지 새로고침" 을 눌러서 둘의 차이를 보세요.
+          </p>
+          <div class="demo-area">
+            <div class="cs-grid">
+              <div class="cs-pane">
+                <h3>다크모드 토글 (client state)</h3>
+                <p class="owner">주인: 앱</p>
+                <button class="btn" id="cs-toggle">토글 전환</button>
+                <div class="cs-status" id="cs-client">현재 값: light</div>
+              </div>
+              <div class="cs-pane">
+                <h3>사용자 정보 (server state)</h3>
+                <p class="owner">주인: 서버 (캐시 사본)</p>
+                <button class="btn" id="cs-fetch">서버에서 fetch</button>
+                <div class="cs-status" id="cs-server">캐시: 비어있음</div>
+              </div>
+            </div>
+            <div class="controls" style="margin-top: 1rem;">
+              <button class="btn btn-ghost" id="cs-refresh">🔄 페이지 새로고침 시뮬레이션</button>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.5rem 0 0;">
+              새로고침하면 <strong>client state 는 초기값으로 돌아가고</strong>, server state 는 다시 fetch 해야 합니다.
+            </p>
+          </div>
+          <pre>// React 진영의 분리 패턴
+const [theme, setTheme] = useState('light');       // client
+const { data: user } = useQuery(['user'], fetchUser); // server</pre>
+        </section>
+
+        <!-- 2. Derived -->
+        <section class="demo" id="derived">
+          <h2>2. Derived (파생 상태) — 저장하지 말고 계산해서 써라</h2>
+          <p class="intro">
+            아래는 장바구니. <strong>물품 가격·수량은 원본 상태</strong> 로 저장, <strong>총액은 derived (계산값)</strong>. 값을 바꿔보세요. 총액이 자동 갱신됩니다.
+          </p>
+          <div class="demo-area">
+            <div id="cart-list"></div>
+            <button class="btn btn-ghost" id="cart-add" style="margin-top: 1rem;">+ 물품 추가</button>
+            <div class="cart-total">
+              <div>물품 수: <strong id="cart-count">0</strong> 종 / <strong id="cart-qty-total">0</strong> 개</div>
+              <div>총액: <span class="derived" id="cart-total">0 원</span></div>
+            </div>
+          </div>
+          <pre>// 원본만 저장
+const items = [{ name, price, qty }, ...];
+
+// derived — 계산해서 씀 (저장 X)
+const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);</pre>
+        </section>
+
+        <!-- 3. Optimistic -->
+        <section class="demo" id="optimistic">
+          <h2>3. Optimistic Update — 즉시 UI 변경 + 실패 시 롤백</h2>
+          <p class="intro">
+            하트 버튼을 누르면 <strong>UI 는 즉시</strong> 채워집니다. 백그라운드에서 가짜 서버 요청이 1.5초 후 응답. <strong>실패 확률을 조정</strong>해서 롤백 동작을 확인해보세요.
+          </p>
+          <div class="demo-area">
+            <div class="controls">
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">
+                서버 실패 확률
+                <input id="opt-fail-rate" type="number" value="30" min="0" max="100" step="10" style="width: 70px;" />
+                %
+              </label>
+              <button class="btn btn-ghost" id="opt-reset">초기화</button>
+            </div>
+            <div style="text-align: center;">
+              <button class="like-btn" id="like-btn">🤍</button>
+              <div style="color: var(--text-muted); font-size: 0.85rem;">
+                좋아요 <strong id="like-count">0</strong>
+              </div>
+            </div>
+            <div class="like-state">
+              <div class="like-pane" id="like-ui">
+                <strong>UI 상태 (즉시 반영)</strong>
+                <span id="like-ui-text">😐 비어있음</span>
+              </div>
+              <div class="like-pane" id="like-server">
+                <strong>서버 상태 (캐시)</strong>
+                <span id="like-server-text">😐 비어있음</span>
+              </div>
+            </div>
+            <div class="toast is-error" id="opt-toast"></div>
+          </div>
+          <pre>// 1. UI 먼저 바꿈
+setLiked(true);
+
+// 2. 서버 요청
+try {
+  await api.like(postId);
+  // 3a. 성공 → 그대로
+} catch (e) {
+  // 3b. 실패 → 롤백 + 사용자 알림
+  setLiked(false);
+  toast.error("좋아요 실패");
+}</pre>
+        </section>
+
+        <!-- 4. Cache invalidation -->
+        <section class="demo" id="cache">
+          <h2>4. Cache Invalidation — 4가지 트리거 패턴</h2>
+          <p class="intro">
+            오른쪽이 캐시. "서버 데이터 변경" 으로 캐시가 낡아지면 (stale), 4가지 트리거로 갱신할 수 있습니다.
+          </p>
+          <div class="demo-area">
+            <div class="cache-stage">
+              <div class="cache-pane">
+                <h3>🗄 서버 (진짜 원본)</h3>
+                <div class="cache-state" id="server-data">{ posts: 3 }</div>
+                <div class="controls" style="margin-top: 0.75rem;">
+                  <button class="btn btn-danger" id="server-mutate">서버 데이터 변경 (글 추가)</button>
+                </div>
+              </div>
+              <div class="cache-pane is-fresh" id="cache-pane">
+                <h3 id="cache-title">📦 앱 캐시 (fresh)</h3>
+                <div class="cache-state" id="cache-data">{ posts: 3 }</div>
+                <div class="cache-meta" id="cache-meta">마지막 fetch: 방금</div>
+              </div>
+            </div>
+            <div class="label" style="margin-top: 1rem;">트리거 패턴 — 캐시 무효화 → 재fetch</div>
+            <div class="trigger-grid">
+              <button class="btn btn-ghost" id="trig-event">이벤트 기반 (글 POST 시뮬)</button>
+              <button class="btn btn-ghost" id="trig-time">시간 기반 (10초 후 자동)</button>
+              <button class="btn btn-ghost" id="trig-focus">포커스 기반 (탭 재진입)</button>
+              <button class="btn btn-ghost" id="trig-manual">수동 새로고침</button>
+            </div>
+            <div class="timer-state" id="timer-state"></div>
+          </div>
+          <pre>// TanStack Query 예
+// 이벤트: mutation 성공 시 무효화
+mutation.onSuccess(() => qc.invalidateQueries(['posts']));
+
+// 시간: staleTime + refetchInterval
+useQuery(['posts'], fetchPosts, {
+  staleTime: 10_000,    // 10초 후 stale
+  refetchOnWindowFocus: true,
+});</pre>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      // ============ 1. Client / Server state ============
+      (function () {
+        const toggleBtn = document.getElementById("cs-toggle");
+        const fetchBtn = document.getElementById("cs-fetch");
+        const refreshBtn = document.getElementById("cs-refresh");
+        const clientStatus = document.getElementById("cs-client");
+        const serverStatus = document.getElementById("cs-server");
+
+        let theme = "light";          // client state
+        let userCache = null;          // server state cache
+
+        function render() {
+          clientStatus.textContent = "현재 값: " + theme;
+          serverStatus.textContent = userCache
+            ? "캐시: { name: \"" + userCache.name + "\", since: " + userCache.since + " }"
+            : "캐시: 비어있음";
+        }
+        toggleBtn.addEventListener("click", function () {
+          theme = theme === "light" ? "dark" : "light";
+          render();
+        });
+        fetchBtn.addEventListener("click", function () {
+          fetchBtn.textContent = "fetch 중...";
+          setTimeout(function () {
+            userCache = { name: "박효인", since: Date.now() };
+            fetchBtn.textContent = "다시 fetch";
+            render();
+          }, 600);
+        });
+        refreshBtn.addEventListener("click", function () {
+          theme = "light";      // client state → 초기화
+          userCache = null;     // server state 캐시 → 비움
+          fetchBtn.textContent = "서버에서 fetch";
+          render();
+        });
+        render();
+      })();
+
+      // ============ 2. Derived (장바구니) ============
+      (function () {
+        const list = document.getElementById("cart-list");
+        const addBtn = document.getElementById("cart-add");
+        const countEl = document.getElementById("cart-count");
+        const qtyTotalEl = document.getElementById("cart-qty-total");
+        const totalEl = document.getElementById("cart-total");
+
+        let items = [
+          { name: "사과", price: 1000, qty: 3 },
+          { name: "바나나", price: 500, qty: 5 },
+        ];
+
+        function render() {
+          list.innerHTML = "";
+          items.forEach(function (it, i) {
+            const row = document.createElement("div");
+            row.className = "cart-row";
+            row.innerHTML =
+              '<input type="text" value="' + it.name + '" data-i="' + i + '" data-k="name" />' +
+              '<input type="number" value="' + it.price + '" data-i="' + i + '" data-k="price" min="0" />' +
+              '<input type="number" value="' + it.qty + '" data-i="' + i + '" data-k="qty" min="0" />' +
+              '<button data-rm="' + i + '">✕</button>';
+            list.appendChild(row);
+          });
+
+          // derived
+          const total = items.reduce(function (s, i) { return s + i.price * i.qty; }, 0);
+          const qtyTotal = items.reduce(function (s, i) { return s + i.qty; }, 0);
+          countEl.textContent = String(items.length);
+          qtyTotalEl.textContent = String(qtyTotal);
+          totalEl.textContent = total.toLocaleString() + " 원";
+        }
+        list.addEventListener("input", function (e) {
+          const t = e.target;
+          if (!t.dataset || t.dataset.i === undefined) return;
+          const i = parseInt(t.dataset.i, 10);
+          const k = t.dataset.k;
+          items[i][k] = k === "name" ? t.value : (parseInt(t.value, 10) || 0);
+          // derived 만 재계산 (input value 는 유지)
+          const total = items.reduce(function (s, i) { return s + i.price * i.qty; }, 0);
+          const qtyTotal = items.reduce(function (s, i) { return s + i.qty; }, 0);
+          countEl.textContent = String(items.length);
+          qtyTotalEl.textContent = String(qtyTotal);
+          totalEl.textContent = total.toLocaleString() + " 원";
+        });
+        list.addEventListener("click", function (e) {
+          const idx = e.target.dataset && e.target.dataset.rm;
+          if (idx === undefined) return;
+          items.splice(parseInt(idx, 10), 1);
+          render();
+        });
+        addBtn.addEventListener("click", function () {
+          items.push({ name: "새 물품", price: 0, qty: 1 });
+          render();
+        });
+        render();
+      })();
+
+      // ============ 3. Optimistic Update ============
+      (function () {
+        const likeBtn = document.getElementById("like-btn");
+        const countEl = document.getElementById("like-count");
+        const uiText = document.getElementById("like-ui-text");
+        const serverText = document.getElementById("like-server-text");
+        const failRate = document.getElementById("opt-fail-rate");
+        const resetBtn = document.getElementById("opt-reset");
+        const toast = document.getElementById("opt-toast");
+        const uiPane = document.getElementById("like-ui");
+        const serverPane = document.getElementById("like-server");
+
+        let uiLiked = false;
+        let serverLiked = false;
+        let count = 0;
+        let busy = false;
+
+        function render() {
+          likeBtn.textContent = uiLiked ? "❤️" : "🤍";
+          likeBtn.classList.toggle("is-liked", uiLiked);
+          countEl.textContent = String(count);
+          uiText.textContent = uiLiked ? "❤️ 좋아요" : "😐 비어있음";
+          serverText.textContent = serverLiked ? "❤️ 좋아요" : "😐 비어있음";
+          uiPane.classList.toggle("is-rollback", uiLiked !== serverLiked);
+        }
+        function showToast(msg) {
+          toast.textContent = msg;
+          toast.classList.add("is-show");
+          setTimeout(function () { toast.classList.remove("is-show"); }, 2500);
+        }
+        likeBtn.addEventListener("click", function () {
+          if (busy) return;
+          busy = true;
+          const prevServer = serverLiked;
+
+          // 1. 즉시 UI 변경 (optimistic)
+          uiLiked = !uiLiked;
+          count = uiLiked ? count + 1 : count - 1;
+          render();
+
+          // 2. 서버 요청 시뮬 (1.5초)
+          setTimeout(function () {
+            const rate = parseInt(failRate.value, 10) || 0;
+            const success = Math.floor(Math.random() * 100) >= rate;
+            if (success) {
+              serverLiked = uiLiked;       // 서버도 갱신
+            } else {
+              // 3b. 실패 → 롤백
+              uiLiked = prevServer;
+              count = prevServer ? count : count - 1;
+              if (!prevServer && count < 0) count = 0;
+              showToast("❌ 서버 요청 실패 — 좋아요 롤백");
+            }
+            busy = false;
+            render();
+          }, 1500);
+        });
+        resetBtn.addEventListener("click", function () {
+          uiLiked = false;
+          serverLiked = false;
+          count = 0;
+          busy = false;
+          toast.classList.remove("is-show");
+          render();
+        });
+        render();
+      })();
+
+      // ============ 4. Cache invalidation ============
+      (function () {
+        const serverDataEl = document.getElementById("server-data");
+        const cacheDataEl = document.getElementById("cache-data");
+        const cacheMetaEl = document.getElementById("cache-meta");
+        const cacheTitleEl = document.getElementById("cache-title");
+        const cachePaneEl = document.getElementById("cache-pane");
+        const serverMutateBtn = document.getElementById("server-mutate");
+        const trigEvent = document.getElementById("trig-event");
+        const trigTime = document.getElementById("trig-time");
+        const trigFocus = document.getElementById("trig-focus");
+        const trigManual = document.getElementById("trig-manual");
+        const timerState = document.getElementById("timer-state");
+
+        let serverPosts = 3;
+        let cachePosts = 3;
+        let lastFetchAt = "방금";
+        let stale = false;
+        let timeBased = null;
+        let timeRemaining = 0;
+
+        function render() {
+          serverDataEl.textContent = "{ posts: " + serverPosts + " }";
+          cacheDataEl.textContent = "{ posts: " + cachePosts + " }";
+          cacheMetaEl.textContent = "마지막 fetch: " + lastFetchAt;
+
+          if (stale) {
+            cacheTitleEl.textContent = "📦 앱 캐시 (⚠ stale — 낡음)";
+            cachePaneEl.classList.remove("is-fresh");
+            cachePaneEl.classList.add("is-stale");
+            cacheDataEl.classList.add("is-stale");
+          } else {
+            cacheTitleEl.textContent = "📦 앱 캐시 (fresh)";
+            cachePaneEl.classList.remove("is-stale");
+            cachePaneEl.classList.add("is-fresh");
+            cacheDataEl.classList.remove("is-stale");
+          }
+        }
+        function refetch(label) {
+          cachePosts = serverPosts;
+          lastFetchAt = label;
+          stale = false;
+          render();
+        }
+        function markStaleIfNeeded() {
+          if (cachePosts !== serverPosts) {
+            stale = true;
+          }
+        }
+        serverMutateBtn.addEventListener("click", function () {
+          serverPosts++;
+          markStaleIfNeeded();
+          render();
+        });
+        trigEvent.addEventListener("click", function () {
+          // POST 요청 → 서버 변경 + 즉시 무효화
+          serverPosts++;
+          refetch("이벤트 트리거 — POST 후 invalidate");
+        });
+        trigTime.addEventListener("click", function () {
+          if (timeBased) {
+            clearInterval(timeBased);
+            timeBased = null;
+            timerState.textContent = "";
+            trigTime.textContent = "시간 기반 (10초 후 자동)";
+            return;
+          }
+          timeRemaining = 10;
+          trigTime.textContent = "취소 (실행 중)";
+          timerState.textContent = "⏱ " + timeRemaining + "초 후 재fetch...";
+          timeBased = setInterval(function () {
+            timeRemaining--;
+            if (timeRemaining <= 0) {
+              refetch("시간 트리거 — 10초 경과");
+              timerState.textContent = "⏱ 갱신 완료";
+              clearInterval(timeBased);
+              timeBased = null;
+              trigTime.textContent = "시간 기반 (10초 후 자동)";
+              setTimeout(function () { timerState.textContent = ""; }, 2000);
+            } else {
+              timerState.textContent = "⏱ " + timeRemaining + "초 후 재fetch...";
+            }
+          }, 1000);
+        });
+        trigFocus.addEventListener("click", function () {
+          refetch("포커스 트리거 — 탭 재진입");
+        });
+        trigManual.addEventListener("click", function () {
+          refetch("수동 새로고침");
+        });
+        render();
+      })();
+    </script>
+  </body>
+</html>
