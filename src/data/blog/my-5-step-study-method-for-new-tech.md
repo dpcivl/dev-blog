@@ -8,7 +8,7 @@ tags:
   - 회고
   - 학습
 draft: false
-featured: true
+featured: false
 ---
 
 요즘 계속 [용어 정리](/tags/용어정리) 글과 RAG 관련 공부를 하면서 **두 가지 공부 방법** 을 적용해봤다.
