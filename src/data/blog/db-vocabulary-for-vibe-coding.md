@@ -9,7 +9,7 @@ tags:
   - 데이터모델링
   - 학습
 draft: false
-featured: true
+featured: false
 ---
 
 [UI 어휘 정리](./ui-vocabulary-for-vibe-coding) 에 이어지는 **용어 정리 시리즈 2탄**. DB에 대해 잘 모르면 AI에게 "DB 좀 짜줘" 라는 막연한 지시를 하게 되고, AI가 짠 코드를 이해도 못 한다. **AI에게 코딩을 맡기더라도 명확하게 업무를 맡길 수 있을 정도**의 어휘를 정리하는 게 이번 글의 목적.

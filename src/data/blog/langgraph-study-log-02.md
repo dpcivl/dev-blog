@@ -9,7 +9,7 @@ tags:
   - 학습
   - 일지
 draft: false
-featured: true
+featured: false
 ---
 
 [지난 일지 #1](./langgraph-study-log-01) 에서는 가장 단순한 에이전트를 구현했다. 이번엔 **State 에 메시지 외 다양한 정보를 추가** 하고 **시스템 프롬프트를 활용** 해서 좀 더 응용해본다.

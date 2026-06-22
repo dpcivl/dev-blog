@@ -8,7 +8,7 @@ tags:
   - 용어정리
   - 학습
 draft: false
-featured: true
+featured: false
 ---
 
 용어 정리 시리즈의 **마지막** 글이다 ([UI](./ui-vocabulary-for-vibe-coding) / [DB](./db-vocabulary-for-vibe-coding) / [API](./api-vocabulary-for-vibe-coding) 에 이은 4편). 오늘 먼저 올린 글 [내가 보려고 만든 공부 방법](./my-5-step-study-method-for-new-tech) 에서 적었듯 **용어 정리 + playground 도 좋지만 직접 구현하면서 공부하는 게 더 낫다고 판단** 해서 시리즈는 여기서 마무리. 다음부터는 구현 글로 전환.

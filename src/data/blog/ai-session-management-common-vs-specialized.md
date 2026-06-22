@@ -9,7 +9,7 @@ tags:
   - 에이전트
   - 학습
 draft: false
-featured: true
+featured: false
 ---
 
 [지난 글](./claude-code-instructions-placement-by-working-dir)에서 부서별 Claude Code 세션이 지침을 잘 안 지키는 문제를, 작업 폴더에 직접 `CLAUDE.md`를 두는 식으로 해결한 사례를 적었다. 거기서 한 단계 더 가서 이번엔 **"그럼 지침을 어떤 기준으로 나눠야 하는가"** 에 대한 정리.

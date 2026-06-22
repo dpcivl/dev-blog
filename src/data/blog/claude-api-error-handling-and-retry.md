@@ -9,7 +9,7 @@ tags:
   - 재시도
   - 학습
 draft: false
-featured: true
+featured: false
 ---
 
 오늘 배운 건 **에러 핸들링 + 재시도.** 신뢰성·정확도를 갖춘 LLM 서비스를 운영하려면 가장 먼저 깔아야 할 인프라.

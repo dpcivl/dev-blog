@@ -8,7 +8,7 @@ tags:
   - 트러블슈팅
   - oauth
 draft: false
-featured: true
+featured: false
 ---
 
 1인 앱 개발에서 백엔드를 Supabase로 잡고, 소셜 로그인(카카오·구글)을 붙이는 작업을 했다. 양쪽 다 공식 문서대로 따라하면 될 것 같았는데, 실제로는 한참 헤맸다. 두 가지 함정과 해결법을 기록한다.

@@ -10,7 +10,7 @@ tags:
   - 사이드프로젝트
   - 포트폴리오
 draft: false
-featured: true
+featured: false
 ---
 
 [지난 편](./agv-prototype-log-02) 에서 ROS2 첫 노드 + STM32 PWM 까지 했다. 오늘은 USB-UART 컨버터가 아직 안 와서 진도를 더 못 빼고, 하드웨어 쪽에서 할 수 있는 일들을 했다. **코딩 0줄, 납땜·자석·전압 측정만 한 날.**

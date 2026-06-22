@@ -10,7 +10,7 @@ tags:
   - NDT
   - 포트폴리오
 draft: false
-featured: true
+featured: false
 ---
 
 임베디드 환경에서 객체 인식을 했던 이전 경력을 살려 NDT(Non-Destructive Testing, 비파괴 검사) 분야에 다시 도전해볼 기회가 생겼다. 이를 계기로 며칠 동안 NDT 도메인을 다시 잡고 작은 실습 프로젝트를 돌렸다. PyTorch + ResNet18 전이학습으로 강철 표면 결함 6종을 분류하고, Grad-CAM으로 모델이 어디를 보고 판단하는지까지 확인한 전체 파이프라인.

@@ -8,7 +8,7 @@ tags:
   - claude-code
   - 일지
 draft: false
-featured: true
+featured: false
 ---
 
 ![Claude Code 에이전트 호출 실패 — 529 Overloaded 에러 메시지](/assets/posts/claude-code-529-overloaded-jun-2026/01-claude-code-error.png)

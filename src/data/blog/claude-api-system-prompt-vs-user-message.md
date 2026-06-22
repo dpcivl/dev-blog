@@ -8,7 +8,7 @@ tags:
   - 학습
   - 시스템-프롬프트
 draft: false
-featured: true
+featured: false
 ---
 
 [이전 글](./claude-api-multi-turn-context)에서 멀티턴 대화에서의 컨텍스트 누적을 정리했다. 이번엔 한 단계 더 들어가서, 같은 모델에 **여러 페르소나 시스템 프롬프트**를 붙여보면서 알게 된 것들.

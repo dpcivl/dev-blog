@@ -7,7 +7,7 @@ tags:
   - vercel
   - 트러블슈팅
 draft: false
-featured: true
+featured: false
 ---
 
 AstroPaper 템플릿으로 블로그를 새로 세팅하면서 만난 이상한 현상을 기록한다.

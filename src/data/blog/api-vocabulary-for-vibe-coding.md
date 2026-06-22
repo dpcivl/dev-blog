@@ -8,7 +8,7 @@ tags:
   - 용어정리
   - 학습
 draft: false
-featured: true
+featured: false
 ---
 
 [DB 어휘 정리](./db-vocabulary-for-vibe-coding) 에 이어지는 **용어 정리 시리즈 3탄**. 저번엔 DB 를 통해 **테이블이 어떻게 만들어지는지** 봤다. 이번 글의 API 는 그 테이블을 **앱 · 브라우저 같은 외부에 어떻게 노출하는지** 를 다룬다.

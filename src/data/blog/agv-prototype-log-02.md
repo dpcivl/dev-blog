@@ -11,7 +11,7 @@ tags:
   - 사이드프로젝트
   - 포트폴리오
 draft: false
-featured: true
+featured: false
 ---
 
 [지난 편](./agv-prototype-log-01) 에서 ROS2 Jazzy 설치까지 끝냈다. 이번엔 본격적으로 **첫 노드를 작성**하고, 같은 날 시간을 좀 남겨서 **STM32 쪽 PWM LED 예제**도 같이 했다.

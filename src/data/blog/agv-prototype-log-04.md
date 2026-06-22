@@ -12,7 +12,7 @@ tags:
   - 사이드프로젝트
   - 포트폴리오
 draft: false
-featured: true
+featured: false
 ---
 
 [지난 편](./agv-prototype-log-03) 끝에 "USB-UART 컨버터 오면 통신 작업" 이라고 적어뒀던 그게 드디어 도착했다. **오늘은 STM32F407 + UART 컨버터로 PC 시리얼 모니터까지 메시지 흘리는 게 목표.**

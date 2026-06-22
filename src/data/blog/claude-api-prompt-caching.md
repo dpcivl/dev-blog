@@ -8,7 +8,7 @@ tags:
   - 최적화
   - 학습
 draft: false
-featured: true
+featured: false
 ---
 
 [스트리밍 글](./claude-api-streaming-ttft-and-events) 끝의 "공부할 것" 에 적어둔 **Prompt Caching** 차례. 직접 같은 시스템 프롬프트로 캐싱 유무를 비교해보니 인상이 명확해졌다. 결론부터: **챗봇 / 에이전트 / RAG에는 거의 필수.**

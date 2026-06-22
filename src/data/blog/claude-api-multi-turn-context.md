@@ -7,7 +7,7 @@ tags:
   - llm
   - 학습
 draft: false
-featured: true
+featured: false
 ---
 
 Claude API로 간단한 챗 시스템을 만들면서 "왜 모델이 직전 대화를 기억하지 못하지?" 라는 질문을 직접 부딪히며 풀어봤다.

@@ -10,7 +10,7 @@ tags:
   - semantic-search
   - 학습
 draft: false
-featured: true
+featured: false
 ---
 
 오늘 주제는 **RAG 직접 구현**. **R**etrieval-**A**ugmented **G**eneration — 한국어로 "검색 증강 생성". 용어만 봤을 땐 뭔 말인지 모르겠다. 직접 깎아보면서 안쪽을 봤다.
