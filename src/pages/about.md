@@ -49,5 +49,4 @@ title: "About"
 
 - GitHub — [@dpcivl](https://github.com/dpcivl)
 - Email — dpcivl713@gmail.com
-- X — [@dpcivl](https://x.com/dpcivl)
 - Blog — [parkhyo.in](https://parkhyo.in)
