@@ -64,6 +64,20 @@ RAG 가 답변할 근거 문서가 필요하다. FEMS 도메인에서 가능한 
 - **Ollama** 설치 (로컬 LLM 런타임)
 - Provider 3종 (Ollama / Claude / OpenAI) 을 동일한 인터페이스로 호출하는 어댑터
 
+### 모델 선정 — 로컬은 VRAM 6GB 에 맞춰 qwen2.5:7b
+
+3-provider 비교를 위해 각각의 모델을 다음과 같이 픽:
+
+| Provider | 모델 | 선정 이유 |
+|---|---|---|
+| **Ollama** (로컬) | **qwen2.5:7b** | VRAM 6GB 에 들어가는 7B 급, 한국어 성능 우수 |
+| **Claude** (클라우드) | **claude-opus-4-8** | 현재 라인업 상위 모델 — 품질 상한 확인용 |
+| **OpenAI** (클라우드) | **gpt-4o** | 중간 가격대 비교 기준 |
+
+로컬은 **VRAM 이 모델 선택을 가른다.** 7B 모델은 양자화(4bit) 거치면 VRAM 4~5GB 정도라 6GB 환경에 들어감. 13B 이상은 시도조차 불가. **qwen2.5** 는 7B 라인에서 한국어/추론 성능이 균형 잡혀서 채택.
+
+> 클라우드 쪽은 일부러 **상위 (Opus 4.8) vs 중간 (gpt-4o)** 으로 가격·품질 스펙트럼을 갖다 놨다. 이래야 "로컬이 어디까지 따라잡나" 를 두 기준으로 볼 수 있다.
+
 ### Smoke test — 첫 실행 (콜드 스타트)
 
 세 provider 가 동일한 질문에 답하는지부터 확인:
@@ -74,16 +88,16 @@ python -m scripts.smoke_test
 
 ![Smoke test 첫 실행 — ollama 콜드스타트로 95.22초, claude 2.72초, openai 6.43초](/assets/posts/fems-project-log-01/01-smoke-test-cold-start.png)
 
-| provider | latency | in / out 토큰 | 비용 |
-|---|---|---|---|
-| **ollama** | 95.22s | 47 / 36 | $0.00000 |
-| **claude** (opus) | 2.72s | 60 / 73 | $0.00213 |
-| **openai** (gpt-4o) | 6.43s | 45 / 30 | $0.00041 |
+| provider | 모델 | latency | in / out 토큰 | 비용 |
+|---|---|---|---|---|
+| **ollama** | qwen2.5:7b | 95.22s | 47 / 36 | $0.00000 |
+| **claude** | opus-4-8 | 2.72s | 60 / 73 | $0.00213 |
+| **openai** | gpt-4o | 6.43s | 45 / 30 | $0.00041 |
 
 **3개 다 정답.** 차이는 latency 와 비용:
 
-- **Opus 가 gpt-4o 보다 약 5배 비쌈** ($0.00213 vs $0.00041)
-- **ollama 가 95초** — 콜드 스타트 때문. 첫 호출이 모델 로딩이라 대부분이 로딩 시간.
+- **Opus 4.8 이 gpt-4o 보다 약 5배 비쌈** ($0.00213 vs $0.00041)
+- **ollama (qwen2.5:7b) 가 95초** — 콜드 스타트 때문. 첫 호출이 모델 로딩이라 대부분이 로딩 시간.
 
 ### Smoke test — 두 번째 실행 (워밍업 후)
 
