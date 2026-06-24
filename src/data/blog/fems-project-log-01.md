@@ -1,7 +1,7 @@
 ---
 title: "FEMS 프로젝트 #1 — 면접 일주일, 저사양 로컬 (Ollama + bge-m3 + Chroma) vs Claude API RAG 비교 셋업"
 description: "원하는 회사 면접이 일주일 남아 FEMS (Factory Energy Management System) 도메인 RAG 프로토타입을 짠다. GTX1660 Super · VRAM 6GB 의 저사양 환경에서 로컬 LLM(Ollama) 으로 추론하는 것과 Claude / OpenAI API 를 호출하는 것을 비교. 임베딩은 한국어 강한 bge-m3, 벡터 DB 는 Chroma. 콜드스타트 95초 → 워밍업 후 10초까지 줄어든 ollama, 정답률은 클라우드와 동등."
-pubDatetime: 2026-06-25T12:00:00Z
+pubDatetime: 2026-06-24T16:00:00Z
 tags:
   - fems
   - rag
