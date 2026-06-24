@@ -68,6 +68,10 @@ RAG 가 답변할 근거 문서가 필요하다. FEMS 도메인에서 가능한 
 
 세 provider 가 동일한 질문에 답하는지부터 확인:
 
+```powershell
+python -m scripts.smoke_test
+```
+
 ![Smoke test 첫 실행 — ollama 콜드스타트로 95.22초, claude 2.72초, openai 6.43초](/assets/posts/fems-project-log-01/01-smoke-test-cold-start.png)
 
 | provider | latency | in / out 토큰 | 비용 |
@@ -123,13 +127,11 @@ RAG 가 답변할 근거 문서가 필요하다. FEMS 도메인에서 가능한 
 
 테스트용 가이드라인을 **800자 이하로 청크 분할** 후 인덱싱:
 
-![build_index 실행 — 5 chunks loaded, bge-m3 임베딩, Chroma 에 인덱싱](/assets/posts/fems-project-log-01/03-build-index-chroma.png)
+```powershell
+python -m scripts.build_index
+```
 
-```
-Loaded 5 chunks from data/documents
-Embedding with bge-m3 (Ollama)...
-Indexed 5 chunks into chroma db/
-```
+![build_index 실행 — 5 chunks loaded, bge-m3 임베딩, Chroma 에 인덱싱](/assets/posts/fems-project-log-01/03-build-index-chroma.png)
 
 총 **5 청크**:
 
@@ -142,6 +144,10 @@ Indexed 5 chunks into chroma db/
 ## RAG 동작 검증 — 3 질문 모두 정답
 
 지정된 질문에 대해 **출처가 정확히 매칭되는지** 확인:
+
+```powershell
+python -m scripts.rag_demo
+```
 
 ![rag_demo 결과 — 3 질문 모두 1순위 매칭 정답. 압축공기/피크전력/조명 가이드라인 각각](/assets/posts/fems-project-log-01/04-rag-demo-results.png)
 
