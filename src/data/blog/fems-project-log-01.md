@@ -1,6 +1,6 @@
 ---
-title: "FEMS 프로젝트 #1 — 면접 일주일, 저사양 로컬 (Ollama + bge-m3 + Chroma) vs Claude API RAG 비교 셋업"
-description: "원하는 회사 면접이 일주일 남아 FEMS (Factory Energy Management System) 도메인 RAG 프로토타입을 짠다. GTX1660 Super · VRAM 6GB 의 저사양 환경에서 로컬 LLM(Ollama) 으로 추론하는 것과 Claude / OpenAI API 를 호출하는 것을 비교. 임베딩은 한국어 강한 bge-m3, 벡터 DB 는 Chroma. 콜드스타트 95초 → 워밍업 후 10초까지 줄어든 ollama, 정답률은 클라우드와 동등."
+title: "FEMS 프로젝트 #1 — 저사양 로컬 (Ollama + bge-m3 + Chroma) vs Claude API RAG 비교 셋업"
+description: "FEMS (Factory Energy Management System) 도메인을 학습하면서 RAG 프로토타입을 짜본다. GTX1660 Super · VRAM 6GB 의 저사양 환경에서 로컬 LLM(Ollama) 으로 추론하는 것과 Claude / OpenAI API 를 호출하는 것을 비교. 임베딩은 한국어 강한 bge-m3, 벡터 DB 는 Chroma. 콜드스타트 95초 → 워밍업 후 10초까지 줄어든 ollama, 정답률은 클라우드와 동등."
 pubDatetime: 2026-06-24T16:00:00Z
 tags:
   - fems
@@ -16,7 +16,7 @@ featured: false
 
 새 시리즈 시작. **FEMS (Factory Energy Management System)** 프로젝트 일지.
 
-배경부터 말하면 — **원하는 회사 면접이 잡혔고, 일주일이 남았다.** 그 일주일 동안 FEMS 관련 RAG 프로토타입을 만들어보면서 도메인 어휘와 시스템 감각을 손에 익히려 한다. 면접에서 "공부했습니다" 보다 "이 정도까지 돌려봤습니다" 가 훨씬 단단하니까.
+이전에 회사에서 엣지 AI 보드 위에서 객체 감지를 돌려본 경험이 있어서 **공장 / 산업 데이터 + AI 의 결합** 이라는 흐름이 계속 머릿속에 남아 있었다. 그 연장선에서 **FEMS 도메인을 학습하면서 RAG 프로토타입을 한 번 깎아보기로** 결정. "공부했습니다" 보다 "이 정도까지 돌려봤습니다" 가 손에 더 잘 붙는다.
 
 이 시리즈에서 경험하게 될 기술:
 
@@ -44,7 +44,7 @@ RAG · 임베딩 · 벡터 DB 는 최근 [RAG 직접 구현](/posts/rag-from-scr
 
 > **저사양 온프레미스 환경에서 로컬 추론 vs Claude / OpenAI API 호출 — 어느 쪽이, 어떤 상황에서 합리적인가**
 
-면접 도메인이 **FEMS** 라는 점에서도 자연스러운 질문이다. 공장은 데이터 외부 반출이 까다로워서 **온프레미스 추론** 수요가 분명히 있고, 동시에 도입 비용(GPU) 도 부담스러우니까 **저사양에서 어디까지 되는지** 가 실무적 질문이 된다.
+**FEMS** 도메인 자체와도 잘 맞는 질문이다. 공장은 데이터 외부 반출이 까다로워서 **온프레미스 추론** 수요가 분명히 있고, 동시에 도입 비용(GPU) 도 부담스러우니까 **저사양에서 어디까지 되는지** 가 실무적 질문이 된다.
 
 ## 데이터 — FEMS 도메인 문서 어떻게 모을까
 
@@ -175,7 +175,7 @@ python -m scripts.rag_demo
 
 내일은 실제 공개 데이터 PDF (한국에너지공단 FEMS 구축 가이드, 에너지절약 기술자료 등) 를 붙여서 청크 수를 키우고, **로컬 vs 클라우드 답변 품질을 진짜 도메인 질문으로 비교** 할 예정.
 
-면접까지 6일 — 정해진 페이스로.
+다음 글부터는 본격 비교 실험으로 들어간다.
 
 ## 더 공부해볼 것
 
