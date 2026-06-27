@@ -122,8 +122,6 @@ def search_fems_documents(query: str, top_k: int = 5) -> list[dict]:
 
 → **사용자는 그냥 Claude Desktop 쓰는데 뒤에서 RAG 가 동작**. Streamlit 같은 별도 UI 없이 Claude Desktop 이 그대로 프론트가 됨.
 
-이 패턴을 다음 글에서 직접 구현해볼 예정.
-
 ## 회고
 
 오늘 짧은 학습 정리:
@@ -132,8 +130,6 @@ def search_fems_documents(query: str, top_k: int = 5) -> list[dict]:
 2. **Claude Desktop 이 자체적으로 도구 호출 승인 UX** 를 깔아줌 — 클라이언트 단 HITL
 3. **개발 사이클은 단순** — 코드 수정 → 재시작 → 즉시 인식
 4. **RAG ↔ MCP 분리감의 해법** — RAG 함수를 `@mcp.tool()` 로 감싸기
-
-다음은 **RAG 를 MCP 서버로 노출** 해서 Claude Desktop 에서 직접 FEMS 질문 던지는 시나리오로.
 
 ## 더 공부해볼 것
 
