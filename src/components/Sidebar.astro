@@ -47,7 +47,11 @@ const currentLang: "ko" | "en" = isEnglishPage ? "en" : "ko";
       <div class="sidebar-name">박효인</div>
       <div class="sidebar-name-en">Park Hyoin</div>
     </div>
-    <p class="sidebar-tagline">임베디드 SW · AI Agent · Vibe coding</p>
+    <p class="sidebar-tagline">
+      {currentLang === "en"
+        ? "Embedded SW · AI Agent · Vibe coding"
+        : "임베디드 SW · AI Agent · Vibe coding"}
+    </p>
     <div class="sidebar-lang-switch" role="group" aria-label="Language">
       <a
         href={koHref}
@@ -87,11 +91,13 @@ const currentLang: "ko" | "en" = isEnglishPage ? "en" : "ko";
       }
       <LinkButton
         href="/rss.xml"
-        title="RSS 피드 구독"
+        title={currentLang === "en" ? "Subscribe to RSS feed" : "RSS 피드 구독"}
         class="sidebar-social-link"
       >
         <IconRss class="sidebar-social-icon" />
-        <span class="sr-only">RSS 피드 구독</span>
+        <span class="sr-only">
+          {currentLang === "en" ? "Subscribe to RSS feed" : "RSS 피드 구독"}
+        </span>
       </LinkButton>
     </div>
   </div>

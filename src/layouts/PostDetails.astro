@@ -193,7 +193,9 @@ const nextPost =
           >
             <IconChevronLeft class="inline-block flex-none stroke-current opacity-60 group-hover:opacity-100 rtl:rotate-180" />
             <div class="min-w-0">
-              <div class="text-xs opacity-60">이전 글</div>
+              <div class="text-xs opacity-60">
+                {currentLang === "en" ? "Previous" : "이전 글"}
+              </div>
               <div class="mt-0.5 line-clamp-2 text-sm font-medium group-hover:text-accent">{prevPost.title}</div>
             </div>
           </a>
@@ -206,7 +208,9 @@ const nextPost =
             class="prev-next-card group flex items-center justify-end gap-3 rounded-lg border border-border p-4 text-end transition hover:border-accent hover:-translate-y-0.5 sm:col-start-2"
           >
             <div class="min-w-0">
-              <div class="text-xs opacity-60">다음 글</div>
+              <div class="text-xs opacity-60">
+                {currentLang === "en" ? "Next" : "다음 글"}
+              </div>
               <div class="mt-0.5 line-clamp-2 text-sm font-medium group-hover:text-accent">{nextPost.title}</div>
             </div>
             <IconChevronRight class="inline-block flex-none stroke-current opacity-60 group-hover:opacity-100 rtl:rotate-180" />
