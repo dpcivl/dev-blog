@@ -9,6 +9,8 @@ import Analytics from "@vercel/analytics/astro";
 import { SITE } from "@/config";
 import "@/styles/global.css";
 
+type HreflangAlt = { lang: string; href: string };
+
 type Props = {
   title?: string;
   author?: string;
@@ -20,6 +22,8 @@ type Props = {
   modDatetime?: Date | null;
   scrollSmooth?: boolean;
   noIndex?: boolean;
+  htmlLang?: string;
+  hreflangAlternates?: HreflangAlt[];
 };
 
 const {
@@ -33,6 +37,8 @@ const {
   modDatetime,
   scrollSmooth = false,
   noIndex = false,
+  htmlLang,
+  hreflangAlternates,
 } = Astro.props;
 
 const socialImageURL = new URL(ogImage, Astro.url);
@@ -57,7 +63,7 @@ const structuredData = {
 <!doctype html>
 <html
   dir={SITE.dir}
-  lang=`${SITE.lang ?? "en"}`
+  lang={htmlLang ?? SITE.lang ?? "en"}
   class={`${scrollSmooth && "scroll-smooth"}`}
 >
   <head>
@@ -67,6 +73,12 @@ const structuredData = {
     <link rel="canonical" href={canonicalURL} />
     <meta name="generator" content={Astro.generator} />
     {noIndex && <meta name="robots" content="noindex, nofollow" />}
+
+    {
+      hreflangAlternates?.map(alt => (
+        <link rel="alternate" hreflang={alt.lang} href={alt.href} />
+      ))
+    }
 
     <!-- Pretendard 본문/헤딩 폰트 (CDN 동적 서브셋) -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />

@@ -1,5 +1,5 @@
 ---
-import { render, type CollectionEntry } from "astro:content";
+import { getCollection, render, type CollectionEntry } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
@@ -11,6 +11,7 @@ import ShareLinks from "@/components/ShareLinks.astro";
 import BackButton from "@/components/BackButton.astro";
 import ScrollButtons from "@/components/ScrollButtons.astro";
 import { getPath } from "@/utils/getPath";
+import { getLang, stripLangPrefix } from "@/utils/i18n";
 import { slugifyStr } from "@/utils/slugify";
 import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
 import IconChevronRight from "@/assets/icons/IconChevronRight.svg";
@@ -57,6 +58,42 @@ const ogImage = ogImageUrl
   ? new URL(ogImageUrl, Astro.url.origin).href
   : undefined;
 
+/* ========== i18n hreflang ========== */
+
+const currentLang = getLang(post);
+const otherLang = currentLang === "ko" ? "en" : "ko";
+const slugKey = stripLangPrefix(post.id);
+
+const allEntries = await getCollection("blog");
+const alternateEntry = allEntries.find(
+  p => getLang(p) === otherLang && stripLangPrefix(p.id) === slugKey
+);
+
+const currentSelfHref = new URL(
+  getPath(post.id, post.filePath),
+  SITE.website
+).href;
+
+const hreflangAlternates: { lang: string; href: string }[] = [
+  { lang: currentLang, href: currentSelfHref },
+];
+
+if (alternateEntry) {
+  const alternateHref = new URL(
+    getPath(alternateEntry.id, alternateEntry.filePath),
+    SITE.website
+  ).href;
+  hreflangAlternates.push({ lang: otherLang, href: alternateHref });
+
+  // x-default → Korean (site's default locale)
+  const koreanEntry = currentLang === "ko" ? post : alternateEntry;
+  const koreanHref = new URL(
+    getPath(koreanEntry.id, koreanEntry.filePath),
+    SITE.website
+  ).href;
+  hreflangAlternates.push({ lang: "x-default", href: koreanHref });
+}
+
 const layoutProps = {
   title: `${title} | ${SITE.title}`,
   author,
@@ -66,6 +103,8 @@ const layoutProps = {
   canonicalURL,
   ogImage,
   scrollSmooth: true,
+  htmlLang: currentLang,
+  hreflangAlternates,
 };
 
 /* ========== Prev/Next Posts ========== */
