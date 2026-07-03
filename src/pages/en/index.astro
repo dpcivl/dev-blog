@@ -11,7 +11,7 @@ import { filterByLang } from "@/utils/i18n";
 import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
 import { SITE } from "@/config";
 
-const posts = filterByLang(await getCollection("blog"), "ko");
+const posts = filterByLang(await getCollection("blog"), "en");
 
 const sortedPosts = getSortedPosts(posts);
 const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
@@ -23,6 +23,25 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
   <div class="page-shell page-grid">
     <Sidebar />
     <main id="main-content" data-layout="index">
+      {
+        sortedPosts.length === 0 && (
+          <section class="pt-8 pb-8">
+            <h1 class="text-2xl font-semibold tracking-wide mb-2">
+              English translations coming soon
+            </h1>
+            <p class="text-muted-foreground leading-7">
+              I'm translating my Korean posts to English. Meanwhile, feel free
+              to browse the{" "}
+              <a class="underline" href="/">
+                Korean version
+              </a>{" "}
+              — most posts include code, diagrams, and screenshots that are
+              language-independent.
+            </p>
+          </section>
+        )
+      }
+
       {
         featuredPosts.length > 0 && (
           <section
@@ -59,23 +78,17 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
         )
       }
 
-      <div class="my-8 text-center">
-        <LinkButton href="/posts/">
-          All Posts
-          <IconArrowRight class="inline-block rtl:-rotate-180" />
-        </LinkButton>
-      </div>
+      {
+        sortedPosts.length > 0 && (
+          <div class="my-8 text-center">
+            <LinkButton href="/en/posts/">
+              All Posts
+              <IconArrowRight class="inline-block rtl:-rotate-180" />
+            </LinkButton>
+          </div>
+        )
+      }
     </main>
   </div>
   <Footer />
 </Layout>
-
-<script>
-  document.addEventListener("astro:page-load", () => {
-    const indexLayout = (document.querySelector("#main-content") as HTMLElement)
-      ?.dataset?.layout;
-    if (indexLayout) {
-      sessionStorage.setItem("backUrl", "/");
-    }
-  });
-</script>

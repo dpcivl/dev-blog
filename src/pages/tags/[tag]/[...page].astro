@@ -9,10 +9,11 @@ import Card from "@/components/Card.astro";
 import Pagination from "@/components/Pagination.astro";
 import getUniqueTags from "@/utils/getUniqueTags";
 import getPostsByTag from "@/utils/getPostsByTag";
+import { filterByLang } from "@/utils/i18n";
 import { SITE } from "@/config";
 
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
-  const posts = await getCollection("blog");
+  const posts = filterByLang(await getCollection("blog"), "ko");
   const tags = getUniqueTags(posts);
 
   return tags.flatMap(({ tag, tagName }) => {

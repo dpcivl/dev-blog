@@ -14,7 +14,7 @@ export async function getStaticPaths() {
     await getCollection("blog").then(p =>
       p.filter(({ data }) => !data.draft && !data.ogImage)
     ),
-    "ko"
+    "en"
   );
 
   return posts.map(post => ({

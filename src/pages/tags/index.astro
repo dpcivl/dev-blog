@@ -6,9 +6,10 @@ import Tag from "@/components/Tag.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import getUniqueTags from "@/utils/getUniqueTags";
+import { filterByLang } from "@/utils/i18n";
 import { SITE } from "@/config";
 
-const posts = await getCollection("blog");
+const posts = filterByLang(await getCollection("blog"), "ko");
 
 let tags = getUniqueTags(posts);
 ---

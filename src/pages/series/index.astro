@@ -4,6 +4,8 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import Sidebar from "@/components/Sidebar.astro";
+import { filterByLang } from "@/utils/i18n";
+import { getPath } from "@/utils/getPath";
 import { SITE } from "@/config";
 
 // 시리즈 정의 — 새 시리즈 추가 시 여기에 항목 추가
@@ -24,7 +26,7 @@ const SERIES = [
   },
 ];
 
-const posts = await getCollection("blog");
+const posts = filterByLang(await getCollection("blog"), "ko");
 
 // 각 시리즈의 글 목록을 태그로 필터해서 묶기
 const seriesWithPosts = SERIES.map(s => {
@@ -78,7 +80,7 @@ function formatDate(d?: Date) {
             <ol class="series-list">
               {s.posts.map((p, idx) => (
                 <li>
-                  <a href={`/posts/${p.id}/`} class="series-item group">
+                  <a href={`${getPath(p.id, p.filePath)}/`} class="series-item group">
                     <span class="series-idx">{String(idx + 1).padStart(2, "0")}</span>
                     <div class="series-item-body">
                       <div class="series-item-title group-hover:text-accent">

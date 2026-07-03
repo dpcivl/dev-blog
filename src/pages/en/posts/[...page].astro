@@ -14,8 +14,9 @@ import { SITE } from "@/config";
 export const getStaticPaths = (async ({ paginate }) => {
   const posts = filterByLang(
     await getCollection("blog", ({ data }) => !data.draft),
-    "ko"
+    "en"
   );
+  if (posts.length === 0) return [];
   return paginate(getSortedPosts(posts), { pageSize: SITE.postPerPage });
 }) satisfies GetStaticPaths;
 
