@@ -1,11 +1,13 @@
 import { BLOG_PATH } from "@/content.config";
 import { slugifyStr } from "./slugify";
 
+const LANG_PREFIXES = new Set(["ko", "en"]);
+
 /**
  * Get full path of a blog post
- * @param id - id of the blog post (aka slug)
+ * @param id - id of the blog post (aka slug, may include `ko/` or `en/` prefix)
  * @param filePath - the blog post full file location
- * @param includeBase - whether to include `/posts` in return value
+ * @param includeBase - whether to include `/posts` in return value (Korean) or `/en/posts` (English)
  * @returns blog post path
  */
 export function getPath(
@@ -13,21 +15,30 @@ export function getPath(
   filePath: string | undefined,
   includeBase = true
 ) {
-  const pathSegments = filePath
+  const rawSegments = filePath
     ?.replace(BLOG_PATH, "")
     .split("/")
-    .filter(path => path !== "") // remove empty string in the segments ["", "other-path"] <- empty string will be removed
-    .filter(path => !path.startsWith("_")) // exclude directories start with underscore "_"
-    .slice(0, -1) // remove the last segment_ file name_ since it's unnecessary
-    .map(segment => slugifyStr(segment)); // slugify each segment path
+    .filter(path => path !== "")
+    .filter(path => !path.startsWith("_"))
+    .slice(0, -1); // remove filename
 
-  const basePath = includeBase ? "/posts" : "";
+  // Detect language from first segment (ko / en)
+  const isEnglish = rawSegments?.[0] === "en";
 
-  // Making sure `id` does not contain the directory
+  const pathSegments = rawSegments
+    ?.filter(segment => !LANG_PREFIXES.has(segment)) // strip language prefix
+    .map(segment => slugifyStr(segment));
+
+  const basePath = includeBase
+    ? isEnglish
+      ? "/en/posts"
+      : "/posts"
+    : "";
+
+  // slug = last segment of id
   const blogId = id.split("/");
   const slug = blogId.length > 0 ? blogId.slice(-1) : blogId;
 
-  // If not inside the sub-dir, simply return the file path
   if (!pathSegments || pathSegments.length < 1) {
     return [basePath, slug].join("/");
   }
