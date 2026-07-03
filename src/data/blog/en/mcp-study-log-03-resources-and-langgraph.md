@@ -14,7 +14,7 @@ draft: false
 featured: false
 ---
 
-In [MCP Study #1 (Inspector)](/posts/mcp-study-log-01) and [#2 (Claude Desktop)](/posts/mcp-study-log-02-claude-desktop), I only covered **Tools**. Today I'll cover the remaining two components — **Resources / Prompts** — plus **LangGraph integration**.
+In [MCP Study #1 (Inspector)](/en/posts/mcp-study-log-01) and [#2 (Claude Desktop)](/en/posts/mcp-study-log-02-claude-desktop), I only covered **Tools**. Today I'll cover the remaining two components — **Resources / Prompts** — plus **LangGraph integration**.
 
 ## Table of contents
 
@@ -75,7 +75,7 @@ The Resources / Prompts tabs are now active. Previously there were only Tools, b
 
 ## Checking in Claude Desktop too
 
-I added the new server to [the config registered in #2](/posts/mcp-study-log-02-claude-desktop) and restarted:
+I added the new server to [the config registered in #2](/en/posts/mcp-study-log-02-claude-desktop) and restarted:
 
 ![Claude Desktop — greeting 'Good afternoon, hyoin' + energy-v2 enabled in the connector menu, with Daily analysis prompt / Alarm response prompt / Get operating rules / Get line specifications / Get troubleshooting guide shown on the right](/assets/posts/mcp-study-log-03-resources-and-langgraph/05-claude-desktop-connector-menu.png)
 
@@ -101,7 +101,7 @@ LangGraph State + 노드 함수 정의 (asyncio)
 도구 로드 → ainvoke
 ```
 
-The pattern is the same as [the previous LangGraph series](/posts/langgraph-study-log-01), except **`asyncio`** has been added.
+The pattern is the same as [the previous LangGraph series](/en/posts/langgraph-study-log-01), except **`asyncio`** has been added.
 
 ### asyncio — a nice callback to a data logger project from my previous company
 
@@ -127,7 +127,7 @@ An interesting part — **the MCP server code hasn't changed a single line**, ye
 
 > Why this is possible = **because the implementation follows the MCP standard.** As long as the server follows the stdio / message format standard, any client can pick it up and use it.
 
-This is essentially seeing, in practice, how the **"universal standard"** row of [the "Tool Use vs MCP" table I compared in #1](/posts/mcp-study-log-01#왜-mcp-가-필요한가--tool-use-의-한계) actually manifests.
+This is essentially seeing, in practice, how the **"universal standard"** row of [the "Tool Use vs MCP" table I compared in #1](/en/posts/mcp-study-log-01#왜-mcp-가-필요한가--tool-use-의-한계) actually manifests.
 
 ## Integrating Resources too — domain knowledge as a system prompt
 
@@ -168,14 +168,14 @@ I've now touched all three components of MCP and combined them with LangGraph. T
 
 ### 1. MCP server depth — a side-project track
 
-- Not just simple demos, but real usage scenarios (e.g., exposing my [FEMS RAG](/posts/fems-project-log-03) as an MCP server)
+- Not just simple demos, but real usage scenarios (e.g., exposing my [FEMS RAG](/en/posts/fems-project-log-03) as an MCP server)
 - Operational issues like auth / permissions / rate limits
 - Dynamic URIs like Resource templates (`config://users/{user_id}`)
 
 ### 2. Evaluating RAG responses / agent systems
 
 - How to measure the responses of the systems I've built so far (FEMS / LangGraph / MCP)
-- Applying the same principle from [the quant post's "gut-feel benchmarking → numerical benchmarking"](/posts/quant-study-00-pandas#회고--느낌으로-벤치마킹-하는-습관을-발견)
+- Applying the same principle from [the quant post's "gut-feel benchmarking → numerical benchmarking"](/en/posts/quant-study-00-pandas#회고--느낌으로-벤치마킹-하는-습관을-발견)
 - Frameworks like RAGAS / TruLens / DeepEval
 - Automatically building evaluation sets + managing golden answers
 

@@ -12,7 +12,7 @@ draft: false
 featured: false
 ---
 
-Following [LangGraph Study #1 (the State game-character analogy)](/posts/langgraph-study-log-01) and [#2 (what "AI remembers" actually means)](/posts/langgraph-study-log-02), here's #3. Today's topic is **Human-in-the-Loop (HITL)**.
+Following [LangGraph Study #1 (the State game-character analogy)](/en/posts/langgraph-study-log-01) and [#2 (what "AI remembers" actually means)](/en/posts/langgraph-study-log-02), here's #3. Today's topic is **Human-in-the-Loop (HITL)**.
 
 ## Table of contents
 
@@ -144,7 +144,7 @@ What I got out of today's study:
 2. **The LLM's own helpfulness can block deterministic gating** — vague safety instructions in the system prompt conflict with HITL
 3. **In production, use SqliteSaver / PostgreSaver instead of MemorySaver** — it needs to survive process restarts
 
-I'm currently working on the [FEMS project](/posts/fems-project-log-01), and risky tools could show up there too (e.g., permanently deleting measurement data, changing settings), so this pattern is worth applying there.
+I'm currently working on the [FEMS project](/en/posts/fems-project-log-01), and risky tools could show up there too (e.g., permanently deleting measurement data, changing settings), so this pattern is worth applying there.
 
 ## Things to study further
 

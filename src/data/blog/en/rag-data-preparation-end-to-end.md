@@ -13,7 +13,7 @@ draft: false
 featured: false
 ---
 
-While running RAG on a 230-page corpus in [FEMS Project #2](/posts/fems-project-log-02), a few questions came up.
+While running RAG on a 230-page corpus in [FEMS Project #2](/en/posts/fems-project-log-02), a few questions came up.
 
 - **How do you select and clean the data that goes into a vector DB?**
 - **If you're using scanned analog data, does attaching a file title actually matter?**
@@ -52,7 +52,7 @@ If you dump in everything based on domain alone, noise increases and search resu
 | **Density** | Cover pages, tables of contents, and empty forms with almost no information become noise |
 | **Timeliness** | Information that changes over time → set an update cycle |
 
-> The `readable_ratio` quality gate I built in [FEMS #2](/posts/fems-project-log-02) corresponds to the automated part of the **"density"** criterion in the table above.
+> The `readable_ratio` quality gate I built in [FEMS #2](/en/posts/fems-project-log-02) corresponds to the automated part of the **"density"** criterion in the table above.
 
 ## 2. Cleansing — automation + human review
 
@@ -145,7 +145,7 @@ Data preparation runs as **a loop**. It's not just indexing once and being done:
 
 > **Build a set of question-answer pairs.** This lets you **immediately measure retrieval accuracy** whenever you change the chunking strategy or embedding model.
 
-Without this, you're left guessing at "did changing the embedding model make the answers better or worse?" With an evaluation set, you can **compare with numbers instead**. This is the same idea I picked up from the [retrospective in the quant post](/posts/quant-study-00-pandas#회고--느낌으로-벤치마킹-하는-습관을-발견) — the shift from "gut-feel benchmarking" to "numerical benchmarking."
+Without this, you're left guessing at "did changing the embedding model make the answers better or worse?" With an evaluation set, you can **compare with numbers instead**. This is the same idea I picked up from the [retrospective in the quant post](/en/posts/quant-study-00-pandas#회고--느낌으로-벤치마킹-하는-습관을-발견) — the shift from "gut-feel benchmarking" to "numerical benchmarking."
 
 ### Other ongoing management items
 

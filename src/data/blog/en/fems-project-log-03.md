@@ -15,7 +15,7 @@ draft: false
 featured: false
 ---
 
-This is part 3, following [FEMS #1 (setup)](/posts/fems-project-log-01) and [#2 (corpus + model comparison)](/posts/fems-project-log-02). Today: **Streamlit dashboard + 3-backend question evaluation**.
+This is part 3, following [FEMS #1 (setup)](/en/posts/fems-project-log-01) and [#2 (corpus + model comparison)](/en/posts/fems-project-log-02). Today: **Streamlit dashboard + 3-backend question evaluation**.
 
 ## Table of contents
 
@@ -33,7 +33,7 @@ Today I was going to build the Streamlit dashboard, but **when I started a new C
 
 What's shown in the screenshot is **synthetic data**. Since anomalies were intentionally injected, they can be identified directly from the graph.
 
-> The reason for using synthetic data is the same as [the question raised in #2](/posts/fems-project-log-02#합성-데이터-vs-실-데이터--과적합-의문) — when I need questions based on real data, I have to create them separately. Today I threw both types of questions at the system.
+> The reason for using synthetic data is the same as [the question raised in #2](/en/posts/fems-project-log-02#합성-데이터-vs-실-데이터--과적합-의문) — when I need questions based on real data, I have to create them separately. Today I threw both types of questions at the system.
 
 ## Q1 — Synthetic data: "Was there a problem with the air compressor in May?"
 
@@ -191,4 +191,4 @@ Three key things learned today:
 - Today's questions were written by hand
 - **Corpus chunks → LLM automatically generates questions** → human review
 - A larger evaluation set produces more reliable scores
-- Directly connected to the evaluation set construction section in [the RAG data preparation post](/posts/rag-data-preparation-end-to-end)
+- Directly connected to the evaluation set construction section in [the RAG data preparation post](/en/posts/rag-data-preparation-end-to-end)

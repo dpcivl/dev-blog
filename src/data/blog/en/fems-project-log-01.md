@@ -25,7 +25,7 @@ Technologies I'll touch on in this series:
 - **Embeddings, vector DB**
 - **Token usage strategy / local vs cloud comparison**
 
-RAG, embeddings, and vector DBs are somewhat familiar to me already since I covered them recently in [Building RAG From Scratch](/posts/rag-from-scratch-embedding-and-similarity-search) and [Building a RAG System with Chroma](/posts/rag-system-chroma-blog-qa). **Local LLM (Ollama)** is the new axis added here.
+RAG, embeddings, and vector DBs are somewhat familiar to me already since I covered them recently in [Building RAG From Scratch](/en/posts/rag-from-scratch-embedding-and-similarity-search) and [Building a RAG System with Chroma](/en/posts/rag-system-chroma-blog-qa). **Local LLM (Ollama)** is the new axis added here.
 
 ## Table of contents
 
@@ -135,7 +135,7 @@ For embeddings, I settled on **Ollama's `bge-m3`**.
 
 One thing to note — **Chroma's default embedding function is English-specialized.** Feeding it Korean documents directly degrades embedding quality. So I **computed the embeddings myself and injected them into Chroma** instead.
 
-> In my previous [post on building RAG from scratch](/posts/rag-from-scratch-embedding-and-similarity-search), when I ran Korean text through OpenAI embeddings, the absolute similarity scores came out low, around 0.3 to 0.5. Since bge-m3 specializes in multilingual embeddings, checking whether this improves is one of the key points of this test.
+> In my previous [post on building RAG from scratch](/en/posts/rag-from-scratch-embedding-and-similarity-search), when I ran Korean text through OpenAI embeddings, the absolute similarity scores came out low, around 0.3 to 0.5. Since bge-m3 specializes in multilingual embeddings, checking whether this improves is one of the key points of this test.
 
 ## Building the index — starting with 5 chunks
 

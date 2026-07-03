@@ -14,7 +14,7 @@ draft: false
 featured: false
 ---
 
-In [FEMS #1](/posts/fems-project-log-01), I did the setup and a 5-chunk demo. Today: **growing the corpus with real data + a quality gate + comparing models**.
+In [FEMS #1](/en/posts/fems-project-log-01), I did the setup and a 5-chunk demo. Today: **growing the corpus with real data + a quality gate + comparing models**.
 
 ## Table of contents
 

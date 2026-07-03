@@ -21,7 +21,7 @@ Starting **MCP study** today.
 
 ## Why MCP Is Needed — The Limits of Tool Use
 
-[Tool Use, which I covered before](/posts/claude-api-tool-use-and-agent-loop), already lets LLMs interact with the outside world. But there's a problem: **as the number of tools grows, the code gets complicated.**
+[Tool Use, which I covered before](/en/posts/claude-api-tool-use-and-agent-loop), already lets LLMs interact with the outside world. But there's a problem: **as the number of tools grows, the code gets complicated.**
 
 MCP solves this by **separating tools into a dedicated server**. This gives you:
 
@@ -154,7 +154,7 @@ If you provide a name, it returns a greeting string. There's a note saying **Val
 
 ## Second Example — Energy Management MCP Server
 
-I built an **energy management** MCP server using fake data. It naturally ties into the scenario from the [FEMS project](/posts/fems-project-log-02).
+I built an **energy management** MCP server using fake data. It naturally ties into the scenario from the [FEMS project](/en/posts/fems-project-log-02).
 
 ![Energy management server — 4 tools: list_production_lines / get_energy_consumption / list_alarms / get_line_status](/assets/posts/mcp-study-log-01/05-energy-management-tools.png)
 
@@ -213,7 +213,7 @@ The flow, as I experienced it:
 
 ### 4. MCP Server Security
 
-- Combining this with the risky-tool approval pattern covered in [Human-in-the-Loop](/posts/langgraph-study-log-03-human-in-the-loop)
+- Combining this with the risky-tool approval pattern covered in [Human-in-the-Loop](/en/posts/langgraph-study-log-03-human-in-the-loop)
 - Defining permissions / scope at the MCP server level
 - Gating policies for when MCP exposes a risky tool like `delete_user`
 

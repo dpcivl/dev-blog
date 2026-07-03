@@ -13,7 +13,7 @@ draft: false
 featured: false
 ---
 
-Following [Eval Study #1 (Accuracy + LLM-as-Judge)](/posts/eval-study-log-01-accuracy-and-llm-as-judge), today's topic is **similarity-based evaluation + test set design principles**.
+Following [Eval Study #1 (Accuracy + LLM-as-Judge)](/en/posts/eval-study-log-01-accuracy-and-llm-as-judge), today's topic is **similarity-based evaluation + test set design principles**.
 
 ## Table of contents
 
@@ -31,7 +31,7 @@ Today I'm covering the third one — **comparing an expected answer to the actua
 
 ## Starting the Experiment — and a Sense for Choosing Embedding Models
 
-While typing out the example code, I noticed it used `text-embedding-3-small` as the embedding model. This reminded me of **[the issue I ran into in a previous RAG post](/posts/rag-from-scratch-embedding-and-similarity-search#3-semantic-search--한국어가-의외로-낮다)** — this model does well picking top-K results for English, but for **Korean, the absolute similarity values are low and it has poor discriminative power**.
+While typing out the example code, I noticed it used `text-embedding-3-small` as the embedding model. This reminded me of **[the issue I ran into in a previous RAG post](/en/posts/rag-from-scratch-embedding-and-similarity-search#3-semantic-search--한국어가-의외로-낮다)** — this model does well picking top-K results for English, but for **Korean, the absolute similarity values are low and it has poor discriminative power**.
 
 Once you've accumulated experience like this, you start noticing what needs to change before blindly copying code. I think this is exactly why, even as more code gets written with AI assistance these days, the value of a senior developer actually goes up — **the sense of knowing which parts to adjust for your specific situation when the AI spits out a probabilistically plausible answer** becomes more important. Rather than vaguely thinking "I should study more," this is the first concrete direction I've spotted here.
 
@@ -185,7 +185,7 @@ Three things I took away from today's study:
 
 ### 5. Applying Real Eval to a RAG System
 
-- Layering today's combined similarity + LLM-as-Judge pipeline onto the [FEMS RAG](/posts/fems-project-log-03) I built recently
+- Layering today's combined similarity + LLM-as-Judge pipeline onto the [FEMS RAG](/en/posts/fems-project-log-03) I built recently
 - Measuring retrieval (Hit Rate @ K, MRR) and generation (Faithfulness, Answer Relevance) separately
 - Actually running the **measure → improve (chunking / embedding / prompt) → re-measure** cycle
 

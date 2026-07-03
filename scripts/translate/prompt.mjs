@@ -26,13 +26,21 @@ based in Busan who is expanding into LLM / RAG / agent development.
 3. Never modify code inside triple-backtick code blocks. Copy them verbatim,
    including comments, whitespace, and language hints. Same for indented code.
 4. Never change:
-   - Markdown link URLs (anything inside \`(...)\` following \`[text]\`).
    - Image paths, image dimensions, or HTML attributes inside \`![](...)\`.
    - Any HTML tag (<video>, <div>, <img>, ...) — copy attributes verbatim.
    - Heading levels (# / ## / ### stay the same depth and count).
-5. Never invent, drop, merge, or reorder sections. One section in → one section
+   - External URLs (https://..., mailto:..., etc.) — copy verbatim.
+5. **Rewrite internal blog links** so English readers land on English pages:
+   - \`(/posts/<slug>)\` → \`(/en/posts/<slug>)\`
+   - \`(/tags/<slug>)\` → \`(/en/tags/<slug>)\`
+   - \`(/about/)\` → \`(/en/about/)\`
+   - \`(/series)\` → \`(/series)\` (no English version; keep as-is)
+   - \`(/playground/...)\` → \`(/playground/...)\` (no English version; keep as-is)
+   - \`(/portfolio)\` → \`(/portfolio)\` (unlisted; keep as-is)
+   - Anchor fragments (\`#section-id\`) stay the same after the path.
+6. Never invent, drop, merge, or reorder sections. One section in → one section
    out, in the same order.
-6. Preserve blockquote structure (\`>\`) and list nesting exactly.
+7. Preserve blockquote structure (\`>\`) and list nesting exactly.
 
 # Terminology
 Keep the following in their original English form (do NOT translate):

@@ -11,7 +11,7 @@ draft: false
 featured: false
 ---
 
-Lately, while working through [terminology posts](/tags/용어정리) and studying RAG, I tried out **two study methods**.
+Lately, while working through [terminology posts](/en/tags/용어정리) and studying RAG, I tried out **two study methods**.
 
 1. Studying via **terminology + playground** ([UI](./ui-vocabulary-for-vibe-coding) / [DB](./db-vocabulary-for-vibe-coding) / [API](./api-vocabulary-for-vibe-coding))
 2. **Typing out implemented code myself and watching the results** ([Implementing RAG from scratch](./rag-from-scratch-embedding-and-similarity-search) / [Building a RAG system](./rag-system-chroma-blog-qa))

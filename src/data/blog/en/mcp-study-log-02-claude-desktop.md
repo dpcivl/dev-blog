@@ -13,7 +13,7 @@ draft: false
 featured: false
 ---
 
-Following [MCP Study #1 (first call with Inspector)](/posts/mcp-study-log-01), today I'm connecting to an actual LLM client — **Claude Desktop**.
+Following [MCP Study #1 (first call with Inspector)](/en/posts/mcp-study-log-01), today I'm connecting to an actual LLM client — **Claude Desktop**.
 
 Yesterday I only verified server behavior with MCP Inspector. **Today's goal is to actually call my server from Claude Desktop.**
 
@@ -71,7 +71,7 @@ I typed **"Show me the factory line list"** into the chat window. Claude automat
 
 > **"Claude wants to use List production lines from energy-management"** + [Always Allow / Deny] buttons
 
-This is exactly the client-side implementation of the [HITL pattern I covered in LangGraph #3](/posts/langgraph-study-log-03-human-in-the-loop). Claude Desktop **inserts a user approval gate right before the MCP tool call, on its own.** I didn't have to implement anything — the client itself provides this safety layer.
+This is exactly the client-side implementation of the [HITL pattern I covered in LangGraph #3](/en/posts/langgraph-study-log-03-human-in-the-loop). Claude Desktop **inserts a user approval gate right before the MCP tool call, on its own.** I didn't have to implement anything — the client itself provides this safety layer.
 
 Once approved, it takes the result and formats a natural-language answer. **The response quality is the same as what I verified yesterday with streamlit.**
 
@@ -93,7 +93,7 @@ Today's study session wrapped up quickly. (Maybe it was deliberately light since
 
 ## Question — how do you use RAG and MCP together?
 
-MCP turned out to be convenient, but there's one thing that's a bit unsatisfying — **it doesn't connect with the [FEMS RAG](/posts/fems-project-log-03) I've already built.**
+MCP turned out to be convenient, but there's one thing that's a bit unsatisfying — **it doesn't connect with the [FEMS RAG](/en/posts/fems-project-log-03) I've already built.**
 
 - RAG → a separate backend that calls an API (bundled inside Streamlit)
 - MCP → called directly within the Claude Desktop app
@@ -151,7 +151,7 @@ Today's short study session, summarized:
 
 - How a tool is managed after selecting "Always Allow"
 - An option to force explicit confirmation every time for risky tools
-- The division of labor between [LangGraph's server-side HITL](/posts/langgraph-study-log-03-human-in-the-loop) and client-side approval
+- The division of labor between [LangGraph's server-side HITL](/en/posts/langgraph-study-log-03-human-in-the-loop) and client-side approval
 
 ### 4. Cowork × MCP
 
@@ -161,7 +161,7 @@ Today's short study session, summarized:
 
 ### 5. Resources / Prompts UX in Claude Desktop
 
-- How [Resources / Prompts covered in #1](/posts/mcp-study-log-01) appear in Claude Desktop
+- How [Resources / Prompts covered in #1](/en/posts/mcp-study-log-01) appear in Claude Desktop
 - The pattern of attaching a Resource URI directly in the chat window
 - Whether prompt templates are exposed like slash commands
 
