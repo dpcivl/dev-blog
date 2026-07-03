@@ -40,6 +40,17 @@ function multisetEqual(a, b) {
 
 // ---------- individual validators ----------
 
+// Strip common comment patterns from code so that translating comments
+// (e.g. `// 정수 나눗셈` → `// integer division`) doesn't flag a false positive.
+// The AI translating code comments to English is desirable behavior.
+function stripCommentsFromCode(code) {
+  return code
+    .replace(/\/\/[^\n]*/g, "") // // line comments
+    .replace(/#[^\n]*/g, "") // # line comments
+    .replace(/\/\*[\s\S]*?\*\//g, "") // /* block comments */
+    .replace(/<!--[\s\S]*?-->/g, ""); // <!-- html comments -->
+}
+
 export function validateCodeBlocks(kr, en) {
   const krBlocks = extractAll(kr, CODE_FENCE);
   const enBlocks = extractAll(en, CODE_FENCE);
@@ -51,15 +62,30 @@ export function validateCodeBlocks(kr, en) {
     return { ok: false, issues };
   }
   for (let i = 0; i < krBlocks.length; i++) {
-    if (krBlocks[i] !== enBlocks[i]) {
-      issues.push(
-        `code block ${i + 1} content differs (KR first line: ${krBlocks[i]
-          .split("\n")[0]
-          .slice(0, 60)})`
-      );
+    if (krBlocks[i] === enBlocks[i]) continue;
+    // Compare with comments stripped — if that matches, treat as OK
+    // (comment translation is desirable, not a failure).
+    if (stripCommentsFromCode(krBlocks[i]) === stripCommentsFromCode(enBlocks[i])) {
+      continue;
     }
+    issues.push(
+      `code block ${i + 1} content differs (KR first line: ${krBlocks[i]
+        .split("\n")[0]
+        .slice(0, 60)})`
+    );
   }
   return { ok: issues.length === 0, issues };
+}
+
+// Normalize an EN URL back to its KR equivalent for comparison,
+// since the translator rewrites /posts → /en/posts, /tags → /en/tags, etc.
+function normalizeEnUrlForCompare(url) {
+  return url
+    .replace(/^\/en\/posts\//, "/posts/")
+    .replace(/^\/en\/tags\//, "/tags/")
+    .replace(/^\/en\/about\//, "/about/")
+    .replace(/^\/en\/about$/, "/about")
+    .replace(/^\/en\/?$/, "/");
 }
 
 export function validateLinkUrls(kr, en) {
@@ -69,7 +95,7 @@ export function validateLinkUrls(kr, en) {
   const rxKr = new RegExp(MD_LINK.source, MD_LINK.flags);
   while ((m = rxKr.exec(kr)) !== null) krUrls.push(m[2]);
   const rxEn = new RegExp(MD_LINK.source, MD_LINK.flags);
-  while ((m = rxEn.exec(en)) !== null) enUrls.push(m[2]);
+  while ((m = rxEn.exec(en)) !== null) enUrls.push(normalizeEnUrlForCompare(m[2]));
   const cmp = multisetEqual(krUrls, enUrls);
   if (!cmp.equal) {
     return {

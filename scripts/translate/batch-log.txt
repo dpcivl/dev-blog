@@ -1,0 +1,58 @@
+
+== BATCH: 39 pending (42 total, 3 already translated) ==
+  → agv-prototype-log-01 ... ✓ 32.2s | in=4,699 out=3,783 cache=r0/w1,385 | $0.0507
+  → agv-prototype-log-02 ... ✓ 30.8s | in=4,686 out=3,715 cache=r1,385/w0 | $0.0468
+  → agv-prototype-log-03 ... ✗ 31.5s | in=4,300 out=3,422 cache=r1,385/w0 | $0.0431
+      ! [lengthRatio] length ratio out of range: 2.01 (KR 4567 → EN 9162, expected 0.5x - 2x)
+  → agv-prototype-log-04 ... ✓ 36.4s | in=5,210 out=4,164 cache=r1,385/w0 | $0.0523
+  → ai-limits-in-user-pain-research ... ✓ 29.7s | in=4,359 out=2,991 cache=r1,385/w0 | $0.0389
+  → ai-session-management-common-vs-specialized ... ✓ 24.9s | in=3,787 out=2,583 cache=r1,385/w0 | $0.0337
+  → api-vocabulary-for-vibe-coding ... ✓ 37.2s | in=5,729 out=4,349 cache=r1,385/w0 | $0.0552
+  → claude-api-error-handling-and-retry ... ✓ 25.9s | in=4,208 out=3,113 cache=r1,385/w0 | $0.0398
+  → claude-api-multi-turn-context ... ✗ 19.5s | in=2,996 out=2,217 cache=r1,385/w0 | $0.0284
+      ! [codeBlocks] code block 2 content differs (KR first line: ```python)
+  → claude-api-prompt-caching ... ✓ 30.5s | in=4,633 out=3,567 cache=r1,385/w0 | $0.0452
+  → claude-api-streaming-ttft-and-events ... ✓ 24.7s | in=3,985 out=2,848 cache=r1,385/w0 | $0.0367
+  → claude-api-system-prompt-vs-user-message ... ✓ 24.0s | in=3,604 out=2,517 cache=r1,385/w0 | $0.0327
+  → claude-api-tool-use-and-agent-loop ... ✓ 31.2s | in=4,708 out=3,516 cache=r1,385/w0 | $0.0449
+  → claude-api-vision-base64-url-and-model ... ✓ 16.9s | in=2,460 out=1,728 cache=r1,385/w0 | $0.0225
+  → claude-code-529-overloaded-jun-2026 ... ✓ 22.4s | in=2,976 out=2,387 cache=r1,385/w0 | $0.0301
+  → claude-code-instructions-placement-by-working-dir ... ✗ 21.8s | in=3,478 out=2,453 cache=r1,385/w0 | $0.0318
+      ! [codeBlocks] code block 1 content differs (KR first line: ```)
+      ! [codeBlocks] code block 2 content differs (KR first line: ```)
+  → db-vocabulary-for-vibe-coding ... ✓ 46.0s | in=7,061 out=5,260 cache=r1,385/w0 | $0.0670
+  → eval-study-log-01-accuracy-and-llm-as-judge ... ✓ 31.9s | in=4,821 out=3,772 cache=r1,385/w0 | $0.0476
+  → fems-project-log-01 ... ✓ 35.5s | in=5,478 out=4,350 cache=r1,385/w0 | $0.0547
+  → fems-project-log-03 ... ✓ 39.4s | in=5,843 out=4,679 cache=r1,385/w0 | $0.0588
+  → image-classification-training-pipeline-checklist ... ✓ 26.4s | in=3,816 out=3,022 cache=r1,385/w0 | $0.0381
+  → langgraph-study-log-01 ... ✓ 18.8s | in=2,675 out=2,005 cache=r1,385/w0 | $0.0257
+  → langgraph-study-log-02 ... ✓ 22.8s | in=3,383 out=2,443 cache=r1,385/w0 | $0.0315
+  → langgraph-study-log-03-human-in-the-loop ... ✗ 31.5s | in=4,555 out=3,462 cache=r1,385/w0 | $0.0440
+      ! [codeBlocks] code block 2 content differs (KR first line: ```)
+  → mcp-study-log-01 ... ✓ 28.6s | in=4,461 out=3,529 cache=r1,385/w0 | $0.0445
+  → mcp-study-log-02-claude-desktop ... ✗ 25.7s | in=4,050 out=3,066 cache=r1,385/w0 | $0.0390
+      ! [codeBlocks] code block 2 content differs (KR first line: ```python)
+  → my-5-step-study-method-for-new-tech ... ✗ 26.1s | in=3,369 out=2,400 cache=r1,385/w0 | $0.0310
+      ! [lengthRatio] length ratio out of range: 2.02 (KR 3617 → EN 7315, expected 0.5x - 2x)
+  → ndt-defect-classification-pytorch-resnet18 ... ✓ 43.9s | in=7,044 out=5,403 cache=r1,385/w0 | $0.0684
+  → perfectionism-as-a-tool-vertical-slice-development ... ✓ 31.1s | in=4,467 out=3,284 cache=r1,385/w0 | $0.0421
+  → quant-study-00-pandas ... ✗ 37.1s | in=5,343 out=4,075 cache=r1,385/w0 | $0.0517
+      ! [codeBlocks] code block 2 content differs (KR first line: ```)
+  → rag-data-preparation-end-to-end ... ✗ 35.1s | in=5,122 out=3,835 cache=r1,385/w0 | $0.0489
+      ! [codeBlocks] code block 1 content differs (KR first line: ```)
+      ! [codeBlocks] code block 2 content differs (KR first line: ```)
+  → rag-from-scratch-embedding-and-similarity-search ... ✓ 33.5s | in=4,978 out=3,942 cache=r1,385/w0 | $0.0497
+  → rag-system-chroma-blog-qa ... ✓ 32.9s | in=4,716 out=3,798 cache=r1,385/w0 | $0.0477
+  → state-management-vocabulary-for-vibe-coding ... ✓ 28.0s | in=3,953 out=2,917 cache=r1,385/w0 | $0.0374
+  → stm32-cubeide-cubemx-separation ... ✓ 18.5s | in=2,545 out=1,904 cache=r1,385/w0 | $0.0244
+  → supabase-social-login-multiple-keys ... ✗ 25.0s | in=3,891 out=2,902 cache=r1,385/w0 | $0.0371
+      ! [codeBlocks] code block 2 content differs (KR first line: ```)
+      ! [codeBlocks] code block 3 content differs (KR first line: ```)
+  → ui-vocabulary-for-vibe-coding ... ✓ 31.9s | in=4,641 out=3,454 cache=r1,385/w0 | $0.0441
+  → vercel-shows-old-posts-after-deletion ... ✓ 19.2s | in=2,928 out=2,135 cache=r1,385/w0 | $0.0275
+  → what-is-deno-and-supabase-edge-functions ... ✗ 19.2s | in=3,067 out=2,146 cache=r1,385/w0 | $0.0279
+      ! [codeBlocks] code block 1 content differs (KR first line: ```bash)
+
+== SUMMARY ==
+  translated: 29 ok, 10 with issues
+  total cost: $1.6214
