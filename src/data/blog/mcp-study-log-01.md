@@ -23,11 +23,11 @@ featured: false
 
 [이전에 다룬 Tool Use](/posts/claude-api-tool-use-and-agent-loop) 만으로도 LLM 이 외부와 상호작용은 가능하다. 다만 **도구가 많아지면 코드가 복잡해지는** 문제가 있다.
 
-MCP 는 이걸 **도구를 별도 서버로 분리** 해서 해결. 그러면:
+MCP 는 이걸 **도구를 별도 서버로 분리** 해서 해결한다. 그러면:
 
-- **도구 개발** 과 **LLM 앱 개발** 을 분리 가능
-- 한 번 만든 도구 서버를 **여러 LLM 앱에서 재사용** 가능
-- **표준화** — Anthropic 외 다른 클라이언트도 같은 서버 사용 가능
+- **도구 개발** 과 **LLM 앱 개발** 을 분리할 수 있다
+- 한 번 만든 도구 서버를 **여러 LLM 앱에서 재사용** 할 수 있다
+- **표준화** — Anthropic 외 다른 클라이언트도 같은 서버를 쓸 수 있다
 
 ![Tool Use vs MCP 비교표 — 정의 위치 / 실행 위치 / 재사용 / 표준 / 호환 / 배포 6가지 측면](/assets/posts/mcp-study-log-01/01-tool-use-vs-mcp-table.png)
 
@@ -53,7 +53,7 @@ MCP 는 이걸 **도구를 별도 서버로 분리** 해서 해결. 그러면:
 | **Resources** | LLM 이 **읽을 수 있는** 데이터 |
 | **Prompts** | 미리 정의된 **프롬프트 템플릿** |
 
-오늘은 **Tools** 중심으로.
+오늘은 **Tools** 중심으로 다룬다.
 
 ## 통신 방식 — stdio vs HTTP/SSE
 
@@ -62,11 +62,11 @@ MCP 는 이걸 **도구를 별도 서버로 분리** 해서 해결. 그러면:
 | **stdio** | 표준 입출력 (로컬 프로세스 간 통신) | 구현 간단 |
 | **HTTP/SSE** | 네트워크 통한 원격 서버 | 구현 복잡 |
 
-오늘은 **stdio** 로 예제 진행. 로컬 데모용으로 충분.
+오늘은 **stdio** 로 예제를 진행한다. 로컬 데모용으로 충분하다.
 
 ## MCP SDK 설치
 
-MCP SDK 는 **Python** 과 **TypeScript** 가 있다. 나는 Python 으로 진행.
+MCP SDK 는 **Python** 과 **TypeScript** 가 있다. 나는 Python 으로 진행한다.
 
 ```bash
 pip install mcp
@@ -76,7 +76,7 @@ pip install mcp
 
 코드: [`first_mcp_server.py`](https://github.com/dpcivl/ai-study/blob/main/week5-mcp/first_mcp_server.py)
 
-MCP 가 **Tool Use 대신** 으로 쓰이는 게 바로 체감되는 부분 — 어노테이션 **`@mcp.tool()`** 을 사용.
+MCP 가 **Tool Use 대신** 으로 쓰이는 게 바로 체감되는 부분 — 어노테이션 **`@mcp.tool()`** 을 사용한다.
 
 ```python
 from mcp.server.fastmcp import FastMCP
@@ -99,24 +99,24 @@ def add_numbers(a: int, b: int) -> int:
 
 ### 두 가지 핵심
 
-1. **docstring 의 Args / Returns 형식** — LLM 에게 함수를 설명하는 부분. 형식이 중요
-2. **파라미터 타입 힌트** (`a: int`) — 자동으로 **input schema** 생성
+1. **docstring 의 Args / Returns 형식** — LLM 에게 함수를 설명하는 부분. 형식이 중요하다
+2. **파라미터 타입 힌트** (`a: int`) — 자동으로 **input schema** 를 생성한다
 
-타입 힌트 하나 적었을 뿐인데 MCP 가 알아서 JSON schema 를 만들어 LLM 에 노출. 깔끔.
+타입 힌트 하나 적었을 뿐인데 MCP 가 알아서 JSON schema 를 만들어 LLM 에 노출한다. 깔끔하다.
 
 ### 서버 실행 — 출력 없음
 
-서버를 실행하면 **아무 출력 없이 가만히 있음.**
+서버를 실행하면 **아무 출력 없이 가만히 있는다.**
 
 ```bash
 python first_mcp_server.py
 ```
 
-**stdio 방식이기 때문에 MCP 클라이언트가 호출하지 않으면 대기 상태.** 화면에 아무것도 안 떠도 정상.
+**stdio 방식이기 때문에 MCP 클라이언트가 호출하지 않으면 대기 상태다.** 화면에 아무것도 안 떠도 정상이다.
 
 ## MCP Inspector 로 테스트
 
-서버가 떴는지, Tools 가 잘 노출되는지 확인하려면 **MCP Inspector** 가 표준 도구:
+서버가 떴는지, Tools 가 잘 노출되는지 확인하려면 **MCP Inspector** 가 표준 도구다:
 
 ```bash
 npx @modelcontextprotocol/inspector python first_mcp_server.py
@@ -124,7 +124,7 @@ npx @modelcontextprotocol/inspector python first_mcp_server.py
 
 ![MCP Inspector 초기 화면 — Transport Type STDIO, Command python, Arguments .\first_mcp_server.py, 아직 Disconnected 상태](/assets/posts/mcp-study-log-01/02-mcp-inspector-disconnected.png)
 
-Inspector 에서 확인 가능한 것:
+Inspector 에서 확인할 수 있는 것:
 
 - 서버 연결 정보
 - 노출된 Tools / Resources / Prompts 목록
@@ -132,17 +132,17 @@ Inspector 에서 확인 가능한 것:
 
 ### 트러블슈팅 — Connect 안 됨
 
-처음에 Connect 버튼 눌러도 연결이 안 되는 현상.
+처음에 Connect 버튼 눌러도 연결이 안 되는 현상이 있었다.
 
-**원인:** Command 에 있는 `python.exe` 의 경로가 잘못됨. 시스템 PATH 의 python 이 아니라 **venv 의 python** 을 짚어야 함.
+**원인:** Command 에 있는 `python.exe` 의 경로가 잘못됐다. 시스템 PATH 의 python 이 아니라 **venv 의 python** 을 짚어야 한다.
 
-→ venv 경로의 python.exe 위치를 명시한 후 성공적으로 연결 확인.
+→ venv 경로의 python.exe 위치를 명시한 후 성공적으로 연결됐다.
 
 ### 연결 성공 — Tools 노출 확인
 
 ![연결 후 Inspector — Tools 탭에 say_hello / add_numbers 두 도구 노출. add_numbers 에 a=5, b=3 입력 폼](/assets/posts/mcp-study-log-01/03-mcp-inspector-connected-with-tools.png)
 
-좌측에 **`say_hello`** 와 **`add_numbers`** 두 도구가 노출됨. docstring 의 Args/Returns 가 그대로 우측 패널에 정리됨.
+좌측에 **`say_hello`** 와 **`add_numbers`** 두 도구가 노출된다. docstring 의 Args/Returns 가 그대로 우측 패널에 정리된다.
 
 - `add_numbers(a=5, b=3)` → 결과 **`8`** ✅
 
@@ -150,11 +150,11 @@ Inspector 에서 확인 가능한 것:
 
 ![say_hello 결과 — Tool Result Success, structured content { result: "안녕하세요, 효인님! MCP 서버에서 인사드려요." }](/assets/posts/mcp-study-log-01/04-say-hello-result.png)
 
-이름을 입력하면 인사 문자열을 돌려줌. **Valid according to output schema** 라고 표기되는 부분 — MCP 가 output schema 까지 검증한다는 게 보임.
+이름을 입력하면 인사 문자열을 돌려준다. **Valid according to output schema** 라고 표기되는 부분 — MCP 가 output schema 까지 검증한다는 게 보인다.
 
 ## 두번째 예제 — 에너지 관리 MCP 서버
 
-가짜 데이터로 **에너지 관리** MCP 서버 구현. [FEMS 프로젝트](/posts/fems-project-log-02) 와 자연스럽게 이어지는 시나리오.
+가짜 데이터로 **에너지 관리** MCP 서버를 구현한다. [FEMS 프로젝트](/posts/fems-project-log-02) 와 자연스럽게 이어지는 시나리오다.
 
 ![에너지 관리 서버 — list_production_lines / get_energy_consumption / list_alarms / get_line_status 네 도구](/assets/posts/mcp-study-log-01/05-energy-management-tools.png)
 
@@ -171,7 +171,7 @@ Inspector 에서 확인 가능한 것:
 
 ![get_energy_consumption(line_1) 결과 — 정격 150kW, 평균 128.0kW, 시간별 상세 표시](/assets/posts/mcp-study-log-01/06-energy-consumption-result.png)
 
-결과가 잘 나옴. **지금은 가짜 데이터지만**, 실제 DB 연결하면:
+결과가 잘 나온다. **지금은 가짜 데이터지만**, 실제 DB 연결하면:
 
 - 전력 효율 확인 / 개선 포인트 도출
 - 알람 발생 부분 파악 + 원인 분석
@@ -189,9 +189,7 @@ Inspector 에서 확인 가능한 것:
 
 1. 서버에서 `@mcp.tool()` 데코레이터로 도구 정의
 2. MCPInspector 로 연결해서 노출된 도구 확인 + 직접 호출
-3. (다음 단계) **LLM 이 도구 사용이 필요한 노드를 만났을 때 MCP 서버를 호출** → 결과를 LLM 컨텍스트로 가져옴
-
-내일은 **Claude Desktop 에 내가 만든 MCP 서버를 실제로 연결** 하는 작업을 해볼 예정.
+3. 그 다음 단계에서 **LLM 이 도구 사용이 필요한 노드를 만났을 때 MCP 서버를 호출** → 결과를 LLM 컨텍스트로 가져오는 그림이 완성된다
 
 ## 더 공부해볼 것
 
