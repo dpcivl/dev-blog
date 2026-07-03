@@ -4,13 +4,13 @@ import Anthropic from "@anthropic-ai/sdk";
 import { SYSTEM_PROMPT } from "./prompt.mjs";
 import { validateAll } from "./validate.mjs";
 
-const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-5";
+const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-5";
 const MAX_TOKENS = 8000;
-// Pricing per 1M tokens (Sonnet 4.5)
-const PRICE_IN = 3;
-const PRICE_OUT = 15;
-const PRICE_CACHE_WRITE = 3.75;
-const PRICE_CACHE_READ = 0.3;
+// Pricing per 1M tokens (Sonnet 5 intro pricing through 2026-08-31: $2/$10)
+const PRICE_IN = 2;
+const PRICE_OUT = 10;
+const PRICE_CACHE_WRITE = 2.5; // 1.25x input
+const PRICE_CACHE_READ = 0.2;  // 0.1x input
 
 /**
  * Translate a single Korean markdown file to English.

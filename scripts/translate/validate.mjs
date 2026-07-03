@@ -5,7 +5,8 @@ const CODE_FENCE = /```[\s\S]*?```/g;
 const INLINE_CODE = /`[^`\n]+`/g;
 const MD_LINK = /\[([^\]]*)\]\(([^)]+)\)/g;
 const MD_IMAGE = /!\[[^\]]*\]\(([^)]+)\)/g;
-const HTML_TAG = /<[^>]+>/g;
+// HTML tags: require a letter or / immediately after < to exclude `<=`, `<-`, `<0` etc.
+const HTML_TAG = /<[a-zA-Z\/][^>]*>/g;
 const HEADING = /^(#{1,6})\s+/gm;
 
 function extractAll(text, re) {
@@ -123,9 +124,14 @@ export function validateHeadings(kr, en) {
   return { ok: issues.length === 0, issues };
 }
 
+// Strip code blocks before extracting HTML tags — code often contains `<=` etc.
+function stripCodeBlocks(text) {
+  return text.replace(CODE_FENCE, "").replace(INLINE_CODE, "");
+}
+
 export function validateHtmlTags(kr, en) {
-  const krTags = extractAll(kr, HTML_TAG);
-  const enTags = extractAll(en, HTML_TAG);
+  const krTags = extractAll(stripCodeBlocks(kr), HTML_TAG);
+  const enTags = extractAll(stripCodeBlocks(en), HTML_TAG);
   const cmp = multisetEqual(krTags, enTags);
   if (!cmp.equal) {
     return {
