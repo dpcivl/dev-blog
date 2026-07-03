@@ -107,6 +107,21 @@ const layoutProps = {
   hreflangAlternates,
 };
 
+// Explicit sidebar language switch hrefs.
+// KO / EN button points to the counterpart post if it exists; otherwise to /en/ home.
+const koHref =
+  currentLang === "ko"
+    ? getPath(post.id, post.filePath)
+    : alternateEntry
+      ? getPath(alternateEntry.id, alternateEntry.filePath)
+      : "/";
+const enHref =
+  currentLang === "en"
+    ? getPath(post.id, post.filePath)
+    : alternateEntry
+      ? getPath(alternateEntry.id, alternateEntry.filePath)
+      : "/en/";
+
 /* ========== Prev/Next Posts ========== */
 
 const allPosts = posts.map(({ data: { title }, id, filePath }) => ({
@@ -126,7 +141,7 @@ const nextPost =
   <Header />
   <BackButton />
   <div class="page-shell page-grid">
-    <Sidebar />
+    <Sidebar {koHref} {enHref} />
     <main
       id="main-content"
       class:list={["pb-12", { "mt-8": !SITE.showBackButton }]}

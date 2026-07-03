@@ -2,6 +2,35 @@
 import { SOCIALS } from "@/constants";
 import LinkButton from "./LinkButton.astro";
 import IconRss from "@/assets/icons/IconRss.svg";
+
+interface Props {
+  koHref?: string;
+  enHref?: string;
+}
+
+const { koHref: koHrefProp, enHref: enHrefProp } = Astro.props;
+
+const pathname = Astro.url.pathname;
+const isEnglishPage =
+  pathname === "/en" ||
+  pathname === "/en/" ||
+  pathname.startsWith("/en/");
+
+// Naive URL swap between languages.
+// Post details override with explicit props when the counterpart exists.
+const defaultKoHref = isEnglishPage
+  ? pathname.replace(/^\/en(\/|$)/, "/") || "/"
+  : pathname;
+const defaultEnHref = isEnglishPage
+  ? pathname
+  : pathname === "/"
+    ? "/en/"
+    : `/en${pathname}`;
+
+const koHref = koHrefProp ?? defaultKoHref;
+const enHref = enHrefProp ?? defaultEnHref;
+
+const currentLang: "ko" | "en" = isEnglishPage ? "en" : "ko";
 ---
 
 <aside class="sidebar">
@@ -19,6 +48,30 @@ import IconRss from "@/assets/icons/IconRss.svg";
       <div class="sidebar-name-en">Park Hyoin</div>
     </div>
     <p class="sidebar-tagline">임베디드 SW · AI Agent · Vibe coding</p>
+    <div class="sidebar-lang-switch" role="group" aria-label="Language">
+      <a
+        href={koHref}
+        class:list={[
+          "sidebar-lang-btn",
+          { "sidebar-lang-active": currentLang === "ko" },
+        ]}
+        aria-current={currentLang === "ko" ? "true" : undefined}
+        aria-label="한국어로 보기"
+      >
+        KO
+      </a>
+      <a
+        href={enHref}
+        class:list={[
+          "sidebar-lang-btn",
+          { "sidebar-lang-active": currentLang === "en" },
+        ]}
+        aria-current={currentLang === "en" ? "true" : undefined}
+        aria-label="View in English"
+      >
+        EN
+      </a>
+    </div>
     <div class="sidebar-socials">
       {
         SOCIALS.map(social => (
@@ -82,6 +135,37 @@ import IconRss from "@/assets/icons/IconRss.svg";
     line-height: 1.5;
     max-width: 200px;
     margin: 0;
+  }
+  .sidebar-lang-switch {
+    display: inline-flex;
+    margin-top: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+  .sidebar-lang-btn {
+    padding: 0.25rem 0.6rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .sidebar-lang-btn + .sidebar-lang-btn {
+    border-left: 1px solid var(--border);
+  }
+  .sidebar-lang-btn:hover {
+    background: var(--accent-bg);
+    color: var(--foreground);
+  }
+  .sidebar-lang-active {
+    background: var(--foreground);
+    color: var(--background);
+  }
+  .sidebar-lang-active:hover {
+    background: var(--foreground);
+    color: var(--background);
   }
   .sidebar-socials {
     display: flex;
