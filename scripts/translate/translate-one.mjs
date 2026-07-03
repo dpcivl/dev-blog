@@ -4,7 +4,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { SYSTEM_PROMPT } from "./prompt.mjs";
 import { validateAll } from "./validate.mjs";
 
-const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-5";
+const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-5";
 const MAX_TOKENS = 8000;
 // Pricing per 1M tokens (Sonnet 4.5)
 const PRICE_IN = 3;
