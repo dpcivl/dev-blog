@@ -31,7 +31,7 @@ Today I'm covering the third one — **comparing an expected answer to the actua
 
 ## Starting the Experiment — and a Sense for Choosing Embedding Models
 
-While typing out the example code, I noticed it used `text-embedding-3-small` as the embedding model. This reminded me of **[the issue I ran into in a previous RAG post](/en/posts/rag-from-scratch-embedding-and-similarity-search#3-semantic-search--한국어가-의외로-낮다)** — this model does well picking top-K results for English, but for **Korean, the absolute similarity values are low and it has poor discriminative power**.
+While typing out the example code, I noticed it used `text-embedding-3-small` as the embedding model. This reminded me of **[the issue I ran into in a previous RAG post](/en/posts/rag-from-scratch-embedding-and-similarity-search#3-semantic-search--korean-turns-out-surprisingly-low)** — this model does well picking top-K results for English, but for **Korean, the absolute similarity values are low and it has poor discriminative power**.
 
 Once you've accumulated experience like this, you start noticing what needs to change before blindly copying code. I think this is exactly why, even as more code gets written with AI assistance these days, the value of a senior developer actually goes up — **the sense of knowing which parts to adjust for your specific situation when the AI spits out a probabilistically plausible answer** becomes more important. Rather than vaguely thinking "I should study more," this is the first concrete direction I've spotted here.
 

@@ -24,7 +24,7 @@ Building on my earlier [RAG built from my blog data](/en/posts/rag-system-chroma
 
 - If the correct answer landed in the top 3 for 17 out of 20 questions → **recall@3 = 85%**
 
-Comparing absolute values is difficult because each model has a different **baseline** for similarity scores ([a problem I ran into in Eval #2](/en/posts/eval-study-log-02-similarity-and-testset-design#두-모델-우열은-지금-데이터로-판단-불가) — bge-m3's zero point is inherently higher). recall@k only looks at **whether the correct answer made it into the top ranks**, which makes a fair comparison possible.
+Comparing absolute values is difficult because each model has a different **baseline** for similarity scores ([a problem I ran into in Eval #2](/en/posts/eval-study-log-02-similarity-and-testset-design#cant-judge-which-model-is-better-from-this-data-alone) — bge-m3's zero point is inherently higher). recall@k only looks at **whether the correct answer made it into the top ranks**, which makes a fair comparison possible.
 
 ## In RAG, recall matters more than precision
 
@@ -112,7 +112,7 @@ Three things I took away from today:
 2. **In RAG, recall > precision** — missing the correct answer is far worse than having irrelevant chunks mixed in.
 3. **The quality of the test set itself is also something to verify** — if both models miss the same thing, you should first suspect the grading criteria.
 
-This experiment also ended up providing after-the-fact justification for [the decision to adopt bge-m3 in FEMS #2](/en/posts/fems-project-log-02#임베딩-모델-선정--ollama-의-bge-m3). Back then I adopted it "because it's specialized for Korean" — this time, I confirmed it with actual recall numbers.
+This experiment also ended up providing after-the-fact justification for [the decision to adopt bge-m3 in FEMS #2](/en/posts/fems-project-log-02#indexing-pipeline). Back then I adopted it "because it's specialized for Korean" — this time, I confirmed it with actual recall numbers.
 
 ## Things to study further
 

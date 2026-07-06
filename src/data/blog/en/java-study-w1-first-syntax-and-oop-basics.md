@@ -11,7 +11,7 @@ draft: false
 featured: false
 ---
 
-Starting today, I'm also studying **the backend concepts and production experience I'm lacking**, in parallel. This is the start of the "understanding WAS" track I briefly mentioned in [the retrospective for Eval Study #2](/en/posts/eval-study-log-02-similarity-and-testset-design#더-공부해볼-것).
+Starting today, I'm also studying **the backend concepts and production experience I'm lacking**, in parallel. This is the start of the "understanding WAS" track I briefly mentioned in [the retrospective for Eval Study #2](/en/posts/eval-study-log-02-similarity-and-testset-design#what-to-study-further).
 
 Since **Java wasn't installed** on my machine, I started by installing it, then spent W1 typing along with easy examples to experience the syntax.
 

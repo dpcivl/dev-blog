@@ -33,7 +33,7 @@ Breaking this expression down:
 - **`List` is the interface** — it only specifies what needs to be done
 - **`ArrayList` is the implementation** — the actual code for how it's done
 
-This is exactly the [interface concept I learned in W1](/en/posts/java-study-w1-first-syntax-and-oop-basics#인터페이스--규격만-정하고-구현은-상속받는-쪽) applied here. The reason you don't need to write `String` again in `ArrayList<>` on the right side is that it's already determined on the left — type inference happens automatically.
+This is exactly the [interface concept I learned in W1](/en/posts/java-study-w1-first-syntax-and-oop-basics#interfaces--only-the-spec-is-defined-implementation-belongs-to-the-inheriting-side) applied here. The reason you don't need to write `String` again in `ArrayList<>` on the right side is that it's already determined on the left — type inference happens automatically.
 
 ## Map — the dictionary feel
 

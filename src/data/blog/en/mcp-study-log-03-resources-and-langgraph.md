@@ -127,7 +127,7 @@ An interesting part — **the MCP server code hasn't changed a single line**, ye
 
 > Why this is possible = **because the implementation follows the MCP standard.** As long as the server follows the stdio / message format standard, any client can pick it up and use it.
 
-This is essentially seeing, in practice, how the **"universal standard"** row of [the "Tool Use vs MCP" table I compared in #1](/en/posts/mcp-study-log-01#왜-mcp-가-필요한가--tool-use-의-한계) actually manifests.
+This is essentially seeing, in practice, how the **"universal standard"** row of [the "Tool Use vs MCP" table I compared in #1](/en/posts/mcp-study-log-01#why-mcp-is-needed--the-limits-of-tool-use) actually manifests.
 
 ## Integrating Resources too — domain knowledge as a system prompt
 
@@ -175,7 +175,7 @@ I've now touched all three components of MCP and combined them with LangGraph. T
 ### 2. Evaluating RAG responses / agent systems
 
 - How to measure the responses of the systems I've built so far (FEMS / LangGraph / MCP)
-- Applying the same principle from [the quant post's "gut-feel benchmarking → numerical benchmarking"](/en/posts/quant-study-00-pandas#회고--느낌으로-벤치마킹-하는-습관을-발견)
+- Applying the same principle from [the quant post's "gut-feel benchmarking → numerical benchmarking"](/en/posts/quant-study-00-pandas#retrospective--discovering-the-habit-of-benchmarking-by-feel)
 - Frameworks like RAGAS / TruLens / DeepEval
 - Automatically building evaluation sets + managing golden answers
 

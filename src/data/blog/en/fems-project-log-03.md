@@ -33,7 +33,7 @@ Today I was going to build the Streamlit dashboard, but **when I started a new C
 
 What's shown in the screenshot is **synthetic data**. Since anomalies were intentionally injected, they can be identified directly from the graph.
 
-> The reason for using synthetic data is the same as [the question raised in #2](/en/posts/fems-project-log-02#합성-데이터-vs-실-데이터--과적합-의문) — when I need questions based on real data, I have to create them separately. Today I threw both types of questions at the system.
+> The reason for using synthetic data is the same as [the question raised in #2](/en/posts/fems-project-log-02#synthetic-data-vs-real-data--a-question-of-overfitting) — when I need questions based on real data, I have to create them separately. Today I threw both types of questions at the system.
 
 ## Q1 — Synthetic data: "Was there a problem with the air compressor in May?"
 

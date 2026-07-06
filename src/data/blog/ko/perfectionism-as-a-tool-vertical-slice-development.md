@@ -113,7 +113,7 @@ AI에게 "잘하는 일을 어떻게 찾나" 를 물어봤다. 돌아온 답: **
 - **Walking Skeleton 패턴** (Alistair Cockburn) — 가장 얇은 end-to-end 동작 가능 시스템부터 시작
 - **Tracer Bullet 개발** (Pragmatic Programmer) — 같은 사상의 다른 표현
 - 애자일에서 user story를 자를 때 **"horizontal slice vs vertical slice"** 논쟁
-- 참고: [Walking Skeleton — Alistair Cockburn](http://alistair.cockburn.us/Walking+skeleton)
+- 참고: [Walking Skeleton — c2 wiki (Alistair Cockburn 기고)](https://wiki.c2.com/?WalkingSkeleton)
 
 ### 2. MVP / 점진적 출시 방법론
 

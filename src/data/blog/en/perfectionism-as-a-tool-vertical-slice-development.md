@@ -113,7 +113,7 @@ There's one more thing — **what you've already done never becomes zero.** Even
 - **Walking Skeleton pattern** (Alistair Cockburn) — start with the thinnest possible end-to-end working system
 - **Tracer Bullet development** (The Pragmatic Programmer) — a different expression of the same idea
 - The **"horizontal slice vs vertical slice"** debate in agile, when cutting user stories
-- Reference: [Walking Skeleton — Alistair Cockburn](http://alistair.cockburn.us/Walking+skeleton)
+- Reference: [Walking Skeleton — c2 wiki (contributed by Alistair Cockburn)](https://wiki.c2.com/?WalkingSkeleton)
 
 ### 2. MVP / incremental release methodology
 

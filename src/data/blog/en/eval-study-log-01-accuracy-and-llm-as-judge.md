@@ -17,7 +17,7 @@ Starting **Eval (Evaluation)** study today.
 
 In past projects, I often measured metrics with vague expressions like **"this feels faster"** or **"this seems to give more accurate answers."** That's fine for a tool made just for myself, but **if I'm building a service to show or sell to someone else, it needs to be quantifiable.**
 
-I already wrote in [the quant post retrospective](/en/posts/quant-study-00-pandas#회고--느낌으로-벤치마킹-하는-습관을-발견) that I need to move from "vibe benchmarking" to "numeric benchmarking." Today starts the follow-up study on that.
+I already wrote in [the quant post retrospective](/en/posts/quant-study-00-pandas#retrospective--discovering-the-habit-of-benchmarking-by-feel) that I need to move from "vibe benchmarking" to "numeric benchmarking." Today starts the follow-up study on that.
 
 ## Table of contents
 
@@ -170,7 +170,7 @@ To **objectively explain** what a system I built can do, I ultimately need numer
 - If the eval set is biased, the evaluation results are biased too — calibrating golden answers
 - **Auto-generated eval sets** (auto-generating questions with an LLM) → the ratio of human review
 - Domain / difficulty distribution of the eval set
-- Directly connected to the eval set section in [the RAG data preparation post](/en/posts/rag-data-preparation-end-to-end#평가셋-구축)
+- Directly connected to the eval set section in [the RAG data preparation post](/en/posts/rag-data-preparation-end-to-end#building-an-evaluation-set)
 
 ### 5. Wiring Eval into CI
 
@@ -184,4 +184,4 @@ To **objectively explain** what a system I built can do, I ultimately need numer
 - Since checking everything is inefficient, combine **prioritizing low-confidence cases** + **random sampling**
 - Securing inter-annotator agreement (consistency across human evaluators)
 - Designing evaluation guidelines / rubrics
-- Same approach as the pattern in [FEMS #2's automatic readable_ratio detection + manual review of only suspicious pages](/en/posts/fems-project-log-02#품질-게이트--readable_ratio-의-정의와-한계)
+- Same approach as the pattern in [FEMS #2's automatic readable_ratio detection + manual review of only suspicious pages](/en/posts/fems-project-log-02#quality-gate--defining-and-limiting-readable_ratio)

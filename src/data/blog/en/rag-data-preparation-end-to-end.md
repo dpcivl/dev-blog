@@ -145,7 +145,7 @@ Data preparation runs as **a loop**. It's not just indexing once and being done:
 
 > **Build a set of question-answer pairs.** This lets you **immediately measure retrieval accuracy** whenever you change the chunking strategy or embedding model.
 
-Without this, you're left guessing at "did changing the embedding model make the answers better or worse?" With an evaluation set, you can **compare with numbers instead**. This is the same idea I picked up from the [retrospective in the quant post](/en/posts/quant-study-00-pandas#회고--느낌으로-벤치마킹-하는-습관을-발견) — the shift from "gut-feel benchmarking" to "numerical benchmarking."
+Without this, you're left guessing at "did changing the embedding model make the answers better or worse?" With an evaluation set, you can **compare with numbers instead**. This is the same idea I picked up from the [retrospective in the quant post](/en/posts/quant-study-00-pandas#retrospective--discovering-the-habit-of-benchmarking-by-feel) — the shift from "gut-feel benchmarking" to "numerical benchmarking."
 
 ### Other ongoing management items
 

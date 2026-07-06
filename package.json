@@ -13,7 +13,9 @@
     "lint": "eslint .",
     "translate": "node scripts/translate/translate.mjs",
     "translate:sample": "node scripts/translate/translate.mjs sample",
-    "translate:batch": "node scripts/translate/translate.mjs batch"
+    "translate:batch": "node scripts/translate/translate.mjs batch",
+    "links": "node scripts/check-links.mjs",
+    "links:external": "node scripts/check-links-external.mjs"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.14",
