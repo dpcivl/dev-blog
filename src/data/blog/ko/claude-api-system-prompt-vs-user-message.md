@@ -3,6 +3,7 @@ title: "시스템 프롬프트가 user 메시지와 다른 점 — 페르소나 
 description: "Claude API에서 페르소나를 실험하다 마주친 의문: 시스템 프롬프트와 'user 메시지에 ~이렇게 해줘'를 그냥 적는 건 어떻게 다른가? 일관성·보안·출력 강제 측면에서 정리했다."
 pubDatetime: 2026-05-06T01:00:00Z
 tags:
+  - LLM공부
   - claude-api
   - llm
   - 학습

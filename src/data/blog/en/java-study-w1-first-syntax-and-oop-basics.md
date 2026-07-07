@@ -3,6 +3,7 @@ title: "Java Study W1 — First Java Run · Syntax Overview · OOP Basics (Class
 description: "Starting Java study to fill in my lacking backend and production experience. In one day, I went from installing Java to covering the switch statement's -> arrow syntax, for-each, the need for double casting in integer division, the public class file rule, encapsulation with private + getter, the difference with and without static, the @Override annotation, and connecting interfaces with implements. Having Python / C++ experience, many concepts were already familiar."
 pubDatetime: 2026-07-03T08:30:00Z
 tags:
+  - 백엔드공부
   - java
   - backend
   - oop

@@ -3,6 +3,7 @@ title: "How System Prompts Differ from User Messages — Persona Consistency and
 description: "A question I ran into while experimenting with personas in the Claude API: how is a system prompt actually different from just writing 'please do X' in a user message? I worked through this in terms of consistency, security, and output enforcement."
 pubDatetime: 2026-05-06T01:00:00Z
 tags:
+  - LLM공부
   - claude-api
   - llm
   - 학습

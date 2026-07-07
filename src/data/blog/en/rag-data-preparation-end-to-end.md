@@ -3,6 +3,7 @@ title: "The Full Flow of RAG Data Preparation — Selection, Cleansing, Chunking
 description: "While working on the FEMS project, I got curious about 'what and how should go into a vector DB.' Key insight — data should be selected backward from 'questions that need to be retrieved,' not from the 'domain' criterion. Also covers cleansing / the effect of metadata (document title, section path) before chunks / OCR preprocessing for analog data / building an evaluation set — the full flow of the RAG data pipeline."
 pubDatetime: 2026-06-26T01:30:00Z
 tags:
+  - LLM공부
   - rag
   - llm
   - 데이터전처리

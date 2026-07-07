@@ -3,6 +3,7 @@ title: "MCP Study #1 — Getting Started with Model Context Protocol · First Ca
 description: "Starting to study MCP (Model Context Protocol) today. It's a standard protocol created by Anthropic that standardizes how LLMs access external systems. Comparing it with Tool Use → building my first MCP server (say_hello / add_numbers) with the Python SDK → verifying the stdio connection with MCP Inspector → building a fake energy management server that connects with FEMS. Connection failure due to venv python.exe path issue + fix."
 pubDatetime: 2026-06-26T04:00:00Z
 tags:
+  - LLM공부
   - mcp
   - anthropic
   - llm

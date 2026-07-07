@@ -3,6 +3,7 @@ title: "RAG Embedding Comparison — Measuring recall@k on My Blog Data (OpenAI 
 description: "After establishing the [\"feeling-based benchmarking → numeric benchmarking\" principle](/en/posts/quant-study-00-pandas) in my quant retrospective, I actually quantified an embedding model comparison this time. I indexed 441 chunks from my blog posts with OpenAI text-embedding-3-small and bge-m3 respectively, then measured recall@3 with a test set of 20 question-answer source pairs. Overall: OpenAI 80% vs bge-m3 90%. bge-m3 hit 100% on hard-difficulty questions — the decisive factor was connecting to the source text by meaning even when words didn't overlap. On easy questions, the misses turned out to be caused by typos (cladue, underscores) — a twist showing the grading criteria itself was wrong."
 pubDatetime: 2026-07-03T05:00:00Z
 tags:
+  - LLM공부
   - rag
   - 임베딩
   - openai

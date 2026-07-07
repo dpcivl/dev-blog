@@ -3,6 +3,7 @@ title: "Eval Study #2 — The Pitfalls of Similarity-Based Evaluation, 5 Princip
 description: "My second session studying Eval. I ran similarity-based evaluation (embedding cosine similarity) myself and got an unexpected result — both OpenAI's text-embedding-3-small and bge-m3 gave the highest score to the 'wrong answer.' This is because similarity captures topical/expressive closeness, not content correctness. Just a difference in markdown formatting can swing similarity scores significantly. In practice, combining similarity with LLM-as-Judge is the standard approach. Also covers 5 principles of test set design, plus a terminology correction: it's not a 'regression test,' it's improvement validation (A/B)."
 pubDatetime: 2026-07-02T13:30:00Z
 tags:
+  - LLM공부
   - eval
   - llm
   - rag

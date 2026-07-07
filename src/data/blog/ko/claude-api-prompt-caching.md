@@ -3,6 +3,7 @@ title: "Prompt Caching — 같은 입력을 반복할 때 input 비용을 거의
 description: "긴 시스템 프롬프트나 같은 컨텍스트를 매 호출마다 보내는 챗봇·에이전트·RAG에 필수인 prompt caching. 직접 STM32/임베디드 질문으로 캐싱 유무를 비교 실험했더니 비용은 절반, 시간은 미미하게 줄었다."
 pubDatetime: 2026-06-16T01:00:00Z
 tags:
+  - LLM공부
   - claude-api
   - llm
   - 최적화

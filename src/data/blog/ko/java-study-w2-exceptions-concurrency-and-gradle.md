@@ -3,6 +3,7 @@ title: "자바 공부 W2 (이어서) — 예외 처리 · 동시성 · record ·
 description: "자바 W2 마무리. 예외 처리는 디버깅 편의가 아니라 백엔드 서버가 프로덕션에서 안 죽게 하기 위한 방어막이었음을 이해. print vs throw 의 차이 — print 는 호출자에게 실패를 전달하지 않지만 예외는 강제로 전파. 동시성은 ExecutorService · newFixedThreadPool 로 3초 순차 → 1초 병렬 (실측 3008ms → 1006ms). record 는 필드·생성자·접근자·toString·equals·hashCode 자동 생성 — 강우량계 데이터로거의 RainDataDTO 같은 순수 데이터 컨테이너에 딱 맞음. var/switch 화살표/텍스트 블록 같은 Modern Java 도 훑음. 마지막으로 Gradle — 파일이 수백 개 될 때 java 로 하나씩 컴파일하는 건 불가능, 외부 라이브러리도 자동으로 받아옴. build.gradle 이 핵심 설정 파일."
 pubDatetime: 2026-07-07T05:00:00Z
 tags:
+  - 백엔드공부
   - java
   - backend
   - 예외처리

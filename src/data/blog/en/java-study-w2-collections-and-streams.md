@@ -3,6 +3,7 @@ title: "Java Study W2 — Collections (List / Map / Set) · Stream Pipelines · 
 description: "Week 2 of studying Java. I go through the core of the Collection Framework — List (ArrayList), Map (HashMap), Set — and notice the 'interface and implementation' pattern in each of them (List<String> books = new ArrayList<>()). Then I move on to Stream, building filter → map → collect pipelines without for loops, method references (System.out::println), and combining groupingBy + counting. Finally, Optional — I learn to always handle the absence-of-value case with ifPresent / orElse / map instead of calling get() right away."
 pubDatetime: 2026-07-06T05:00:00Z
 tags:
+  - 백엔드공부
   - java
   - collection
   - stream

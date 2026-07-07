@@ -3,6 +3,7 @@ title: "LLM에게 도구를 쥐여주기 — Claude Tool Use와 에이전트 루
 description: "LLM은 큰 수 계산도, 오늘 날씨도 모른다. 그 약점을 외부 함수 호출로 메우는 Tool Use를 처음 만져봤다. 메시지 흐름, 다중 도구 자동 선택, 에이전트 루프까지."
 pubDatetime: 2026-05-14T13:00:00Z
 tags:
+  - LLM공부
   - claude-api
   - llm
   - tool-use

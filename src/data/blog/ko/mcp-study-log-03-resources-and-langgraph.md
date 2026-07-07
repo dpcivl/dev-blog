@@ -3,6 +3,7 @@ title: "MCP 공부 #3 — Resources / Prompts 의 정체 + LangGraph 와 통합 
 description: "MCP 의 세 구성요소 중 #1 / #2 에서 다룬 Tools 외에 Resources(LLM 이 읽을 데이터, 백그라운드 컨텍스트, 읽기 전용) 와 Prompts(미리 정의된 템플릿) 까지. Inspector + Claude Desktop 으로 새 서버 확인 → langchain-mcp-adapters 로 MCP 서버를 LangGraph 에 통합. MCP 통신이 비동기라 `ainvoke` 필요한 이유, MultiServerMCPClient 가 서버 그대로 불러오는 비결(=MCP 표준 준수), Resources 를 시스템 프롬프트로 주입했을 때의 도메인 응답 품질 차이까지."
 pubDatetime: 2026-06-28T15:00:00Z
 tags:
+  - LLM공부
   - mcp
   - langgraph
   - langchain

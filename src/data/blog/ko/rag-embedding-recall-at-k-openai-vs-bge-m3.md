@@ -3,6 +3,7 @@ title: "RAG 임베딩 비교 — 내 블로그 데이터로 recall@k 측정 (Ope
 description: "[퀀트 회고에서 '느낌 벤치마킹 → 수치 벤치마킹' 원칙](/posts/quant-study-00-pandas) 을 세운 뒤, 이번엔 임베딩 모델 비교를 실제로 수치화. 내 블로그 글 441청크에 OpenAI text-embedding-3-small 과 bge-m3 를 각각 인덱싱하고, 20개 질문·정답 출처 테스트셋으로 recall@3 을 측정. 전체 OpenAI 80% vs bge-m3 90%. hard 난이도에서 bge-m3 가 100% — 단어 안 겹쳐도 의미로 원문과 연결한 케이스가 결정적. easy 에서 놓친 원인은 오타(cladue, 언더스코어)라 채점 기준 자체가 틀렸다는 반전."
 pubDatetime: 2026-07-03T05:00:00Z
 tags:
+  - LLM공부
   - rag
   - 임베딩
   - openai

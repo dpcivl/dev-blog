@@ -3,6 +3,7 @@ title: "자바 공부 W2 — 컬렉션 (List / Map / Set) · Stream 파이프라
 description: "자바 공부 2주차. Collection Framework 핵심 — List (ArrayList), Map (HashMap), Set 을 훑고, 각각 '인터페이스와 구현체' 패턴이 보임 (List<String> books = new ArrayList<>()). 이후 Stream 으로 넘어가 for 문 없이 filter → map → collect 파이프라인, method reference (System.out::println), groupingBy + counting 조합. 마지막은 Optional — get() 즉시 호출 대신 ifPresent / orElse / map 으로 값 없을 때를 항상 함께 처리해야 하는 감각."
 pubDatetime: 2026-07-06T05:00:00Z
 tags:
+  - 백엔드공부
   - java
   - collection
   - stream

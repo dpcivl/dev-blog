@@ -3,6 +3,7 @@ title: "MCP 공부 #2 — Claude Desktop 에 내가 만든 MCP 서버 붙이기 
 description: "어제 만든 energy-management MCP 서버를 Claude Desktop 에 실제로 연결. claude_desktop_config.json 찾는 법(설정 → 개발자 → 구성 편집) → 서버 등록 → 재시작 → 커넥터 메뉴에서 확인 → '공장 라인 목록 보여줘' 질문에 Claude 가 도구 호출 + '항상 허용/거부' 승인 UX 까지. 의문 — RAG 와 MCP 를 같이 쓰는 방법은? (답: RAG 를 MCP 서버로 감싸면 됨)"
 pubDatetime: 2026-06-26T23:30:00Z
 tags:
+  - LLM공부
   - mcp
   - anthropic
   - claude-desktop

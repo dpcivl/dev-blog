@@ -3,6 +3,7 @@ title: "LangGraph Study #3 — Human-in-the-Loop (Approving Risky Tools) · Chec
 description: "When an agent automatically calls risky tools like file deletion, sending emails, or payments, things go wrong. Implementing the HITL pattern using LangGraph's checkpoint + Interrupt mechanism to get human approval right before a risky tool call. An unexpected trap: the LLM's own safety guard can block execution before it ever reaches HITL. How to separate the system prompt from the HITL gate."
 pubDatetime: 2026-06-25T06:00:00Z
 tags:
+  - LLM공부
   - langgraph
   - agent
   - hitl

@@ -3,6 +3,7 @@ title: "Building a RAG Q&A System with Chroma + My Blog — From Parts to System
 description: "Yesterday I played with the parts of RAG (embedding / cosine similarity / chunks). Today, I put them together into a system. I introduced the Chroma vector DB, indexed 270 chunks from my blog, and built a Q&A system with OpenAI + Claude. The most memorable moment was when it answered 'I don't know' to a question about information not covered on my blog."
 pubDatetime: 2026-06-20T07:45:00Z
 tags:
+  - LLM공부
   - rag
   - llm
   - openai

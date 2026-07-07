@@ -3,6 +3,7 @@ title: "MCP 공부 #1 — Model Context Protocol 시작 · stdio 서버 + Inspec
 description: "오늘부터 MCP (Model Context Protocol) 공부 시작. Anthropic 이 만든 표준 프로토콜로, LLM 이 외부 시스템에 접근하는 방식을 표준화. Tool Use 와의 차이 비교 → Python SDK 로 첫 MCP 서버 (say_hello / add_numbers) 구현 → MCP Inspector 로 stdio 연결 확인 → FEMS 와 연결되는 가짜 에너지 관리 서버까지. venv python.exe 경로 문제로 연결 실패 + 해결."
 pubDatetime: 2026-06-26T04:00:00Z
 tags:
+  - LLM공부
   - mcp
   - anthropic
   - llm

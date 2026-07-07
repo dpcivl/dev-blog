@@ -3,6 +3,7 @@ title: "Eval Study #1 — Ending 'Vibe Benchmarking' · Accuracy-based + First L
 description: "Eval Study #1 — Ending 'Vibe Benchmarking' · Accuracy-based + First LLM-as-Judge Implementation"
 pubDatetime: 2026-06-29T08:30:00Z
 tags:
+  - LLM공부
   - eval
   - llm
   - agent

@@ -3,6 +3,7 @@ title: "Prompt Caching — Bringing Input Cost Close to Zero for Repeated Inputs
 description: "Prompt caching is essential for chatbots, agents, and RAG that send long system prompts or the same context on every call. I ran a direct comparison with and without caching using STM32/embedded questions — cost dropped by half, and time dropped slightly."
 pubDatetime: 2026-06-16T01:00:00Z
 tags:
+  - LLM공부
   - claude-api
   - llm
   - 최적화

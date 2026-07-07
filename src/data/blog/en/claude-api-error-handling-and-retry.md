@@ -3,6 +3,7 @@ title: "Claude API Error Handling and Retry — Distinguishing Transient, Perman
 description: "What errors should I handle, and how, to build a reliable LLM service? I classify errors into transient / permanent / user input / response format categories, and practice through 4 stages: basic try-except wrapper → Exponential backoff → Anthropic SDK built-in retry → JSON response validation."
 pubDatetime: 2026-06-19T00:30:00Z
 tags:
+  - LLM공부
   - claude-api
   - llm
   - 에러핸들링

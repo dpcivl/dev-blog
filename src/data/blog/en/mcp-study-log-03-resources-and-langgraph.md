@@ -3,6 +3,7 @@ title: "MCP Study #3 — What Resources / Prompts Actually Are + Integration wit
 description: "Beyond Tools covered in #1 / #2, this post covers the other two components of MCP: Resources (data for the LLM to read, background context, read-only) and Prompts (predefined templates). I check a new server with Inspector + Claude Desktop → integrate the MCP server into LangGraph using langchain-mcp-adapters. Covers why `ainvoke` is needed since MCP communication is asynchronous, the secret behind how MultiServerMCPClient loads servers as-is (= MCP standard compliance), and the difference in domain response quality when injecting Resources as a system prompt."
 pubDatetime: 2026-06-28T15:00:00Z
 tags:
+  - LLM공부
   - mcp
   - langgraph
   - langchain

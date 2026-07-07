@@ -3,6 +3,7 @@ title: "MCP Study #2 — Connecting My MCP Server to Claude Desktop · Tool Call
 description: "Actually connecting the energy-management MCP server I built yesterday to Claude Desktop. From finding claude_desktop_config.json (Settings → Developer → Edit Config) → registering the server → restarting → checking the connectors menu → asking 'show me the factory line list' and watching Claude call the tool with the 'Always Allow/Deny' approval UX. Question raised: how do you use RAG and MCP together? (Answer: wrap RAG in an MCP server)"
 pubDatetime: 2026-06-26T23:30:00Z
 tags:
+  - LLM공부
   - mcp
   - anthropic
   - claude-desktop

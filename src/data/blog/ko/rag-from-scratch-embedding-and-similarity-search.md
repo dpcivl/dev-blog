@@ -3,6 +3,7 @@ title: "RAG 직접 구현 — 임베딩 · 코사인 유사도 · 청크 검색 
 description: "RAG (Retrieval-Augmented Generation) 의 안쪽을 직접 코드로 깎으면서 임베딩이 무엇인지부터 의심스러운 결과를 디버깅하는 데까지. OpenAI text-embedding-3-small 로 1536차원 벡터를 뽑고, 코사인 유사도로 비교하고, 한국어 vs 영어 성능을 비교하고, 청크 분할까지. 의외로 한국어 임베딩 유사도가 낮은 게 관찰됨."
 pubDatetime: 2026-06-19T13:30:00Z
 tags:
+  - LLM공부
   - rag
   - llm
   - openai

@@ -3,6 +3,7 @@ title: "LangGraph 공부 일지 #2 — State 확장 + 동적 시스템 프롬프
 description: "메시지만 들고 다니던 State 를 사용자 이름·도구 호출 횟수·세션 시작 시간까지 확장하고, 그 State 로 시스템 프롬프트를 동적으로 구성. 마지막에 챗봇을 만들다가 '기억' 의 정체를 알아챈 게 오늘의 진짜 깨달음."
 pubDatetime: 2026-06-21T09:20:00Z
 tags:
+  - LLM공부
   - LangGraph
   - LLM
   - 에이전트

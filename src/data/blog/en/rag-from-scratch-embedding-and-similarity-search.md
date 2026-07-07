@@ -3,6 +3,7 @@ title: "Building RAG from Scratch — Embedding, Cosine Similarity, Chunk Search
 description: "Carving out the inside of RAG (Retrieval-Augmented Generation) with actual code, from what embedding even is to debugging suspicious results. I pulled 1536-dimension vectors with OpenAI's text-embedding-3-small, compared them with cosine similarity, compared Korean vs English performance, and worked through chunk splitting. Surprisingly, Korean embedding similarity turned out to be lower."
 pubDatetime: 2026-06-19T13:30:00Z
 tags:
+  - LLM공부
   - rag
   - llm
   - openai

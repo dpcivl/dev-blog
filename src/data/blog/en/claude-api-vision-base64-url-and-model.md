@@ -3,6 +3,7 @@ title: "Claude Vision — How Do You Send Images In, and Which Model Should Rece
 description: "I tried both ways of sending images — base64 encoding and URL — and found them accurate but more token-costly, hit limits with small text and complex shapes, and got a sense of when to move up to a bigger model for tasks that need accuracy."
 pubDatetime: 2026-05-15T12:30:00Z
 tags:
+  - LLM공부
   - claude-api
   - vision
   - llm

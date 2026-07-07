@@ -3,6 +3,7 @@ title: "LangGraph Study Log #2 — Extending State + Dynamic System Prompts + Ch
 description: "I extended State beyond just messages to include user name, tool call count, and session start time, then used that State to dynamically build the system prompt. Along the way, building a chatbot led me to the real revelation of the day: what 'memory' actually is."
 pubDatetime: 2026-06-21T09:20:00Z
 tags:
+  - LLM공부
   - LangGraph
   - LLM
   - 에이전트

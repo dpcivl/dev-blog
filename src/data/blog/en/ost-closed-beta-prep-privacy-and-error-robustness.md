@@ -1,5 +1,5 @@
 ---
-title: "OST Closed Beta Prep #1 — Error Robustness, Privacy Notice Draft, Consent Gate"
+title: "OST Closed Beta Prep — Error Robustness, Privacy Notice Draft, Consent Gate"
 description: "Preparing to hand off the perfectionism companion app OneSmallThing (OST) to other users after 2 weeks of dogfooding. Today's three things — (1) discovering that optimistic mutation code had zero catch blocks and adding rollback, (2) drafting a privacy notice — closed beta doesn't require a full privacy policy (a fine of up to 50 million KRW applies at full launch if one isn't written), but consent is required for three items: general collection/use, sensitive information (emotions/records), and cross-border transfer (Anthropic API = US, no Korea region), (3) building a consent gate UI that re-prompts existing users who haven't consented yet. KISA and PIPC's free consulting (for SMEs, small business owners, solo developers) is the review path for full launch."
 pubDatetime: 2026-07-06T08:30:00Z
 tags:
@@ -70,7 +70,7 @@ While searching for how much legal counsel might cost, I found out that the **Pe
 
 After drafting the privacy notice, I added a **consent gate**. Even existing users who haven't consented now see the consent screen right after entry. I was still in dogfooding, but I ran into this new screen myself and had to click through it.
 
-![OST consent gate — checkbox UI for 3 items: (Required) personal information collection/use, (Required) sensitive information (emotion/feeling records) processing, (Optional) cross-border transfer of personal information](/assets/posts/ost-closed-beta-prep-01-privacy-and-error-robustness/01-consent-gate.png)
+![OST consent gate — checkbox UI for 3 items: (Required) personal information collection/use, (Required) sensitive information (emotion/feeling records) processing, (Optional) cross-border transfer of personal information](/assets/posts/ost-closed-beta-prep-privacy-and-error-robustness/01-consent-gate.png)
 
 - (Required) General collection/use — service access restricted if refused
 - (Required) Sensitive information processing — journaling/analysis features restricted if refused

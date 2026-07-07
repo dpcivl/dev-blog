@@ -3,6 +3,7 @@ title: "Claude API Doesn't Remember — Maintaining Context in Multi-Turn Conver
 description: "The API is stateless. You need to accumulate assistant messages in the messages array for the chatbot to remember the previous conversation. I confirmed this through a direct comparison experiment."
 pubDatetime: 2026-05-05T13:30:00Z
 tags:
+  - LLM공부
   - claude-api
   - llm
   - 학습

@@ -3,6 +3,7 @@ title: "Claude API Streaming — Why TTFT Matters, and How Events Actually Flow"
 description: "Streaming isn't just a 'text appears letter by letter like an LLM' effect. Even with the same total time, the time until the user sees the first result (TTFT) differs, and that difference is the core of UX. I also traced the event order that delivers it, hands-on."
 pubDatetime: 2026-05-07T13:30:00Z
 tags:
+  - LLM공부
   - claude-api
   - llm
   - 스트리밍

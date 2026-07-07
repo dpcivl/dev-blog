@@ -3,6 +3,7 @@ title: "Java Study W2 (Continued) — Exception Handling · Concurrency · recor
 description: "Wrapping up Java W2. Understood that exception handling isn't about debugging convenience — it's a safeguard so backend servers don't die in production. The difference between print vs throw — print doesn't convey failure to the caller, but exceptions force propagation. Concurrency with ExecutorService · newFixedThreadPool — 3 seconds sequential → 1 second parallel (measured 3008ms → 1006ms). record auto-generates fields, constructor, accessors, toString, equals, hashCode — a perfect fit for pure data containers like RainDataDTO from a rain gauge data logger. Also covered Modern Java features like var/switch arrows/text blocks. Finally, Gradle — once you have hundreds of files, compiling one by one with java is impossible, and it also auto-fetches external libraries. build.gradle is the core config file."
 pubDatetime: 2026-07-07T05:00:00Z
 tags:
+  - 백엔드공부
   - java
   - backend
   - 예외처리
@@ -78,7 +79,7 @@ Code: [`ModernDemo.java`](https://github.com/dpcivl/be-study/blob/main/week2-col
 Three modern Java features — things that feel familiar if you're coming from Python:
 
 - **`var`** — type inference. Like `var name = "hyoin";`, the type is inferred from the right-hand side
-- **`switch` arrow** — the `case ... ->` syntax [I already covered in W1](/en/posts/java-study-w1-first-syntax-and-oop-basics#switch--화살표-방식)
+- **`switch` arrow** — the `case ... ->` syntax [I already covered in W1](/en/posts/java-study-w1-first-syntax-and-oop-basics#switch--the-arrow-style)
 - **Text blocks** — multi-line strings with `"""..."""` (similar to Python triple-quoted strings)
 
 There's a perception that Java = lots of old-style boilerplate, but using these recent syntax features makes it **as concise as Python**.
@@ -120,7 +121,7 @@ Three things that clicked while wrapping up W2:
 2. **Concurrency is a tool that "turns a 10-second problem into a 1-second problem"** — throw it at a thread pool and it parallelizes exactly as the theory predicts. But this only holds when "tasks are independent of each other." When there's shared state, new problems like race conditions and deadlocks open up (an advanced topic).
 3. **Gradle is "the thing I'd been putting off because I didn't know it"** — running single example files is fine for learning purposes, but the moment you move to a real project, it's essential. To move on to Spring Boot, you need to get comfortable with this first.
 
-Through W2, [the sense of interfaces I got in W1](/en/posts/java-study-w1-first-syntax-and-oop-basics#인터페이스--규격만-정하고-구현은-상속받는-쪽) got reused in collections (List/ArrayList, etc.), and today I felt that **the contractual nature of exceptions** — Java's enforcement of pinning down in the signature which exceptions a method can throw — is the same kind of thinking.
+Through W2, [the sense of interfaces I got in W1](/en/posts/java-study-w1-first-syntax-and-oop-basics#interfaces--only-the-spec-is-defined-implementation-belongs-to-the-inheriting-side) got reused in collections (List/ArrayList, etc.), and today I felt that **the contractual nature of exceptions** — Java's enforcement of pinning down in the signature which exceptions a method can throw — is the same kind of thinking.
 
 ## Further Study
 

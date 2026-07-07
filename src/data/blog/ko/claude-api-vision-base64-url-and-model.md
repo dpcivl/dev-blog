@@ -3,6 +3,7 @@ title: "Claude Vision — 이미지를 어떻게 넣는가, 그리고 어느 모
 description: "이미지를 base64로 인코딩해서 보내는 방식과 URL로 보내는 방식 두 가지를 모두 써봤다. 정확하지만 토큰 비용이 더 든다는 점, 작은 텍스트·복잡한 도형의 한계, 그리고 정확도가 필요한 작업에는 더 큰 모델로 옮겨야 한다는 감각까지."
 pubDatetime: 2026-05-15T12:30:00Z
 tags:
+  - LLM공부
   - claude-api
   - vision
   - llm

@@ -3,6 +3,7 @@ title: "LangGraph Study Log #1 — My First Graph + Why State Confused Me"
 description: "Starting LangGraph, one of the study candidates I had noted down. Building nodes, edges, conditional branches, and loops with StateGraph was more intuitive than expected, but the term 'State' didn't click for a while. I finally settled on it by comparing it to a game character's inventory and HP."
 pubDatetime: 2026-06-21T06:20:00Z
 tags:
+  - LLM공부
   - LangGraph
   - LLM
   - 에이전트

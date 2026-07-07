@@ -3,6 +3,7 @@ title: "Giving LLMs Tools — Claude Tool Use and the Agent Loop"
 description: "LLMs don't know large-number arithmetic or today's weather. I tried out Tool Use, which patches that weakness with external function calls. Message flow, automatic multi-tool selection, and the agent loop."
 pubDatetime: 2026-05-14T13:00:00Z
 tags:
+  - LLM공부
   - claude-api
   - llm
   - tool-use

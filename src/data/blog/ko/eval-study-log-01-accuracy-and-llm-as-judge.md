@@ -3,6 +3,7 @@ title: "Eval 공부 #1 — '느낌 벤치마킹' 을 끝낼 때 · 정확도 기
 description: "여태 프로젝트마다 '빠른 거 같다', '정확한 것 같다' 식 느낌 평가만 해왔는데, 이제 진짜로 수치화하는 Eval 공부 시작. Eval 의 4가지 종류(정확도 / 유사도 / LLM-as-Judge / 사람 평가) 정리 + 도구 선택 정확도 10/10 측정 + LLM-as-Judge 로 같은 질문에 대한 두 답변을 8/10 vs 3/10 으로 채점. LLM-as-Judge 의 한계(평가자 변동성, 같은 모델 답변 후한 점수)까지."
 pubDatetime: 2026-06-29T08:30:00Z
 tags:
+  - LLM공부
   - eval
   - llm
   - agent
