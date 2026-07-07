@@ -78,38 +78,47 @@ function formatDate(d?: Date) {
 
       {
         seriesWithPosts.map(s => (
-          <section class="series-block">
-            <div class="series-header">
-              <h2 class="series-title">{s.title}</h2>
-              <span class="series-badge">{s.posts.length}편</span>
-            </div>
-            <p class="series-desc">{s.description}</p>
-            {s.firstDate && (
-              <div class="series-period">
-                {formatDate(s.firstDate)}
-                {s.posts.length > 1 && ` ~ ${formatDate(s.lastDate)}`}
+          <details class="series-block">
+            <summary class="series-summary">
+              <div class="series-header">
+                <h2 class="series-title">{s.title}</h2>
+                <span class="series-badge">{s.posts.length}편</span>
               </div>
-            )}
+              <span class="series-chevron" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 6 15 12 9 18"></polyline>
+                </svg>
+              </span>
+            </summary>
+            <div class="series-body">
+              <p class="series-desc">{s.description}</p>
+              {s.firstDate && (
+                <div class="series-period">
+                  {formatDate(s.firstDate)}
+                  {s.posts.length > 1 && ` ~ ${formatDate(s.lastDate)}`}
+                </div>
+              )}
 
-            <ol class="series-list">
-              {s.posts.map((p, idx) => (
-                <li>
-                  <a href={`${getPath(p.id, p.filePath)}/`} class="series-item group">
-                    <span class="series-idx">{String(idx + 1).padStart(2, "0")}</span>
-                    <div class="series-item-body">
-                      <div class="series-item-title group-hover:text-accent">
-                        {p.data.title}
+              <ol class="series-list">
+                {s.posts.map((p, idx) => (
+                  <li>
+                    <a href={`${getPath(p.id, p.filePath)}/`} class="series-item group">
+                      <span class="series-idx">{String(idx + 1).padStart(2, "0")}</span>
+                      <div class="series-item-body">
+                        <div class="series-item-title group-hover:text-accent">
+                          {p.data.title}
+                        </div>
+                        <div class="series-item-desc">{p.data.description}</div>
                       </div>
-                      <div class="series-item-desc">{p.data.description}</div>
-                    </div>
-                  </a>
-                </li>
-              ))}
-            </ol>
-            {s.posts.length === 0 && (
-              <p class="series-empty">아직 발행된 글이 없습니다.</p>
-            )}
-          </section>
+                    </a>
+                  </li>
+                ))}
+              </ol>
+              {s.posts.length === 0 && (
+                <p class="series-empty">아직 발행된 글이 없습니다.</p>
+              )}
+            </div>
+          </details>
         ))
       }
 
@@ -147,11 +156,46 @@ function formatDate(d?: Date) {
   }
 
   .series-block {
-    padding: 2.5rem 0;
+    padding: 0;
     border-bottom: 1px dashed var(--border);
   }
   .series-block:last-child {
     border-bottom: none;
+  }
+
+  .series-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.5rem 0;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+  }
+  .series-summary::-webkit-details-marker {
+    display: none;
+  }
+  .series-summary:hover .series-title {
+    color: var(--accent);
+  }
+  .series-title {
+    transition: color 0.15s ease;
+  }
+  .series-chevron {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    transition: transform 0.2s ease, color 0.15s ease;
+  }
+  .series-block[open] > .series-summary .series-chevron {
+    transform: rotate(90deg);
+    color: var(--accent);
+  }
+  .series-body {
+    padding: 0 0 1.5rem 0;
   }
 
   .series-header {
