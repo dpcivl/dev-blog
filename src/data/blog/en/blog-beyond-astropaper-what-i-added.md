@@ -14,7 +14,7 @@ draft: false
 featured: true
 ---
 
-This blog started on top of **[AstroPaper](https://github.com/satnaing/astro-paper)**, but I didn't leave it as-is. Here's a rundown of the features I've bolted on over the past six-plus months, from the perspective of running **a one-person content system that publishes daily**. Each item follows a 3-part structure: **"what was missing in AstroPaper's default state → how I solved it → the result."**
+This blog started on top of **[AstroPaper](https://github.com/satnaing/astro-paper)**, but I didn't leave it as-is. Starting in May 2026, I spent a bit over two months running **a one-person content system that publishes daily** and bolted on the features described below. Each item follows a 3-part structure: **"what was missing in AstroPaper's default state → how I solved it → the result."**
 
 > **Why I'm writing this:** The code for this blog is public on [GitHub](https://github.com/dpcivl/dev-blog), but the **reasons behind these decisions** are scattered across commit messages with no single place to see them all. This document serves as that context log.
 >
