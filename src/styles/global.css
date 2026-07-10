@@ -15,7 +15,7 @@ html[data-theme="light"] {
   --background: #fafafa;          /* 본문 배경 */
   --surface: #ffffff;             /* 카드, 사이드바 */
   --foreground: #1a1a1a;          /* 헤딩 / 본문 텍스트 */
-  --muted: #6b7280;               /* 메타 정보, 캡션 */
+  --muted: #4b5563;               /* 메타 정보, 캡션 (WCAG AA 여유 확보) */
   --border: #e5e5e5;
   --accent: #6a5acd;              /* 링크/버튼 — 슬레이트블루 (가독성 확보) */
   --accent-bg: #d8d4ea;           /* 태그 배경, hover — 쿼츠 톤 */
