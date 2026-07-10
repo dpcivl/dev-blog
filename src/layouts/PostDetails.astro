@@ -8,6 +8,7 @@ import Tag from "@/components/Tag.astro";
 import Datetime from "@/components/Datetime.astro";
 import EditPost from "@/components/EditPost.astro";
 import ShareLinks from "@/components/ShareLinks.astro";
+import Feedback from "@/components/Feedback.astro";
 import BackButton from "@/components/BackButton.astro";
 import ScrollButtons from "@/components/ScrollButtons.astro";
 import { getPath } from "@/utils/getPath";
@@ -178,6 +179,8 @@ const nextPost =
     <ul class="mt-4 mb-8 flex flex-wrap gap-4 sm:my-8">
       {tags.map(tag => <Tag tag={slugifyStr(tag)} tagName={tag} size="sm" />)}
     </ul>
+
+    <Feedback lang={currentLang} postTitle={title} />
 
     <ShareLinks />
 

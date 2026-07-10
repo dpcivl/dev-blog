@@ -183,6 +183,13 @@ Three optimizations at once:
   - **`<link rel="preload">`** for the Pretendard CSS to fetch the font CSS early → reduces render blocking
 - **Result**: `public/assets/posts/` went **from 62 MB to 15 MB (75% reduction, 61 images converted)**. Off-screen images on list/tag pages now lazy load during scrolling → improved first paint. LCP candidate images still keep priority.
 
+### 15. Post-bottom feedback CTA — a channel without a comments system
+
+- **Problem**: This is a learning-log blog, so there isn't enough interaction pressure to justify a full comments system. But the About page isn't linked from the nav, sidebar, or footer — it functions as a resume / portfolio landing accessed only via a direct URL. That left visitors with only a small email icon in the sidebar as a way to point out errors or suggest additions. The icon is easy to miss.
+- **Solution**: [`src/components/Feedback.astro`](https://github.com/dpcivl/dev-blog/blob/main/src/components/Feedback.astro) — a visible dashed-border box at the bottom of every post exposing exactly two CTAs. **Email** (a `mailto:` with the post title pre-filled into the subject) + **Open a GitHub Issue** (same title pre-fill). i18n aware (KO/EN copy branches).
+- **Result**: A real feedback channel without the JS overhead, spam, moderation, or ghost-town issues of a comments system. Zero performance regression. Visitors explicitly see "this is where you talk to the author."
+- **Note**: Comments (giscus etc.) get re-evaluated once traffic grows and real feedback pressure appears. For now the CTA alone is judged enough.
+
 ## Common principles
 
 Four things run through all of these features:
@@ -210,3 +217,4 @@ Four things run through all of these features:
 
 - **2026-07-10** — First edition. Covered 12 features (series, playground, i18n, translation automation, link checker, Mermaid, Scratch/Inbox, soft-hide, pubDatetime filter, security scrubbing, Featured/series tags, redesign)
 - **2026-07-10** (2nd) — Added SEO improvements (JSON-LD branching by page type, standard field additions) and 3 performance items (rehype image lazy loading, PNG → WebP script, Pretendard CSS preload). Also replaced the README from the original AstroPaper version with a custom one.
+- **2026-07-10** (3rd) — Added the post-bottom feedback CTA (`Feedback.astro`). Provides a real channel via email + GitHub Issues without adopting a comments system (zero JS load).

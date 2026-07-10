@@ -1,0 +1,97 @@
+---
+type Props = {
+  lang: "ko" | "en";
+  postTitle: string;
+};
+
+const { lang, postTitle } = Astro.props;
+
+const subject = lang === "en"
+  ? `Feedback: ${postTitle}`
+  : `[블로그 피드백] ${postTitle}`;
+
+const emailHref =
+  `mailto:dpcivl713@gmail.com?subject=${encodeURIComponent(subject)}`;
+
+const issueHref =
+  `https://github.com/dpcivl/dev-blog/issues/new?title=${encodeURIComponent(subject)}`;
+
+const copy =
+  lang === "en"
+    ? {
+        intro: "Found an error, or have something to add?",
+        email: "Email me",
+        issue: "Open a GitHub Issue",
+      }
+    : {
+        intro: "이 글에 오류나 보충할 부분이 있으면 편하게 알려주세요.",
+        email: "이메일 보내기",
+        issue: "GitHub Issue 열기",
+      };
+---
+
+<aside class="feedback-cta" aria-label={lang === "en" ? "Feedback" : "피드백"}>
+  <p class="feedback-intro">{copy.intro}</p>
+  <div class="feedback-actions">
+    <a href={emailHref} class="feedback-btn">
+      <span class="feedback-icon" aria-hidden="true">✉</span>
+      <span>{copy.email}</span>
+    </a>
+    <a
+      href={issueHref}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="feedback-btn"
+    >
+      <span class="feedback-icon" aria-hidden="true">↗</span>
+      <span>{copy.issue}</span>
+    </a>
+  </div>
+</aside>
+
+<style>
+  .feedback-cta {
+    margin: 1.75rem 0 1.5rem 0;
+    padding: 1rem 1.25rem;
+    background: var(--accent-bg);
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+  }
+  .feedback-intro {
+    margin: 0 0 0.75rem 0;
+    font-size: 0.9rem;
+    color: var(--foreground);
+    line-height: 1.5;
+  }
+  .feedback-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  .feedback-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.9rem;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    text-decoration: none;
+    color: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition:
+      border-color 0.15s ease,
+      color 0.15s ease,
+      transform 0.15s ease;
+  }
+  .feedback-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-1px);
+  }
+  .feedback-icon {
+    font-size: 0.95rem;
+    line-height: 1;
+  }
+</style>
