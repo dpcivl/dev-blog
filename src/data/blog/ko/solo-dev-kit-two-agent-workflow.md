@@ -23,15 +23,7 @@ featured: true
 
 ## 세 개의 기둥
 
-```mermaid
-flowchart LR
-    C["① 규범 파일<br/>CLAUDE.md<br/>(살아있는 source of truth)"]
-    W["② code-writer<br/>구현 전담 · 커밋 안 함"]
-    R["③ code-reviewer<br/>적대적 리뷰 · 로그 · 커밋"]
-    C -.->|"매 호출 첫 읽기"| W
-    C -.->|"매 호출 첫 읽기"| R
-    W -->|"working tree + 보고"| R
-```
+<img src="/assets/mermaid/solo-dev-kit-01-three-pillars.svg" alt="세 개의 기둥 다이어그램 — CLAUDE.md 규범 파일이 code-writer 와 code-reviewer 두 에이전트에 각각 '매 호출 첫 읽기' 로 연결되고, code-writer 가 working tree + 보고를 code-reviewer 에게 넘김" style="max-width:100%;height:auto;" />
 
 1. **규범 파일** — 프로젝트의 정체 · 불가침 규칙 · 작업 방식을 한 파일에. 두 에이전트가 **매번 먼저 읽으므로**, 여기 규칙을 추가하면 다음 작업부터 자동 적용된다.
 2. **code-writer** — 스펙만 구현하고 **git 은 절대 건드리지 않는다**. 구조화된 보고를 남긴다.
@@ -96,19 +88,7 @@ flowchart LR
 
 ### 6단계 (책임 분리)
 
-```mermaid
-flowchart TD
-    u1["사용자: chunk 구현 요청"] --> w["code-writer<br/>[1] 코드 작성 + 구조화 보고"]
-    w --> u2["사용자: 보고 확인 → reviewer 호출"]
-    u2 --> rev["code-reviewer<br/>[2] 적대적 리뷰 (4축) + sanity (build/lint)"]
-    rev -->|"이슈"| stop["STOP · 보고 → writer 재전송"]
-    stop --> w
-    rev -->|"clean"| test["[3] 사용자 manual 기능 테스트<br/>(실행 UI 없으면 스킵)"]
-    test --> share["[4] 사용자 테스트 결과 공유"]
-    share --> log["code-reviewer<br/>[5] 구현 로그 작성"]
-    log --> commit["[6] commit (코드 + 로그 함께)"]
-    commit --> done["최종 보고: SHA + 로그 경로"]
-```
+<img src="/assets/mermaid/solo-dev-kit-02-six-step-workflow.svg" alt="6단계 워크플로우 다이어그램 — 사용자 chunk 요청 → code-writer 코드+보고 → 사용자 reviewer 호출 → code-reviewer 적대적 리뷰 (이슈 시 writer 재전송 루프, clean 시 진행) → 사용자 manual 테스트 → 결과 공유 → 구현 로그 → 커밋 → 최종 보고" style="max-width:100%;height:auto;" />
 
 **책임 분리 — 이게 핵심:**
 

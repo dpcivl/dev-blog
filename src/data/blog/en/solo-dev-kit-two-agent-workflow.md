@@ -23,15 +23,7 @@ From the Claude Code setup I refined in a recent project, I pulled out only the 
 
 ## Three pillars
 
-```mermaid
-flowchart LR
-    C["① Constitution file<br/>CLAUDE.md<br/>(living source of truth)"]
-    W["② code-writer<br/>Implementation only · No commits"]
-    R["③ code-reviewer<br/>Adversarial review · Log · Commit"]
-    C -.->|"Read first, every call"| W
-    C -.->|"Read first, every call"| R
-    W -->|"working tree + report"| R
-```
+<img src="/assets/mermaid/solo-dev-kit-01-three-pillars-en.svg" alt="Three pillars diagram — CLAUDE.md as constitution file (source of truth) connects to code-writer and code-reviewer agents via 'read first every call', and code-writer hands off working tree + report to code-reviewer" style="max-width:100%;height:auto;" />
 
 1. **Constitution file** — the project's identity, non-negotiable rules, and working conventions, all in one file. Since both agents **read it first every time**, adding a rule here applies automatically starting with the next task.
 2. **code-writer** — implements only the spec and **never touches git**. Leaves a structured report behind.
@@ -96,19 +88,7 @@ The key here is **deliberately splitting permissions**:
 
 ### 6 steps (separation of responsibilities)
 
-```mermaid
-flowchart TD
-    u1["User: chunk implementation request"] --> w["code-writer<br/>[1] Write code + structured report"]
-    w --> u2["User: review report → invoke reviewer"]
-    u2 --> rev["code-reviewer<br/>[2] Adversarial review (4 axes) + sanity (build/lint)"]
-    rev -->|"issues"| stop["STOP · report → resend to writer"]
-    stop --> w
-    rev -->|"clean"| test["[3] User manual functional test<br/>(skip if no runnable UI)"]
-    test --> share["[4] User shares test results"]
-    share --> log["code-reviewer<br/>[5] Write implementation log"]
-    log --> commit["[6] commit (code + log together)"]
-    commit --> done["Final report: SHA + log path"]
-```
+<img src="/assets/mermaid/solo-dev-kit-02-six-step-workflow-en.svg" alt="Six-step workflow diagram — user chunk request → code-writer implements + reports → user invokes reviewer → code-reviewer adversarial review (issues loop back to writer, clean progresses) → user manual test → share results → implementation log → commit → final report" style="max-width:100%;height:auto;" />
 
 **Separation of responsibilities — this is the core of it:**
 

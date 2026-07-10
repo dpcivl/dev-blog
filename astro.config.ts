@@ -3,7 +3,6 @@ import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
 import remarkToc from "remark-toc";
 import remarkCollapse from "remark-collapse";
-import remarkMermaid from "remark-mermaidjs";
 import {
   transformerNotationDiff,
   transformerNotationHighlight,
@@ -25,14 +24,7 @@ export default defineConfig({
     }),
   ],
   markdown: {
-    remarkPlugins: [
-      remarkToc,
-      [remarkCollapse, { test: "Table of contents" }],
-      // Renders ```mermaid code blocks to inline SVG at build time
-      // (Playwright + Chromium — no client-side JS on the reader's end).
-      // Runs before Shiki so mermaid fences never get Shiki-highlighted.
-      remarkMermaid,
-    ],
+    remarkPlugins: [remarkToc, [remarkCollapse, { test: "Table of contents" }]],
     shikiConfig: {
       // For more themes, visit https://shiki.style/themes
       themes: { light: "min-light", dark: "night-owl" },
