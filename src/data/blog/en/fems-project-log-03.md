@@ -27,7 +27,7 @@ Today I was going to build the Streamlit dashboard, but **when I started a new C
 
 ## 1. Streamlit comparison dashboard
 
-![Streamlit dashboard — data usage pattern graphs (production_line / lighting / air_compressor) + question → 3-backend comparison area](/assets/posts/fems-project-log-03/01-streamlit-dashboard.png)
+![Streamlit dashboard — data usage pattern graphs (production_line / lighting / air_compressor) + question → 3-backend comparison area](/assets/posts/fems-project-log-03/01-streamlit-dashboard.webp)
 
 **Left sidebar** — checkboxes for Ollama (local) / Claude (API) / GPT (API). **Right side** — data track selection (synthetic / real), time range, graph display, and question input.
 
@@ -39,7 +39,7 @@ What's shown in the screenshot is **synthetic data**. Since anomalies were inten
 
 I confirmed from the graph that `air_compressor` had anomalies throughout May, then asked the same question.
 
-![Q1 — 3-backend comparison: exaone(23.3s, $0)/claude(12.3s, $0.0352)/gpt(1.5s, $0.0056). exaone and gpt responded 'no data available', Claude gave a response](/assets/posts/fems-project-log-03/02-q1-compressor-comparison.png)
+![Q1 — 3-backend comparison: exaone(23.3s, $0)/claude(12.3s, $0.0352)/gpt(1.5s, $0.0056). exaone and gpt responded 'no data available', Claude gave a response](/assets/posts/fems-project-log-03/02-q1-compressor-comparison.webp)
 
 | Backend | Model | Latency | Cost | Response |
 |---|---|---|---|---|
@@ -49,7 +49,7 @@ I confirmed from the graph that `air_compressor` had anomalies throughout May, t
 
 ### Claude's reasoning — using summary stats only, without raw data
 
-![Claude response — conclusion: 'anomalous signs observed during weekend hours' + supporting analysis (weekday daytime 92/171kW, weekday nighttime 29/46kW, weekend 56/150kW)](/assets/posts/fems-project-log-03/03-q1-claude-reasoning.png)
+![Claude response — conclusion: 'anomalous signs observed during weekend hours' + supporting analysis (weekday daytime 92/171kW, weekday nighttime 29/46kW, weekend 56/150kW)](/assets/posts/fems-project-log-03/03-q1-claude-reasoning.webp)
 
 Even though it wasn't given exact timestamp or date-level logs as data, Claude **compared the averages and maximums in the synthetic data** and inferred that "there was likely an anomaly during weekend hours." The screenshot is cut off, but it also provided **recommendations** based on this.
 
@@ -68,7 +68,7 @@ This difference is the most striking part. It clearly shows the difference in mo
 
 The second question is based on the **UCI Steel dataset**. Due to token limits, I explicitly asked it to **"summarize only the key points."**
 
-![Q2 — 3-backend comparison: exaone(46.2s, 480tok)/claude(17.2s, $0.0423, 1024tok)/gpt(4.8s, $0.0100, 475tok). Retrieved sources: fems_market_report_sample.pdf, fems_mv_guideline.pdf](/assets/posts/fems-project-log-03/04-q2-refined-3-backend.png)
+![Q2 — 3-backend comparison: exaone(46.2s, 480tok)/claude(17.2s, $0.0423, 1024tok)/gpt(4.8s, $0.0100, 475tok). Retrieved sources: fems_market_report_sample.pdf, fems_mv_guideline.pdf](/assets/posts/fems-project-log-03/04-q2-refined-3-backend.webp)
 
 | Backend | Latency | Cost | Output tokens |
 |---|---|---|---|
@@ -78,13 +78,13 @@ The second question is based on the **UCI Steel dataset**. Due to token limits, 
 
 ### exaone's answer
 
-![exaone answer — recommended action items, data-based answer but broken index (item 4 appears twice)](/assets/posts/fems-project-log-03/05-q2-exaone-answer.png)
+![exaone answer — recommended action items, data-based answer but broken index (item 4 appears twice)](/assets/posts/fems-project-log-03/05-q2-exaone-answer.webp)
 
 The data-based answer with multiple document references was fine, but **the index broke midway, resulting in "two item 4s"**, and the paragraph breaks became awkward. The "energy saving suggestions" section at the top of the screenshot was just generic-level advice — basically "try harder."
 
 ### Claude's answer
 
-![Claude answer — savings direction from a manager's perspective (distributing high-load periods, improving power factor, checking baseline load during weekends/downtime) + savings estimation/verification procedure + monitoring/visualization use](/assets/posts/fems-project-log-03/06-q2-claude-management-actions.png)
+![Claude answer — savings direction from a manager's perspective (distributing high-load periods, improving power factor, checking baseline load during weekends/downtime) + savings estimation/verification procedure + monitoring/visualization use](/assets/posts/fems-project-log-03/06-q2-claude-management-actions.webp)
 
 Claude covered all of the following:
 
@@ -97,13 +97,13 @@ The quality of the answer was very good. **The sources were properly cited** (`f
 
 However — it hit the **output token cap (1024)**, and the last cautionary section was cut off:
 
-![End of Claude's answer — '4. Monitoring and visualization use' is complete, then cut off at the first line of 'Cautions'](/assets/posts/fems-project-log-03/07-q2-claude-truncated.png)
+![End of Claude's answer — '4. Monitoring and visualization use' is complete, then cut off at the first line of 'Cautions'](/assets/posts/fems-project-log-03/07-q2-claude-truncated.webp)
 
 There seemed to be a lot more to explain. If I had raised `max_tokens`, it would have been complete.
 
 ### GPT's answer — clean but a hallucination found
 
-![GPT answer — 1. Optimize load management, 2. Improve power factor (e.g., install capacitors), 3. Adjust weekday/weekend usage differences, 4. Monitoring, 5. Improve inefficient equipment. Did not exceed token cap](/assets/posts/fems-project-log-03/08-q2-gpt-with-hallucination.png)
+![GPT answer — 1. Optimize load management, 2. Improve power factor (e.g., install capacitors), 3. Adjust weekday/weekend usage differences, 4. Monitoring, 5. Improve inefficient equipment. Did not exceed token cap](/assets/posts/fems-project-log-03/08-q2-gpt-with-hallucination.webp)
 
 GPT's answer was lean and gave **just the essential action items from a manager's perspective**. It didn't exceed the token limit, and the content was good.
 
@@ -117,7 +117,7 @@ This is another side of the conservative vs. proactive response difference. In Q
 
 ## Scoring — 5-axis evaluation
 
-![5-axis scoring — accuracy/hallucination/sourcing/language/usefulness + total score. exaone 7/10, Claude 9/10, gpt-4o 7/10](/assets/posts/fems-project-log-03/09-scoring-result-table.png)
+![5-axis scoring — accuracy/hallucination/sourcing/language/usefulness + total score. exaone 7/10, Claude 9/10, gpt-4o 7/10](/assets/posts/fems-project-log-03/09-scoring-result-table.webp)
 
 Criteria: ① factual consistency with the steel brief the model was given ② hallucination ③ accurate source attribution ④ Korean language consistency ⑤ how well it distilled key points for management use.
 

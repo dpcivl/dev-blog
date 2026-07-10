@@ -25,7 +25,7 @@ To make the blog my own, I did the following:
 
 On the local dev server (`npm run dev`), I got the clean empty post list I intended. But when I opened the site deployed on Vercel, this is what I saw.
 
-![A screen showing old sample posts still visible even after the push finished](/assets/posts/vercel-shows-old-posts-after-deletion/01-old-posts-still-visible.png)
+![A screen showing old sample posts still visible even after the push finished](/assets/posts/vercel-shows-old-posts-after-deletion/01-old-posts-still-visible.webp)
 
 The Korean greeting in the hero section ("안녕하세요 👋") was applied correctly, but **the Featured section still showed the 3 sample posts I had deleted**: "How to configure AstroPaper theme", "Adding new posts in AstroPaper theme", "AstroPaper 5.0".
 
@@ -67,7 +67,7 @@ I didn't know the exact cause, but it seemed like a **zero-content** state was s
 
 I wrote a temporary `hello-world.md` file and pushed it. The result:
 
-![A screen showing the old posts disappeared and only the new post is visible after pushing the temporary post](/assets/posts/vercel-shows-old-posts-after-deletion/02-resolved-after-temp-post.png)
+![A screen showing the old posts disappeared and only the new post is visible after pushing the temporary post](/assets/posts/vercel-shows-old-posts-after-deletion/02-resolved-after-temp-post.webp)
 
 **All 3 old sample posts disappeared and only the new post showed up.** My hypothesis was correct.
 

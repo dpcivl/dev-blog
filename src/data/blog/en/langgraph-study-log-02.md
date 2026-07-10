@@ -73,7 +73,7 @@ What struck me as odd: among the tools I implemented as functions, one just said
 
 ## 5. The truth behind "AI remembers" — it's accumulated messages, not a tool
 
-![The memorize tool in name only — the function body has nothing but a docstring saying "remember this," no real logic](/assets/posts/langgraph-study-log-02/03-fake-memory-tool.png)
+![The memorize tool in name only — the function body has nothing but a docstring saying "remember this," no real logic](/assets/posts/langgraph-study-log-02/03-fake-memory-tool.webp)
 
 It turned out the tool above never actually did anything. **It was simply remembering because whatever I'd said earlier was still sitting in the message history.** Since the LLM receives the entire conversation history as context on every call, **it looks like it's "remembering" even without any separate memory mechanism.**
 

@@ -35,7 +35,7 @@ This pattern matched every part of the chatbot module in my personal app / auton
 
 ## Pricing structure
 
-![Price comparison showing cache write at 1.25x and cache read at 0.1x of normal input](/assets/posts/claude-api-prompt-caching/01-cache-pricing-comparison.png)
+![Price comparison showing cache write at 1.25x and cache read at 0.1x of normal input](/assets/posts/claude-api-prompt-caching/01-cache-pricing-comparison.webp)
 
 | Item | Unit price (Haiku 4.5) | Ratio |
 |---|---|---|
@@ -68,7 +68,7 @@ Cache is kept for **5 minutes by default**, and reportedly can be extended to **
 
 To use caching, you need **input above a certain size**. Small inputs don't even qualify for caching.
 
-![Minimum tokens per model: Claude 3.x is 1,024, and Sonnet 4.5/Haiku 4.5/Opus 4.5+ are 4,096](/assets/posts/claude-api-prompt-caching/02-minimum-tokens-per-model.png)
+![Minimum tokens per model: Claude 3.x is 1,024, and Sonnet 4.5/Haiku 4.5/Opus 4.5+ are 4,096](/assets/posts/claude-api-prompt-caching/02-minimum-tokens-per-model.webp)
 
 | Model | Minimum tokens to use cache |
 |---|---|

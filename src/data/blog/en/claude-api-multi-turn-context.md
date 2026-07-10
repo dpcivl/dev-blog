@@ -34,7 +34,7 @@ You: 내 이름이 뭐였는지 기억나?
 
 ### Method A — remembers correctly
 
-![chat.py 실행 결과: 이름을 다시 물어보자 "박효인님"이라고 정확히 답함](/assets/posts/claude-api-multi-turn-context/01-with-history-remembers.png)
+![chat.py 실행 결과: 이름을 다시 물어보자 "박효인님"이라고 정확히 답함](/assets/posts/claude-api-multi-turn-context/01-with-history-remembers.webp)
 
 > Claude: 네, 기억합니다! 당신의 이름은 **박효인**님이십니다. 대화 시작할 때 말씀해주셨어요. 😊
 

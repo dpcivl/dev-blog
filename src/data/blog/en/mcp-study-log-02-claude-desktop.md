@@ -31,7 +31,7 @@ The problem is that **it's not obvious where this json file is** at first (I str
 1. **Click the account icon in the bottom left** → open the settings menu
 2. Click the **"Developer"** tab under the **"Desktop App"** section in the bottom left
 
-![Claude Desktop settings — Developer tab on the left / 'Local MCP servers: No servers added' + Edit Config and Developer Docs buttons on the right](/assets/posts/mcp-study-log-02-claude-desktop/01-local-mcp-server-settings.png)
+![Claude Desktop settings — Developer tab on the left / 'Local MCP servers: No servers added' + Edit Config and Developer Docs buttons on the right](/assets/posts/mcp-study-log-02-claude-desktop/01-local-mcp-server-settings.webp)
 
 3. Click the **"Edit Config"** button → a popup opens the folder containing `claude_desktop_config.json`
 
@@ -58,7 +58,7 @@ After saving, **restart Claude Desktop.**
 
 Check the list of registered MCP servers via the **+ button** in the bottom left of the chat window → **Connectors**:
 
-![+ button → Connectors menu → 'energy-management' toggle turned on, 'Claude in Chrome' also visible](/assets/posts/mcp-study-log-02-claude-desktop/02-connector-menu-energy-management.png)
+![+ button → Connectors menu → 'energy-management' toggle turned on, 'Claude in Chrome' also visible](/assets/posts/mcp-study-log-02-claude-desktop/02-connector-menu-energy-management.webp)
 
 **`energy-management`** shows up exactly as I typed it in the json. I turn the toggle ON to activate it.
 
@@ -66,7 +66,7 @@ Check the list of registered MCP servers via the **+ button** in the bottom left
 
 I typed **"Show me the factory line list"** into the chat window. Claude automatically tries to use the tool from the MCP server:
 
-![After the question: Thinking → Finding tools → a card saying 'Claude wants to use List production lines from energy-management' with Always Allow/Deny buttons](/assets/posts/mcp-study-log-02-claude-desktop/03-tool-call-with-approval.png)
+![After the question: Thinking → Finding tools → a card saying 'Claude wants to use List production lines from energy-management' with Always Allow/Deny buttons](/assets/posts/mcp-study-log-02-claude-desktop/03-tool-call-with-approval.webp)
 
 ### The interesting part — user approval is inserted into the tool call
 
@@ -80,7 +80,7 @@ Once approved, it takes the result and formats a natural-language answer. **The 
 
 While going through this, a banner popped up:
 
-![Banner suggesting running in the background with Cowork — 'Cowork can handle complex tasks across energy-management without you watching directly'](/assets/posts/mcp-study-log-02-claude-desktop/04-cowork-suggestion-banner.png)
+![Banner suggesting running in the background with Cowork — 'Cowork can handle complex tasks across energy-management without you watching directly'](/assets/posts/mcp-study-log-02-claude-desktop/04-cowork-suggestion-banner.webp)
 
 Claude recommended, **"Why not try this in Cowork?"** Cowork isn't part of what I'm currently studying, so I'm leaving **using MCP within Cowork as a separate track** for now.
 

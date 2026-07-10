@@ -29,7 +29,7 @@ In [MCP Study #1 (Inspector)](/en/posts/mcp-study-log-01) and [#2 (Claude Deskto
 
 Looking at just this doesn't make the difference very clear. I need a more concrete comparison.
 
-![Comparison table of Tools / Resources / Prompts — who calls (LLM/client/user) / when (LLM decides/pre-loaded as context/explicit trigger) / side effects (yes/no/no) / analogy (delegating to staff/reference material/forms·templates)](/assets/posts/mcp-study-log-03-resources-and-langgraph/01-tools-resources-prompts-comparison.png)
+![Comparison table of Tools / Resources / Prompts — who calls (LLM/client/user) / when (LLM decides/pre-loaded as context/explicit trigger) / side effects (yes/no/no) / analogy (delegating to staff/reference material/forms·templates)](/assets/posts/mcp-study-log-03-resources-and-langgraph/01-tools-resources-prompts-comparison.webp)
 
 | Aspect | Tools | Resources | Prompts |
 |---|---|---|---|
@@ -66,19 +66,19 @@ def daily_analysis_prompt(date: str) -> str:
 
 ## Checking with Inspector
 
-![MCP Inspector — connected to the 'energy-management-v2' server, with Resources / Prompts tabs active](/assets/posts/mcp-study-log-03-resources-and-langgraph/02-inspector-resources-prompts-tabs.png)
+![MCP Inspector — connected to the 'energy-management-v2' server, with Resources / Prompts tabs active](/assets/posts/mcp-study-log-03-resources-and-langgraph/02-inspector-resources-prompts-tabs.webp)
 
 The Resources / Prompts tabs are now active. Previously there were only Tools, but the new server has all three.
 
-![Resources list — get_operating_rules / get_line_specifications / get_troubleshooting_guide](/assets/posts/mcp-study-log-03-resources-and-langgraph/03-resources-list.png)
+![Resources list — get_operating_rules / get_line_specifications / get_troubleshooting_guide](/assets/posts/mcp-study-log-03-resources-and-langgraph/03-resources-list.webp)
 
-![Prompts list — daily_analysis_prompt (daily energy analysis prompt, used with /daily_analysis input) / alarm_response_prompt (alarm response prompt)](/assets/posts/mcp-study-log-03-resources-and-langgraph/04-prompts-list.png)
+![Prompts list — daily_analysis_prompt (daily energy analysis prompt, used with /daily_analysis input) / alarm_response_prompt (alarm response prompt)](/assets/posts/mcp-study-log-03-resources-and-langgraph/04-prompts-list.webp)
 
 ## Checking in Claude Desktop too
 
 I added the new server to [the config registered in #2](/en/posts/mcp-study-log-02-claude-desktop) and restarted:
 
-![Claude Desktop — greeting 'Good afternoon, hyoin' + energy-v2 enabled in the connector menu, with Daily analysis prompt / Alarm response prompt / Get operating rules / Get line specifications / Get troubleshooting guide shown on the right](/assets/posts/mcp-study-log-03-resources-and-langgraph/05-claude-desktop-connector-menu.png)
+![Claude Desktop — greeting 'Good afternoon, hyoin' + energy-v2 enabled in the connector menu, with Daily analysis prompt / Alarm response prompt / Get operating rules / Get line specifications / Get troubleshooting guide shown on the right](/assets/posts/mcp-study-log-03-resources-and-langgraph/05-claude-desktop-connector-menu.webp)
 
 Click the + button in the chat window → Connectors → toggle on **energy-v2**, and the registered Resources / Prompts appear as a menu on the right. Clicking an item either **copies the prompt into the chat** or brings up a form where **you can enter parameters directly**.
 

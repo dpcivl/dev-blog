@@ -131,7 +131,7 @@ Document these explicitly. A vague standard like "this is roughly correct" will 
 
 Afterward, I worked through an example comparing **V1, which had a sloppily written description**, and **V2, which had a clearly written one**. At first I called this a **"regression test"** — but the regression test concept I knew was different, so something felt off and I asked again.
 
-![LLM's answer — what was done in regression_eval.py was an A/B comparison of V1(70%) vs V2(90%). Strictly speaking, this isn't a regression test but an A/B comparison, or **improvement validation**](/assets/posts/eval-study-log-02-similarity-and-testset-design/04-regression-test-terminology.png)
+![LLM's answer — what was done in regression_eval.py was an A/B comparison of V1(70%) vs V2(90%). Strictly speaking, this isn't a regression test but an A/B comparison, or **improvement validation**](/assets/posts/eval-study-log-02-similarity-and-testset-design/04-regression-test-terminology.webp)
 
 **The answer:**
 

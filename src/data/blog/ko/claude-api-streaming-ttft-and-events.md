@@ -91,7 +91,7 @@ with client.messages.stream(
 
 여기서 학습 자료에 다음과 같은 비교가 등장했다.
 
-![일반 텍스트 스트리밍과 Tool Use 스트리밍의 이벤트 차이를 비교하는 학습 자료](/assets/posts/claude-api-streaming-ttft-and-events/01-text-vs-tool-use-streaming.png)
+![일반 텍스트 스트리밍과 Tool Use 스트리밍의 이벤트 차이를 비교하는 학습 자료](/assets/posts/claude-api-streaming-ttft-and-events/01-text-vs-tool-use-streaming.webp)
 
 핵심 정리:
 

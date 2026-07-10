@@ -53,7 +53,7 @@ featured: false
 
 ### 테스트 케이스
 
-![test_cases 리스트 — 10개 질문 각각에 expected_tool (calculator / get_weather / search_web) 매핑](/assets/posts/eval-study-log-01-accuracy-and-llm-as-judge/01-test-cases-tool-selection.png)
+![test_cases 리스트 — 10개 질문 각각에 expected_tool (calculator / get_weather / search_web) 매핑](/assets/posts/eval-study-log-01-accuracy-and-llm-as-judge/01-test-cases-tool-selection.webp)
 
 ```python
 test_cases = [
@@ -84,13 +84,13 @@ test_cases = [
 
 ### 평가할 질문 - 답변 쌍
 
-![qa_pairs — RAG 가 뭐야? (좋은 답변 / 부실한 답변 2개), 파이썬 list/tuple 차이? (정확한 답변 / 불완전한 답변 2개)](/assets/posts/eval-study-log-01-accuracy-and-llm-as-judge/03-qa-pairs-for-judge.png)
+![qa_pairs — RAG 가 뭐야? (좋은 답변 / 부실한 답변 2개), 파이썬 list/tuple 차이? (정확한 답변 / 불완전한 답변 2개)](/assets/posts/eval-study-log-01-accuracy-and-llm-as-judge/03-qa-pairs-for-judge.webp)
 
 지금은 가짜 질문+답변 쌍이지만, 실전에서는 **실제 시스템이 생성한 답변** 을 그대로 평가에 넣게 된다.
 
 ### Judge 프롬프트
 
-![judge_answer 함수 — judge_prompt 에 정확성/완결성/명확성/종합 1~10점 + 평가 이유 한 문장, JSON 으로만 응답하도록 강제](/assets/posts/eval-study-log-01-accuracy-and-llm-as-judge/04-judge-prompt-code.png)
+![judge_answer 함수 — judge_prompt 에 정확성/완결성/명확성/종합 1~10점 + 평가 이유 한 문장, JSON 으로만 응답하도록 강제](/assets/posts/eval-study-log-01-accuracy-and-llm-as-judge/04-judge-prompt-code.webp)
 
 핵심: **평가 기준을 명시적으로** + **JSON 형식 강제**.
 

@@ -29,7 +29,7 @@ featured: false
 
 이렇게만 봐서는 차이가 잘 안 와닿는다. 더 구체적인 비교가 필요하다.
 
-![Tools / Resources / Prompts 비교표 — 누가 호출(LLM/클라이언트/사용자) / 언제(LLM판단/컨텍스트로 미리/명시적 트리거) / 부작용(있음/없음/없음) / 비유(직원 시키기/참고 자료/양식·템플릿)](/assets/posts/mcp-study-log-03-resources-and-langgraph/01-tools-resources-prompts-comparison.png)
+![Tools / Resources / Prompts 비교표 — 누가 호출(LLM/클라이언트/사용자) / 언제(LLM판단/컨텍스트로 미리/명시적 트리거) / 부작용(있음/없음/없음) / 비유(직원 시키기/참고 자료/양식·템플릿)](/assets/posts/mcp-study-log-03-resources-and-langgraph/01-tools-resources-prompts-comparison.webp)
 
 | 측면 | Tools | Resources | Prompts |
 |---|---|---|---|
@@ -66,19 +66,19 @@ def daily_analysis_prompt(date: str) -> str:
 
 ## Inspector 로 확인
 
-![MCP Inspector — 'energy-management-v2' 서버 연결 완료, Resources / Prompts 탭이 활성화된 상태](/assets/posts/mcp-study-log-03-resources-and-langgraph/02-inspector-resources-prompts-tabs.png)
+![MCP Inspector — 'energy-management-v2' 서버 연결 완료, Resources / Prompts 탭이 활성화된 상태](/assets/posts/mcp-study-log-03-resources-and-langgraph/02-inspector-resources-prompts-tabs.webp)
 
 Resources / Prompts 탭이 활성화됐다. 이전엔 Tools 만 있었는데 새 서버는 셋 다 갖췄다.
 
-![Resources 목록 — get_operating_rules / get_line_specifications / get_troubleshooting_guide](/assets/posts/mcp-study-log-03-resources-and-langgraph/03-resources-list.png)
+![Resources 목록 — get_operating_rules / get_line_specifications / get_troubleshooting_guide](/assets/posts/mcp-study-log-03-resources-and-langgraph/03-resources-list.webp)
 
-![Prompts 목록 — daily_analysis_prompt (일별 에너지 분석 프롬프트, /daily_analysis 입력 시 사용) / alarm_response_prompt (알람 대응 프롬프트)](/assets/posts/mcp-study-log-03-resources-and-langgraph/04-prompts-list.png)
+![Prompts 목록 — daily_analysis_prompt (일별 에너지 분석 프롬프트, /daily_analysis 입력 시 사용) / alarm_response_prompt (알람 대응 프롬프트)](/assets/posts/mcp-study-log-03-resources-and-langgraph/04-prompts-list.webp)
 
 ## Claude Desktop 에서도 확인
 
 [#2 에서 등록한 config](/posts/mcp-study-log-02-claude-desktop) 에 새 서버 추가 후 재시작:
 
-![Claude Desktop — '오후예요, hyoin님' 인사 + 커넥터 메뉴에 energy-v2 활성화, 우측에 Daily analysis prompt / Alarm response prompt / Get operating rules / Get line specifications / Get troubleshooting guide 노출](/assets/posts/mcp-study-log-03-resources-and-langgraph/05-claude-desktop-connector-menu.png)
+![Claude Desktop — '오후예요, hyoin님' 인사 + 커넥터 메뉴에 energy-v2 활성화, 우측에 Daily analysis prompt / Alarm response prompt / Get operating rules / Get line specifications / Get troubleshooting guide 노출](/assets/posts/mcp-study-log-03-resources-and-langgraph/05-claude-desktop-connector-menu.webp)
 
 채팅창 + 버튼 → 커넥터 → **energy-v2** 토글 켜면 우측에 등록된 Resources / Prompts 가 메뉴로 노출된다. 항목 누르면 **프롬프트가 채팅에 복사** 되거나 **파라미터를 직접 입력** 할 수 있는 폼이 나온다.
 

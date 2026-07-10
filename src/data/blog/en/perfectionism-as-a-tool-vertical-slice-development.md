@@ -55,7 +55,7 @@ There's already a term for this approach.
 
 ## The core idea — cut vertically, don't stack horizontally
 
-![Comparison diagram: horizontal stacking (the perfectionist trap) vs vertical slicing](/assets/posts/perfectionism-and-vertical-slice-dev/04-horizontal-vs-vertical-slicing.png)
+![Comparison diagram: horizontal stacking (the perfectionist trap) vs vertical slicing](/assets/posts/perfectionism-and-vertical-slice-dev/04-horizontal-vs-vertical-slicing.webp)
 
 This one image captured the core idea I needed to hold onto.
 

@@ -141,7 +141,7 @@ python -m scripts.run_analysis
 
 I took a closer look at the ollama response to the second question (about ETRI / fems_mv_guideline.pdf):
 
-![qwen2.5:7b response with Chinese characters mixed in + suddenly outputs Beijing (北京) coordinates as GeoJSON](/assets/posts/fems-project-log-02/03-qwen-chinese-and-generation-collapse.png)
+![qwen2.5:7b response with Chinese characters mixed in + suddenly outputs Beijing (北京) coordinates as GeoJSON](/assets/posts/fems-project-log-02/03-qwen-chinese-and-generation-collapse.webp)
 
 The answer starts out fine, but partway through:
 

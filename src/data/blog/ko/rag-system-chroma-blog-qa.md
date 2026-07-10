@@ -49,7 +49,7 @@ featured: false
 
 ## 2. 블로그 글을 코퍼스로 — glob
 
-![Step 2 본인 학습 노트 로딩 가이드 — 파일 위치 확인부터](/assets/posts/rag-system-chroma-blog-qa/02-load-blog-posts.png)
+![Step 2 본인 학습 노트 로딩 가이드 — 파일 위치 확인부터](/assets/posts/rag-system-chroma-blog-qa/02-load-blog-posts.webp)
 
 따로 학습 기록을 저장한 게 없다. **블로그 글을 데이터로 쓰면 되겠다** 싶었다. `glob.glob` 한 줄로 `.md` 파일 전체 로드.
 
@@ -77,7 +77,7 @@ featured: false
 
 > "**인덱스를 빌드한다**" 는 표현이 보였는데 임베딩이랑 비슷한 말인 것 같다. (실제로는 임베딩 생성 + 벡터 DB 에 적재 + 검색 인덱스 구축까지 묶은 용어)
 
-![인덱스 빌드 — 청크 270개 임베딩, 약 1분 소요](/assets/posts/rag-system-chroma-blog-qa/06-index-build-270.png)
+![인덱스 빌드 — 청크 270개 임베딩, 약 1분 소요](/assets/posts/rag-system-chroma-blog-qa/06-index-build-270.webp)
 
 **약 1분에 청크 270개 생성.** 이제 이걸로 Q&A 시스템.
 

@@ -28,7 +28,7 @@ featured: false
 
 "에이전트의 신경계를 짜는 도구" 라고 하는데 일단 뭔 소린지 모르겠다. 대충 **노드·엣지로 만든 그래프를 컴파일하면 설계대로 에이전트가 실행** 한다 — 이 정도로 이해하고 시작.
 
-![LangGraph 첫 import — StateGraph, add_conditional_edges 등 다양한 모듈](/assets/posts/langgraph-study-log-01/01-langgraph-imports.png)
+![LangGraph 첫 import — StateGraph, add_conditional_edges 등 다양한 모듈](/assets/posts/langgraph-study-log-01/01-langgraph-imports.webp)
 
 구현하려고 보니 **import 가 많다.** 배울 게 많을 거 같다. 한편으로 **"이런 그래프가 어떻게 동작하지?"** 궁금증도 생겼다. 차차 배우게 되겠지.
 
@@ -36,7 +36,7 @@ featured: false
 
 처음 만져보는 거라 모르는 용어들이 많이 나왔다.
 
-![LangGraph 그래프 다이어그램 — Tool 사용 분기와 call_llm 노드](/assets/posts/langgraph-study-log-01/02-graph-diagram.png)
+![LangGraph 그래프 다이어그램 — Tool 사용 분기와 call_llm 노드](/assets/posts/langgraph-study-log-01/02-graph-diagram.webp)
 
 위 다이어그램대로 구현. 내가 이해한 정리:
 

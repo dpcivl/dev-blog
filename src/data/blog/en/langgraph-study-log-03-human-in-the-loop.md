@@ -32,7 +32,7 @@ If the LLM calls these tools on its own, things go wrong. This is an area where 
 
 ### Regular agent vs. HITL agent
 
-![A regular agent runs automatically / an HITL agent pauses on a risky call → shows it to a human → approve/reject flow](/assets/posts/langgraph-study-log-03-human-in-the-loop/01-hitl-pattern-diagram.png)
+![A regular agent runs automatically / an HITL agent pauses on a risky call → shows it to a human → approve/reject flow](/assets/posts/langgraph-study-log-03-human-in-the-loop/01-hitl-pattern-diagram.webp)
 
 | Regular agent | HITL agent |
 |---|---|
@@ -106,7 +106,7 @@ I tried making the request more forceful:
 
 ### The cause — a rule baked into the system prompt
 
-![The system prompt contained a rule saying "risky tools must only be called after confirming clear intent"](/assets/posts/langgraph-study-log-03-human-in-the-loop/04-system-prompt-with-rule.png)
+![The system prompt contained a rule saying "risky tools must only be called after confirming clear intent"](/assets/posts/langgraph-study-log-03-human-in-the-loop/04-system-prompt-with-rule.webp)
 
 Looking at the system prompt again, this rule was baked in:
 

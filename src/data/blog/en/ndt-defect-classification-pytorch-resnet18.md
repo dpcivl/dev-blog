@@ -72,7 +72,7 @@ Before diving into training, I did some exploratory data analysis (EDA). I visua
 - **Are there any artifacts in the data** (label noise, incorrectly included images)?
 - **Is the data pipeline working correctly?** (whether `__getitem__` behaves as intended)
 
-![A grid of sample images from 6 defect classes. Cracks, inclusions, stains, pitting, scale, and scratches on the steel surface are visually distinguishable](/assets/posts/ndt-defect-classification-pytorch-resnet18/01-defect-class-samples.png)
+![A grid of sample images from 6 defect classes. Cracks, inclusions, stains, pitting, scale, and scratches on the steel surface are visually distinguishable](/assets/posts/ndt-defect-classification-pytorch-resnet18/01-defect-class-samples.webp)
 
 I confirmed that the visual characteristics of each class are clearly different. This is a sign that there's enough separability for the model to learn from.
 
@@ -116,7 +116,7 @@ Val Acc reached 1.0 after just 10 epochs. **At this stage, the reaction shouldn'
 
 > Being able to read a learning curve is a basic requirement for a machine learning engineer.
 
-![Loss Curve and Accuracy Curve. A normal training pattern where Train and Val converge together](/assets/posts/ndt-defect-classification-pytorch-resnet18/03-loss-accuracy-curves.png)
+![Loss Curve and Accuracy Curve. A normal training pattern where Train and Val converge together](/assets/posts/ndt-defect-classification-pytorch-resnet18/03-loss-accuracy-curves.webp)
 
 How to read them is actually pretty intuitive.
 
@@ -128,7 +128,7 @@ This time, both curves converged, indicating a normal training pattern. I also r
 
 ## 7. Confusion Matrix — What Matters More Than Plain Accuracy in NDT
 
-![Confusion Matrix. A near-perfect diagonal pattern across all 6 classes, with a test accuracy of 0.9926](/assets/posts/ndt-defect-classification-pytorch-resnet18/04-confusion-matrix.png)
+![Confusion Matrix. A near-perfect diagonal pattern across all 6 classes, with a test accuracy of 0.9926](/assets/posts/ndt-defect-classification-pytorch-resnet18/04-confusion-matrix.webp)
 
 Test accuracy: **0.9926**. But in NDT, **which classes get confused with which** matters far more than plain accuracy. That's why a Confusion Matrix is essential.
 
@@ -154,7 +154,7 @@ For an NDT system to be adopted in practice, **a simple classification result is
 
 (Similar techniques include SHAP and others — the field of model interpretability has several different branches of tools.)
 
-![Grad-CAM heatmap. Visually confirms that the model's activation is focused on the defect region](/assets/posts/ndt-defect-classification-pytorch-resnet18/05-gradcam-visualization.png)
+![Grad-CAM heatmap. Visually confirms that the model's activation is focused on the defect region](/assets/posts/ndt-defect-classification-pytorch-resnet18/05-gradcam-visualization.webp)
 
 Looking at the heatmap, the model is precisely focused on the defect region. If the model had instead been activated on the image edges or background, it would have suggested a **"lucky guess."** Grad-CAM is a verification tool that catches this.
 

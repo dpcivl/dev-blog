@@ -27,7 +27,7 @@ Put plainly, the questions in my head boiled down to three:
 
 I threw these questions straight at Claude.
 
-![The question I asked Claude — for advice on how people find pain points for projects in the age of AI](/assets/posts/ai-limits-in-user-pain-research/01-my-question-to-claude.png)
+![The question I asked Claude — for advice on how people find pain points for projects in the age of AI](/assets/posts/ai-limits-in-user-pain-research/01-my-question-to-claude.webp)
 
 I got back **4 representative approaches**.
 

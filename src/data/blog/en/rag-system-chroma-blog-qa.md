@@ -49,7 +49,7 @@ Since it's a **`PersistentClient`**, I don't need to regenerate embeddings I've 
 
 ## 2. Using blog posts as the corpus — glob
 
-![Step 2 guide for loading your own study notes — starting from checking file locations](/assets/posts/rag-system-chroma-blog-qa/02-load-blog-posts.png)
+![Step 2 guide for loading your own study notes — starting from checking file locations](/assets/posts/rag-system-chroma-blog-qa/02-load-blog-posts.webp)
 
 I hadn't kept a separate record of my study log. **I figured I could use my blog posts as the data.** One line with `glob.glob` loaded all the `.md` files.
 
@@ -77,7 +77,7 @@ Code: [`build_blog_index.py`](https://github.com/dpcivl/ai-study-week1/blob/main
 
 > I came across the phrase "**building an index**," which seems similar to embedding. (In practice it's a term that bundles together generating embeddings, loading them into the vector DB, and constructing the search index.)
 
-![Index build — embedding 270 chunks, took about 1 minute](/assets/posts/rag-system-chroma-blog-qa/06-index-build-270.png)
+![Index build — embedding 270 chunks, took about 1 minute](/assets/posts/rag-system-chroma-blog-qa/06-index-build-270.webp)
 
 **270 chunks generated in about a minute.** Now I could use this for the Q&A system.
 

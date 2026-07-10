@@ -141,7 +141,7 @@ python -m scripts.run_analysis
 
 두번째 질문 (ETRI / fems_mv_guideline.pdf 관련) 에서 ollama 응답을 자세히 봤다:
 
-![qwen2.5:7b 응답에 한자 혼입 + 갑자기 GeoJSON 으로 北京(베이징) 좌표가 튀어나옴](/assets/posts/fems-project-log-02/03-qwen-chinese-and-generation-collapse.png)
+![qwen2.5:7b 응답에 한자 혼입 + 갑자기 GeoJSON 으로 北京(베이징) 좌표가 튀어나옴](/assets/posts/fems-project-log-02/03-qwen-chinese-and-generation-collapse.webp)
 
 답변 자체는 시작은 멀쩡한데:
 

@@ -55,7 +55,7 @@ AI에게 "잘하는 일을 어떻게 찾나" 를 물어봤다. 돌아온 답: **
 
 ## 핵심 — 가로로 쌓지 말고 세로로 자른다
 
-![가로 쌓기(완벽주의의 함정) vs 세로 자르기(수직 슬라이스)의 비교 다이어그램](/assets/posts/perfectionism-and-vertical-slice-dev/04-horizontal-vs-vertical-slicing.png)
+![가로 쌓기(완벽주의의 함정) vs 세로 자르기(수직 슬라이스)의 비교 다이어그램](/assets/posts/perfectionism-and-vertical-slice-dev/04-horizontal-vs-vertical-slicing.webp)
 
 이 그림이 내가 잡고 가야 할 핵심을 한 장에 담고 있었다.
 

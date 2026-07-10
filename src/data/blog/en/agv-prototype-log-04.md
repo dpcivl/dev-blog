@@ -21,7 +21,7 @@ At the end of [the last post](./agv-prototype-log-03) I wrote "when the USB-UART
 
 ## 1. Wiring the UART converter to the STM32F407
 
-![Wiring diagram between USB-UART converter and STM32F407](/assets/posts/agv-prototype-log-04/01-uart-converter-stm32-wiring.png)
+![Wiring diagram between USB-UART converter and STM32F407](/assets/posts/agv-prototype-log-04/01-uart-converter-stm32-wiring.webp)
 
 I connected them as shown above. **I did not connect the VCC pin** — the converter runs on 3.3V and the F407 Discovery is a 3.3V logic board, so there's no need to supply separate power. Only GND / TX / RX are wired.
 
@@ -29,7 +29,7 @@ I connected them as shown above. **I did not connect the VCC pin** — the conve
 
 ### The jumper cable didn't fit into the front header
 
-![Jumper cable connected to the rear header](/assets/posts/agv-prototype-log-04/02-jumper-rear-header.png)
+![Jumper cable connected to the rear header](/assets/posts/agv-prototype-log-04/02-jumper-rear-header.webp)
 
 The jumper cable didn't fit well into the front header, so I connected it to the rear one instead. **The rear header seems to be the correct one for jumper cables**, and the front one seems dedicated to some specific connector, but I couldn't figure out which one (need to check later).
 
@@ -59,7 +59,7 @@ Also, to minimize variables, **I commented out the existing PWM code** (the LED 
 
 ## 3. Enabling USART2 in CubeMX
 
-![Screen showing USART2 enabled on PA2/PA3 in STM32CubeMX](/assets/posts/agv-prototype-log-04/03-cubemx-usart2-config.png)
+![Screen showing USART2 enabled on PA2/PA3 in STM32CubeMX](/assets/posts/agv-prototype-log-04/03-cubemx-usart2-config.webp)
 
 - **Mode**: Asynchronous
 - **Baud rate**: 115200
@@ -72,7 +72,7 @@ After configuring this and generating code, I can transmit with `HAL_UART_Transm
 
 I could check the results with a separate program like Putty, but **since I'm already using STM32CubeIDE, I looked into how to bring up a console right inside the IDE.**
 
-![Selecting the Command Shell Console option in the STM32CubeIDE Console tab](/assets/posts/agv-prototype-log-04/04-stm32cubeide-serial-console.png)
+![Selecting the Command Shell Console option in the STM32CubeIDE Console tab](/assets/posts/agv-prototype-log-04/04-stm32cubeide-serial-console.webp)
 
 Steps:
 
@@ -84,7 +84,7 @@ Steps:
 
 ## 5. Result — confirming message reception
 
-![Serial monitor showing Hello AGV messages arriving every 1 second](/assets/posts/agv-prototype-log-04/05-serial-message-received.png)
+![Serial monitor showing Hello AGV messages arriving every 1 second](/assets/posts/agv-prototype-log-04/05-serial-message-received.webp)
 
 The `Hello AGV #N` messages came through nicely every second. **The STM32 → converter → USB → PC path is verified.**
 

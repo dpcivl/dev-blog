@@ -72,7 +72,7 @@ idx_to_class = {v: k for k, v in class_to_idx.items()}
 - **데이터에 인공물(label noise, 잘못 들어간 이미지)은 없는가?**
 - **데이터 파이프라인이 정상적으로 도는가?** (`__getitem__` 이 의도대로 동작하는지)
 
-![6개 결함 클래스의 샘플 이미지 그리드. 강철 표면 위 균열, 이물질, 얼룩, 핏팅, 스케일, 스크래치가 시각적으로 구분된다](/assets/posts/ndt-defect-classification-pytorch-resnet18/01-defect-class-samples.png)
+![6개 결함 클래스의 샘플 이미지 그리드. 강철 표면 위 균열, 이물질, 얼룩, 핏팅, 스케일, 스크래치가 시각적으로 구분된다](/assets/posts/ndt-defect-classification-pytorch-resnet18/01-defect-class-samples.webp)
 
 각 클래스의 시각적 특징이 분명히 다르다는 걸 확인했다. 모델이 학습할 만한 분리도가 있다는 신호.
 
@@ -116,7 +116,7 @@ NDT에서 증강을 고를 때의 핵심 기준: **결함의 본질적 특성을
 
 > 학습 곡선을 읽을 줄 알아야 머신러닝 엔지니어다.
 
-![Loss Curve와 Accuracy Curve. Train과 Val이 함께 수렴하는 정상적인 학습 양상](/assets/posts/ndt-defect-classification-pytorch-resnet18/03-loss-accuracy-curves.png)
+![Loss Curve와 Accuracy Curve. Train과 Val이 함께 수렴하는 정상적인 학습 양상](/assets/posts/ndt-defect-classification-pytorch-resnet18/03-loss-accuracy-curves.webp)
 
 읽는 방법은 사실 직관적이다.
 
@@ -128,7 +128,7 @@ NDT에서 증강을 고를 때의 핵심 기준: **결함의 본질적 특성을
 
 ## 7. Confusion Matrix — NDT에서 단순 정확도보다 중요한 것
 
-![Confusion Matrix. 6 클래스 모두 거의 완벽한 대각선 패턴, 테스트 정확도 0.9926](/assets/posts/ndt-defect-classification-pytorch-resnet18/04-confusion-matrix.png)
+![Confusion Matrix. 6 클래스 모두 거의 완벽한 대각선 패턴, 테스트 정확도 0.9926](/assets/posts/ndt-defect-classification-pytorch-resnet18/04-confusion-matrix.webp)
 
 테스트 정확도 **0.9926**. 다만 NDT에서는 단순 정확도보다 **어떤 클래스를 어떤 클래스로 헷갈리는지** 가 훨씬 중요하다. Confusion Matrix가 그래서 필수.
 
@@ -154,7 +154,7 @@ NDT 시스템이 실무에 도입되려면 **단순한 분류 결과만으로는
 
 (유사 기법으로 SHAP 등도 있다 — 모델 해석성 분야에는 여러 갈래의 도구가 있다.)
 
-![Grad-CAM 히트맵. 모델이 결함 영역에 집중해서 활성화된 것이 시각적으로 확인됨](/assets/posts/ndt-defect-classification-pytorch-resnet18/05-gradcam-visualization.png)
+![Grad-CAM 히트맵. 모델이 결함 영역에 집중해서 활성화된 것이 시각적으로 확인됨](/assets/posts/ndt-defect-classification-pytorch-resnet18/05-gradcam-visualization.webp)
 
 히트맵을 보면 모델이 결함 영역에 정확히 집중하고 있다. 만약 모델이 이미지 가장자리나 배경에 활성화되어 있었다면 **"우연히 맞춘 것"** 일 가능성이 컸을 것. Grad-CAM은 그걸 잡아주는 검증 도구다.
 

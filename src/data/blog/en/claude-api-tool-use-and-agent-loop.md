@@ -58,7 +58,7 @@ What's interesting is that **even though the model could try to do the multiplic
 
 ### Message flow — the most important diagram
 
-![Tool Use's 2-turn message flow: receiving tool_use in the first turn, then sending tool_result back in the second turn](/assets/posts/claude-api-tool-use-and-agent-loop/02-tool-use-message-flow.png)
+![Tool Use's 2-turn message flow: receiving tool_use in the first turn, then sending tool_result back in the second turn](/assets/posts/claude-api-tool-use-and-agent-loop/02-tool-use-message-flow.webp)
 
 Tool Use is essentially a **2-turn conversation**.
 

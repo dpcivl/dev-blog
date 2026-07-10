@@ -30,7 +30,7 @@ MCP solves this by **separating tools into a dedicated server**. This gives you:
 - The ability to **reuse a tool server across multiple LLM apps** once built
 - **Standardization** — clients other than Anthropic's can use the same server
 
-![Tool Use vs MCP comparison table — 6 aspects: where defined / where executed / reusability / standard / compatibility / deployment](/assets/posts/mcp-study-log-01/01-tool-use-vs-mcp-table.png)
+![Tool Use vs MCP comparison table — 6 aspects: where defined / where executed / reusability / standard / compatibility / deployment](/assets/posts/mcp-study-log-01/01-tool-use-vs-mcp-table.webp)
 
 | Aspect | Tool Use | MCP |
 |---|---|---|
@@ -123,7 +123,7 @@ To check whether the server is up and whether Tools are properly exposed, **MCP 
 npx @modelcontextprotocol/inspector python first_mcp_server.py
 ```
 
-![MCP Inspector initial screen — Transport Type STDIO, Command python, Arguments .\first_mcp_server.py, still Disconnected](/assets/posts/mcp-study-log-01/02-mcp-inspector-disconnected.png)
+![MCP Inspector initial screen — Transport Type STDIO, Command python, Arguments .\first_mcp_server.py, still Disconnected](/assets/posts/mcp-study-log-01/02-mcp-inspector-disconnected.webp)
 
 What you can check in Inspector:
 
@@ -141,7 +141,7 @@ At first, clicking the Connect button didn't establish a connection.
 
 ### Connection Succeeded — Tools Confirmed as Exposed
 
-![Inspector after connecting — Tools tab shows say_hello / add_numbers, with an input form for a=5, b=3 on add_numbers](/assets/posts/mcp-study-log-01/03-mcp-inspector-connected-with-tools.png)
+![Inspector after connecting — Tools tab shows say_hello / add_numbers, with an input form for a=5, b=3 on add_numbers](/assets/posts/mcp-study-log-01/03-mcp-inspector-connected-with-tools.webp)
 
 Two tools, **`say_hello`** and **`add_numbers`**, are exposed on the left. The Args/Returns from the docstring are laid out as-is in the right panel.
 
@@ -149,7 +149,7 @@ Two tools, **`say_hello`** and **`add_numbers`**, are exposed on the left. The A
 
 ### `say_hello` Call Result
 
-![say_hello result — Tool Result Success, structured content { result: "안녕하세요, 효인님! MCP 서버에서 인사드려요." }](/assets/posts/mcp-study-log-01/04-say-hello-result.png)
+![say_hello result — Tool Result Success, structured content { result: "안녕하세요, 효인님! MCP 서버에서 인사드려요." }](/assets/posts/mcp-study-log-01/04-say-hello-result.webp)
 
 If you provide a name, it returns a greeting string. There's a note saying **Valid according to output schema** — this shows that MCP also validates the output schema.
 
@@ -157,7 +157,7 @@ If you provide a name, it returns a greeting string. There's a note saying **Val
 
 I built an **energy management** MCP server using fake data. It naturally ties into the scenario from the [FEMS project](/en/posts/fems-project-log-02).
 
-![Energy management server — 4 tools: list_production_lines / get_energy_consumption / list_alarms / get_line_status](/assets/posts/mcp-study-log-01/05-energy-management-tools.png)
+![Energy management server — 4 tools: list_production_lines / get_energy_consumption / list_alarms / get_line_status](/assets/posts/mcp-study-log-01/05-energy-management-tools.webp)
 
 4 tools:
 
@@ -170,7 +170,7 @@ I built an **energy management** MCP server using fake data. It naturally ties i
 
 ### Call Result
 
-![get_energy_consumption(line_1) result — rated capacity 150kW, average 128.0kW, hourly breakdown shown](/assets/posts/mcp-study-log-01/06-energy-consumption-result.png)
+![get_energy_consumption(line_1) result — rated capacity 150kW, average 128.0kW, hourly breakdown shown](/assets/posts/mcp-study-log-01/06-energy-consumption-result.webp)
 
 The results come out fine. **It's fake data for now**, but once connected to a real DB, this could support:
 

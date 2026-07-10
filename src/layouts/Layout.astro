@@ -43,21 +43,48 @@ const {
 
 const socialImageURL = new URL(ogImage, Astro.url);
 
-const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "BlogPosting",
-  headline: `${title}`,
-  image: `${socialImageURL}`,
-  datePublished: `${pubDatetime?.toISOString()}`,
-  ...(modDatetime && { dateModified: modDatetime.toISOString() }),
-  author: [
-    {
-      "@type": "Person",
-      name: `${author}`,
-      ...(profile && { url: profile }),
-    },
-  ],
-};
+// Emit BlogPosting schema only on actual post pages (identified by pubDatetime).
+// Other pages get WebSite schema, which is cleaner for the site root and
+// avoids Google flagging non-article pages as articles.
+const structuredData = pubDatetime
+  ? {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      headline: title,
+      description,
+      image: socialImageURL.toString(),
+      url: canonicalURL.toString(),
+      datePublished: pubDatetime.toISOString(),
+      ...(modDatetime && { dateModified: modDatetime.toISOString() }),
+      inLanguage: htmlLang ?? SITE.lang ?? "en",
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": canonicalURL.toString(),
+      },
+      author: {
+        "@type": "Person",
+        name: author,
+        ...(profile && { url: profile }),
+      },
+      publisher: {
+        "@type": "Person",
+        name: SITE.author,
+        ...(SITE.profile && { url: SITE.profile }),
+      },
+    }
+  : {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: SITE.title,
+      url: SITE.website,
+      description: SITE.desc,
+      inLanguage: htmlLang ?? SITE.lang ?? "en",
+      author: {
+        "@type": "Person",
+        name: SITE.author,
+        ...(SITE.profile && { url: SITE.profile }),
+      },
+    };
 ---
 
 <!doctype html>
@@ -81,7 +108,13 @@ const structuredData = {
     }
 
     <!-- Pretendard 본문/헤딩 폰트 (CDN 동적 서브셋) -->
+    <!-- preconnect + preload → 브라우저가 폰트 CSS 를 조기 취득, LCP 개선 -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link
+      rel="preload"
+      as="style"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"

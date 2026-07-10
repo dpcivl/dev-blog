@@ -18,7 +18,9 @@
     "links:external": "node scripts/check-links-external.mjs",
     "mermaid:render": "node scripts/render-mermaid.mjs",
     "mermaid:dry": "node scripts/render-mermaid.mjs --dry",
-    "mermaid:gc": "node scripts/render-mermaid.mjs --gc"
+    "mermaid:gc": "node scripts/render-mermaid.mjs --gc",
+    "images:webp": "node scripts/convert-images-to-webp.mjs",
+    "images:webp:dry": "node scripts/convert-images-to-webp.mjs --dry"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.14",

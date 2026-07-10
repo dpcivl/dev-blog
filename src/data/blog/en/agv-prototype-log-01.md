@@ -34,11 +34,11 @@ I started a self-driving car side project for my portfolio. Nothing fancy — ju
 
 I pulled out the frame I'd ordered a long time ago and left sitting unused.
 
-![AGV frame parts — motors, wheels, aluminum profiles, etc.](/assets/posts/agv-prototype-log-01/01-agv-frame-parts.png)
+![AGV frame parts — motors, wheels, aluminum profiles, etc.](/assets/posts/agv-prototype-log-01/01-agv-frame-parts.webp)
 
 I soldered at home with a soldering iron and tightened the screws. Since it had been a while since I last held an iron — and it was also my first time soldering at home — I have a slight feeling something might be a **cold solder joint**. It's holding for now, so I'll judge again during the functionality check stage.
 
-![Fully assembled AGV frame](/assets/posts/agv-prototype-log-01/02-agv-frame-assembled.png)
+![Fully assembled AGV frame](/assets/posts/agv-prototype-log-01/02-agv-frame-assembled.webp)
 
 ## 2. Looking Back — I Didn't Log the STM32 Environment Setup
 
@@ -56,13 +56,13 @@ I was also stuck on the battery assembly because I didn't have insulating tape o
 
 I started burning the OS with Raspberry Pi Imager. But the advanced options tab wasn't lighting up.
 
-![Screen showing the Pi Imager advanced options tab disabled](/assets/posts/agv-prototype-log-01/03-pi-imager-mistake.png)
+![Screen showing the Pi Imager advanced options tab disabled](/assets/posts/agv-prototype-log-01/03-pi-imager-mistake.webp)
 
 > A rookie mistake — **I thought I'd selected the server version, but I'd actually selected the desktop version.** Some options don't apply to the desktop image, so the tab itself was disabled.
 
 After double-checking the OS type, I proceeded.
 
-![Pi Imager showing advanced options properly available](/assets/posts/agv-prototype-log-01/04-pi-imager-fixed.png)
+![Pi Imager showing advanced options properly available](/assets/posts/agv-prototype-log-01/04-pi-imager-fixed.webp)
 
 ## 5. First Boot + SSH Connection
 
@@ -74,7 +74,7 @@ I figured booting was complete once the LED blinking stopped, so I tried to conn
 
 > **WiFi network mismatch**: I had set the Pi 5's WiFi to the living room router's SSID, but my desktop was actually **connected to a different router via ethernet cable**, so they weren't on the same network. After aligning both onto the same network, I confirmed the SSH connection worked.
 
-![Terminal screen showing successful SSH connection to the Pi 5](/assets/posts/agv-prototype-log-01/06-ssh-connected.png)
+![Terminal screen showing successful SSH connection to the Pi 5](/assets/posts/agv-prototype-log-01/06-ssh-connected.webp)
 
 ## 6. Installing ROS2 Jazzy
 
@@ -88,7 +88,7 @@ In order:
 
 But I got stuck at step 4. **The installation failed due to broken dependencies.**
 
-![Error output showing ROS2 installation halted because apt couldn't resolve dependencies](/assets/posts/agv-prototype-log-01/07-ros-install-dependency-error.png)
+![Error output showing ROS2 installation halted because apt couldn't resolve dependencies](/assets/posts/agv-prototype-log-01/07-ros-install-dependency-error.webp)
 
 Root cause:
 - The `apt update` output only listed `noble` and `noble-security` — **the `noble-updates` repository was missing.**
@@ -99,7 +99,7 @@ Fix:
 - Ran `sudo apt update && sudo apt upgrade` to apply the missing upgrades
 - Retried `sudo apt install ros-jazzy-desktop` → **success**
 
-![Output showing ROS2 Jazzy package installation completed successfully](/assets/posts/agv-prototype-log-01/08-ros-install-success.png)
+![Output showing ROS2 Jazzy package installation completed successfully](/assets/posts/agv-prototype-log-01/08-ros-install-success.webp)
 
 ## 7. ROS2 Workspace Setup
 

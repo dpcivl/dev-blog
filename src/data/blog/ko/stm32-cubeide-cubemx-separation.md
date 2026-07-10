@@ -45,7 +45,7 @@ ST의 입장은 대략 이렇다.
 
 CubeMX에서 초기화 코드를 생성한 뒤 프로젝트 폴더를 열었는데, IDE 좌측에 **Project Explorer 패널이 안 보이는** 상황이 있었다.
 
-![STM32CubeIDE에서 Project Explorer가 보이지 않고 오른쪽 Outline/Build Targets만 떠있는 상태](/assets/posts/stm32-cubeide-cubemx-separation/01-project-explorer-missing.png)
+![STM32CubeIDE에서 Project Explorer가 보이지 않고 오른쪽 Outline/Build Targets만 떠있는 상태](/assets/posts/stm32-cubeide-cubemx-separation/01-project-explorer-missing.webp)
 
 해결: **Window → Perspective → Reset Perspective** 클릭하면 Project Explorer가 돌아온다. Eclipse 기반 IDE의 perspective(작업 공간 레이아웃 프리셋)가 어쩌다 어그러진 상태일 때 흔히 쓰는 복구 방법.
 

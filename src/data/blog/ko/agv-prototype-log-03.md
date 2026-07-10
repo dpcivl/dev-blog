@@ -41,7 +41,7 @@ featured: false
 
 ## 2. 배터리 + 로커 스위치 결선 계획
 
-![배터리 + 로커 스위치 결선 계획도](/assets/posts/agv-prototype-log-03/01-wiring-plan.png)
+![배터리 + 로커 스위치 결선 계획도](/assets/posts/agv-prototype-log-03/01-wiring-plan.webp)
 
 배터리와 로커 스위치를 어떻게 연결할지 손으로 그렸다. 입력은 배터리 +극, 출력은 STM32·모터드라이버 등 부하 쪽으로 가야 한다.
 
@@ -49,7 +49,7 @@ featured: false
 
 겨우 납땜해서 끝냈다. 오랜만에 납땜이기도 하고 집에서 납땜하는 게 익숙하지가 않아서 그런가, 원래도 똥손인데 땀 뻘뻘 흘리면서 겨우겨우 마무리했다.
 
-![배터리 + 로커 스위치 납땜 완료](/assets/posts/agv-prototype-log-03/02-soldering-result.png)
+![배터리 + 로커 스위치 납땜 완료](/assets/posts/agv-prototype-log-03/02-soldering-result.webp)
 
 ## 4. 배터리 전압 측정 — 10.61V
 
@@ -94,7 +94,7 @@ USB-UART 컨버터가 아직 안 왔으니 다른 거. **네오디움 자석을 
 
 네오디움 자석이 너무 작아서 핀셋으로 집어야겠다 싶었는데, **핀셋에 자석이 그대로 붙었다.** 당황. 다행히 **핀셋에 자석이 붙는 힘보다 접착제의 힘이 더 강해서**, 자석이 핀셋에 붙은 상태로 접착제를 발라 휠에 옮겨붙이는 식으로 작업했다.
 
-![휠 안쪽에 부착된 네오디움 자석](/assets/posts/agv-prototype-log-03/03-magnet-on-wheel.png)
+![휠 안쪽에 부착된 네오디움 자석](/assets/posts/agv-prototype-log-03/03-magnet-on-wheel.webp)
 
 ## 오늘 한 것
 

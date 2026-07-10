@@ -30,7 +30,7 @@ MCP 는 이걸 **도구를 별도 서버로 분리** 해서 해결한다. 그러
 - 한 번 만든 도구 서버를 **여러 LLM 앱에서 재사용** 할 수 있다
 - **표준화** — Anthropic 외 다른 클라이언트도 같은 서버를 쓸 수 있다
 
-![Tool Use vs MCP 비교표 — 정의 위치 / 실행 위치 / 재사용 / 표준 / 호환 / 배포 6가지 측면](/assets/posts/mcp-study-log-01/01-tool-use-vs-mcp-table.png)
+![Tool Use vs MCP 비교표 — 정의 위치 / 실행 위치 / 재사용 / 표준 / 호환 / 배포 6가지 측면](/assets/posts/mcp-study-log-01/01-tool-use-vs-mcp-table.webp)
 
 | 측면 | Tool Use | MCP |
 |---|---|---|
@@ -123,7 +123,7 @@ python first_mcp_server.py
 npx @modelcontextprotocol/inspector python first_mcp_server.py
 ```
 
-![MCP Inspector 초기 화면 — Transport Type STDIO, Command python, Arguments .\first_mcp_server.py, 아직 Disconnected 상태](/assets/posts/mcp-study-log-01/02-mcp-inspector-disconnected.png)
+![MCP Inspector 초기 화면 — Transport Type STDIO, Command python, Arguments .\first_mcp_server.py, 아직 Disconnected 상태](/assets/posts/mcp-study-log-01/02-mcp-inspector-disconnected.webp)
 
 Inspector 에서 확인할 수 있는 것:
 
@@ -141,7 +141,7 @@ Inspector 에서 확인할 수 있는 것:
 
 ### 연결 성공 — Tools 노출 확인
 
-![연결 후 Inspector — Tools 탭에 say_hello / add_numbers 두 도구 노출. add_numbers 에 a=5, b=3 입력 폼](/assets/posts/mcp-study-log-01/03-mcp-inspector-connected-with-tools.png)
+![연결 후 Inspector — Tools 탭에 say_hello / add_numbers 두 도구 노출. add_numbers 에 a=5, b=3 입력 폼](/assets/posts/mcp-study-log-01/03-mcp-inspector-connected-with-tools.webp)
 
 좌측에 **`say_hello`** 와 **`add_numbers`** 두 도구가 노출된다. docstring 의 Args/Returns 가 그대로 우측 패널에 정리된다.
 
@@ -149,7 +149,7 @@ Inspector 에서 확인할 수 있는 것:
 
 ### `say_hello` 호출 결과
 
-![say_hello 결과 — Tool Result Success, structured content { result: "안녕하세요, 효인님! MCP 서버에서 인사드려요." }](/assets/posts/mcp-study-log-01/04-say-hello-result.png)
+![say_hello 결과 — Tool Result Success, structured content { result: "안녕하세요, 효인님! MCP 서버에서 인사드려요." }](/assets/posts/mcp-study-log-01/04-say-hello-result.webp)
 
 이름을 입력하면 인사 문자열을 돌려준다. **Valid according to output schema** 라고 표기되는 부분 — MCP 가 output schema 까지 검증한다는 게 보인다.
 
@@ -157,7 +157,7 @@ Inspector 에서 확인할 수 있는 것:
 
 가짜 데이터로 **에너지 관리** MCP 서버를 구현한다. [FEMS 프로젝트](/posts/fems-project-log-02) 와 자연스럽게 이어지는 시나리오다.
 
-![에너지 관리 서버 — list_production_lines / get_energy_consumption / list_alarms / get_line_status 네 도구](/assets/posts/mcp-study-log-01/05-energy-management-tools.png)
+![에너지 관리 서버 — list_production_lines / get_energy_consumption / list_alarms / get_line_status 네 도구](/assets/posts/mcp-study-log-01/05-energy-management-tools.webp)
 
 4 개 도구:
 
@@ -170,7 +170,7 @@ Inspector 에서 확인할 수 있는 것:
 
 ### 호출 결과
 
-![get_energy_consumption(line_1) 결과 — 정격 150kW, 평균 128.0kW, 시간별 상세 표시](/assets/posts/mcp-study-log-01/06-energy-consumption-result.png)
+![get_energy_consumption(line_1) 결과 — 정격 150kW, 평균 128.0kW, 시간별 상세 표시](/assets/posts/mcp-study-log-01/06-energy-consumption-result.webp)
 
 결과가 잘 나온다. **지금은 가짜 데이터지만**, 실제 DB 연결하면:
 

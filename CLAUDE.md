@@ -160,6 +160,10 @@
 - 이 저장소는 Windows + PowerShell 환경. Bash 도구도 쓸 수 있지만 경로 표기 주의 (`c:\dev\dev-blog\` ↔ `/c/dev/dev-blog/`)
 - 빌드 스크립트의 `cp -r dist/pagefind public/`는 Unix 명령이라 Windows 로컬 빌드 시 마지막 단계가 실패함. Vercel(Linux)에서는 정상.
 
+## 이미지 최적화 워크플로우
+
+새 포스트에 스크린샷/사진을 추가할 때 PNG/JPG 로 첨부해도 되지만, **발행 전 `pnpm images:webp` 를 한 번 돌리면 자동으로 WebP 변환 + MD 참조 갱신 + 원본 삭제**. WebP 가 원본보다 크면 스킵 (일부 소형 이미지). 지연 로드는 rehype 플러그인이 빌드 시 자동 처리 (첫 이미지는 eager, 나머지는 lazy).
+
 ## Mermaid 다이어그램 워크플로우
 
 Vercel 빌드 환경에서 Chromium 실행이 불안정해 remark-mermaidjs 를 파이프라인에 넣으면 본문 유실 사고가 남 (2026-07-10 실제 발생). 그래서 **로컬에서 사전 렌더 → static asset 커밋** 방식으로 고정.

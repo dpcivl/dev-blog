@@ -25,7 +25,7 @@ AstroPaper 템플릿으로 블로그를 새로 세팅하면서 만난 이상한 
 
 로컬 dev 서버(`npm run dev`)에서는 의도대로 글 목록이 비어있는 깔끔한 화면이 나왔다. 그런데 Vercel에 배포된 사이트를 열어보니 이런 모습이었다.
 
-![push가 끝났는데도 옛날 샘플 글들이 그대로 보이는 화면](/assets/posts/vercel-shows-old-posts-after-deletion/01-old-posts-still-visible.png)
+![push가 끝났는데도 옛날 샘플 글들이 그대로 보이는 화면](/assets/posts/vercel-shows-old-posts-after-deletion/01-old-posts-still-visible.webp)
 
 Hero 섹션의 한국어 인사("안녕하세요 👋")는 적용됐는데, **Featured 섹션에는 지웠던 샘플 글 3개가 그대로 보였다.** "How to configure AstroPaper theme", "Adding new posts in AstroPaper theme", "AstroPaper 5.0".
 
@@ -67,7 +67,7 @@ The collection "blog" does not exist or is empty.
 
 임시로 `hello-world.md` 한 개를 작성해서 push했다. 결과:
 
-![임시 포스트 push 후 옛 글들이 사라지고 새 포스트만 보이는 화면](/assets/posts/vercel-shows-old-posts-after-deletion/02-resolved-after-temp-post.png)
+![임시 포스트 push 후 옛 글들이 사라지고 새 포스트만 보이는 화면](/assets/posts/vercel-shows-old-posts-after-deletion/02-resolved-after-temp-post.webp)
 
 **옛날 샘플 글 3개가 전부 사라지고 새 포스트만 노출됐다.** 가설이 맞았다.
 

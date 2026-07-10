@@ -91,7 +91,7 @@ From the outside it just looks like text flowing in, but there's actually a clea
 
 At this point, the study material included the following comparison.
 
-![일반 텍스트 스트리밍과 Tool Use 스트리밍의 이벤트 차이를 비교하는 학습 자료](/assets/posts/claude-api-streaming-ttft-and-events/01-text-vs-tool-use-streaming.png)
+![일반 텍스트 스트리밍과 Tool Use 스트리밍의 이벤트 차이를 비교하는 학습 자료](/assets/posts/claude-api-streaming-ttft-and-events/01-text-vs-tool-use-streaming.webp)
 
 Key summary:
 

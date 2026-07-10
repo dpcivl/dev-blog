@@ -45,7 +45,7 @@ While installing this time, I saw a **STM32CubeIDE for VS Code** extension optio
 
 After generating the initialization code in CubeMX and opening the project folder, I ran into a situation where the **Project Explorer panel wasn't showing** on the left side of the IDE.
 
-![STM32CubeIDE showing no Project Explorer, with only the Outline/Build Targets visible on the right](/assets/posts/stm32-cubeide-cubemx-separation/01-project-explorer-missing.png)
+![STM32CubeIDE showing no Project Explorer, with only the Outline/Build Targets visible on the right](/assets/posts/stm32-cubeide-cubemx-separation/01-project-explorer-missing.webp)
 
 Fix: click **Window → Perspective → Reset Perspective** to bring the Project Explorer back. This is a common recovery method for when the perspective (a workspace layout preset) of an Eclipse-based IDE somehow gets messed up.
 

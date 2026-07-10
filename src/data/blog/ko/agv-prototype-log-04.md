@@ -21,7 +21,7 @@ featured: false
 
 ## 1. UART 컨버터 ↔ STM32F407 결선
 
-![USB-UART 컨버터와 STM32F407 결선도](/assets/posts/agv-prototype-log-04/01-uart-converter-stm32-wiring.png)
+![USB-UART 컨버터와 STM32F407 결선도](/assets/posts/agv-prototype-log-04/01-uart-converter-stm32-wiring.webp)
 
 위와 같이 연결한다. **VCC 핀은 연결하지 않았다** — 컨버터도 3.3V 고 F407 Discovery 가 3.3V 로직 보드라 따로 전원을 줄 필요가 없다. GND / TX / RX 만 결선.
 
@@ -29,7 +29,7 @@ featured: false
 
 ### 점퍼 케이블이 앞쪽 헤더에 안 들어감
 
-![점퍼 케이블을 뒤쪽 헤더에 연결한 모습](/assets/posts/agv-prototype-log-04/02-jumper-rear-header.png)
+![점퍼 케이블을 뒤쪽 헤더에 연결한 모습](/assets/posts/agv-prototype-log-04/02-jumper-rear-header.webp)
 
 점퍼 케이블이 앞쪽 헤더엔 잘 안 들어가서 뒤쪽에 연결했다. **점퍼 케이블용 헤더는 뒤쪽이 맞는 것 같고**, 앞쪽은 어떤 특정 커넥터 전용인 듯한데 어떤 건지는 못 찾았다 (나중에 확인 필요).
 
@@ -59,7 +59,7 @@ UART 송신은 세 가지 방식이 있다:
 
 ## 3. CubeMX 에서 USART2 활성화
 
-![STM32CubeMX 에서 USART2 를 PA2/PA3 에 활성화한 화면](/assets/posts/agv-prototype-log-04/03-cubemx-usart2-config.png)
+![STM32CubeMX 에서 USART2 를 PA2/PA3 에 활성화한 화면](/assets/posts/agv-prototype-log-04/03-cubemx-usart2-config.webp)
 
 - **모드**: Asynchronous
 - **Baud rate**: 115200
@@ -72,7 +72,7 @@ UART 송신은 세 가지 방식이 있다:
 
 결과 확인은 Putty 같은 별도 프로그램으로 해도 되지만, **이왕 STM32CubeIDE 를 쓰는 김에 IDE 안에서 어떻게 띄우는지** 찾아봤다.
 
-![STM32CubeIDE Console 탭에서 Command Shell Console 옵션 선택](/assets/posts/agv-prototype-log-04/04-stm32cubeide-serial-console.png)
+![STM32CubeIDE Console 탭에서 Command Shell Console 옵션 선택](/assets/posts/agv-prototype-log-04/04-stm32cubeide-serial-console.webp)
 
 방법:
 
@@ -84,7 +84,7 @@ UART 송신은 세 가지 방식이 있다:
 
 ## 5. 결과 — 메시지 수신 확인
 
-![시리얼 모니터에 Hello AGV 메시지가 1초마다 도착하는 화면](/assets/posts/agv-prototype-log-04/05-serial-message-received.png)
+![시리얼 모니터에 Hello AGV 메시지가 1초마다 도착하는 화면](/assets/posts/agv-prototype-log-04/05-serial-message-received.webp)
 
 `Hello AGV #N` 메시지가 1초마다 잘 들어왔다. **STM32 → 컨버터 → USB → PC** 라인 검증 완료.
 

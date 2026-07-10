@@ -164,6 +164,25 @@ featured: true
   - Design log (`docs/design-log.md`) — Phase 별 결정 누적
 - **결과**: 개인 톤 확립 + 결정 히스토리 보존. Phase 1 (레이아웃) → Phase 7 (i18n UI) 로 이어짐.
 
+### 13. SEO 강화 — JSON-LD 구조화 데이터 페이지 유형별 분기
+
+- **문제**: 기본 상태에서는 모든 페이지가 `@type: BlogPosting` JSON-LD 를 emit. 홈페이지 · 시리즈 · 태그 페이지도 "블로그 글" 로 잘못 마킹됨. `description` · `publisher` · `mainEntityOfPage` · `inLanguage` 같은 표준 필드도 누락.
+- **해법**: `src/layouts/Layout.astro` 의 `structuredData` 를 페이지 유형에 따라 분기
+  - 포스트 (`pubDatetime` 있음) → **BlogPosting** + `description` · `url` · `mainEntityOfPage` · `inLanguage` · `publisher` 필드 추가
+  - 그 외 (`pubDatetime` 없음) → **WebSite** 스키마
+- **결과**: 구글 리치 스니펫에서 저자 · 발행일 · 언어 정확 인식. 홈페이지가 잘못 article 로 마킹되던 문제 해결.
+
+### 14. Perf — 이미지 lazy loading + PNG → WebP + 폰트 preload
+
+세 축 동시 최적화:
+
+- **문제**: 스크린샷 위주 포스트의 초기 페이지 로드가 무거움 (`public/assets/posts/` 총 62 MB). 아카이브 · 태그 페이지에서 목록 스크롤 시 뷰 밖 이미지까지 즉시 로드. Pretendard CSS 는 렌더링 차단.
+- **해법**:
+  - **커스텀 rehype 플러그인** ([`src/plugins/rehype-image-perf.mjs`](https://github.com/dpcivl/dev-blog/blob/main/src/plugins/rehype-image-perf.mjs)) — 첫 이미지는 `loading="eager" fetchpriority="high"` (LCP 후보), 나머지는 `loading="lazy" decoding="async"`
+  - **`pnpm images:webp`** — sharp 로 PNG → WebP 일괄 변환 스크립트. WebP 가 더 작을 때만 교체 (일부 소형 스크린샷은 PNG 가 오히려 압축률 좋음), MD 의 이미지 URL 도 자동 갱신, 원본 삭제
+  - **Pretendard CSS `<link rel="preload">`** 로 폰트 CSS 조기 취득 → 렌더링 차단 완화
+- **결과**: `public/assets/posts/` **62 MB → 15 MB (75% 감소, 61개 변환)**. 목록/태그 페이지 스크롤 시 뷰 밖 이미지 지연 로드 → 첫 뷰 페인트 개선. LCP 후보 이미지는 여전히 우선순위 유지.
+
 ## 공통 원칙
 
 기능들을 관통하는 4가지:
@@ -190,3 +209,4 @@ featured: true
 ### 갱신 기록
 
 - **2026-07-10** — 초판. 12개 기능 정리 (시리즈 · 플레이그라운드 · i18n · 번역 자동화 · 링크 체커 · Mermaid · Scratch/Inbox · 소프트 숨김 · pubDatetime 필터 · 보안 스크러빙 · Featured/시리즈 태그 · 리디자인)
+- **2026-07-10** (2차) — SEO 강화 (JSON-LD 페이지 유형별 분기 · 표준 필드 보강) + Perf 3종 (rehype 이미지 lazy loading · PNG → WebP 스크립트 · Pretendard CSS preload) 추가. README 도 AstroPaper 원본에서 커스텀으로 교체.

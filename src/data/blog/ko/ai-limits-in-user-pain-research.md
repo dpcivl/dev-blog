@@ -27,7 +27,7 @@ featured: false
 
 이 의문을 그대로 Claude에 던졌다.
 
-![Claude에게 던진 질문 — AI 시대에 사람들이 프로젝트를 위한 pain을 어떻게 찾는지에 대한 자문](/assets/posts/ai-limits-in-user-pain-research/01-my-question-to-claude.png)
+![Claude에게 던진 질문 — AI 시대에 사람들이 프로젝트를 위한 pain을 어떻게 찾는지에 대한 자문](/assets/posts/ai-limits-in-user-pain-research/01-my-question-to-claude.webp)
 
 대표적인 방식 **4가지** 가 돌아왔다.
 

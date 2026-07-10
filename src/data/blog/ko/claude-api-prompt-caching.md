@@ -35,7 +35,7 @@ LLM은 입력을 받으면 **컴퓨팅 비싼 전처리**를 내부적으로 수
 
 ## 가격 구조
 
-![Cache write는 일반 input의 1.25배, Cache read는 0.1배인 가격 비교](/assets/posts/claude-api-prompt-caching/01-cache-pricing-comparison.png)
+![Cache write는 일반 input의 1.25배, Cache read는 0.1배인 가격 비교](/assets/posts/claude-api-prompt-caching/01-cache-pricing-comparison.webp)
 
 | 항목 | 단가 (Haiku 4.5 기준) | 비율 |
 |---|---|---|
@@ -68,7 +68,7 @@ LLM은 입력을 받으면 **컴퓨팅 비싼 전처리**를 내부적으로 수
 
 캐시를 쓰려면 **일정 크기 이상의 입력** 이 필요하다. 작은 입력은 캐싱 대상조차 안 됨.
 
-![모델별 최소 토큰: Claude 3.x 1024, Sonnet 4.5/Haiku 4.5/Opus 4.5+ 는 4,096](/assets/posts/claude-api-prompt-caching/02-minimum-tokens-per-model.png)
+![모델별 최소 토큰: Claude 3.x 1024, Sonnet 4.5/Haiku 4.5/Opus 4.5+ 는 4,096](/assets/posts/claude-api-prompt-caching/02-minimum-tokens-per-model.webp)
 
 | 모델 | 캐시 사용 최소 토큰 |
 |---|---|

@@ -3,6 +3,7 @@ import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
 import remarkToc from "remark-toc";
 import remarkCollapse from "remark-collapse";
+import { rehypeImagePerf } from "./src/plugins/rehype-image-perf.mjs";
 import {
   transformerNotationDiff,
   transformerNotationHighlight,
@@ -25,6 +26,10 @@ export default defineConfig({
   ],
   markdown: {
     remarkPlugins: [remarkToc, [remarkCollapse, { test: "Table of contents" }]],
+    rehypePlugins: [
+      // Auto lazy-load images beyond the first (LCP-safe).
+      rehypeImagePerf,
+    ],
     shikiConfig: {
       // For more themes, visit https://shiki.style/themes
       themes: { light: "min-light", dark: "night-owl" },

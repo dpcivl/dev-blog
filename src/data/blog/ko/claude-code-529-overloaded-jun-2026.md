@@ -11,7 +11,7 @@ draft: false
 featured: false
 ---
 
-![Claude Code 에이전트 호출 실패 — 529 Overloaded 에러 메시지](/assets/posts/claude-code-529-overloaded-jun-2026/01-claude-code-error.png)
+![Claude Code 에이전트 호출 실패 — 529 Overloaded 에러 메시지](/assets/posts/claude-code-529-overloaded-jun-2026/01-claude-code-error.webp)
 
 Claude Code 로 코딩 중인데 자꾸 **서버 과부하로 에이전트 호출이 안 된다** 고 했다. 어떤 문제인지 따라가본 짧은 일지.
 
@@ -36,7 +36,7 @@ duration_ms: 191200
 
 ## 2. Claude API Docs 에서 529 원인 확인
 
-![Claude API Docs — 529 Overloaded 의 정의와 발생 상황 설명](/assets/posts/claude-code-529-overloaded-jun-2026/02-claude-api-docs-529.png)
+![Claude API Docs — 529 Overloaded 의 정의와 발생 상황 설명](/assets/posts/claude-code-529-overloaded-jun-2026/02-claude-api-docs-529.webp)
 
 요약하면:
 
@@ -47,7 +47,7 @@ duration_ms: 191200
 
 ## 3. 개발자 단톡에서 단서 — `status.claude.com`
 
-![개발자 단톡 — 같은 시각 다수가 같은 에러를 보고하고 status 페이지를 공유](/assets/posts/claude-code-529-overloaded-jun-2026/03-group-chat-confirms.png)
+![개발자 단톡 — 같은 시각 다수가 같은 에러를 보고하고 status 페이지를 공유](/assets/posts/claude-code-529-overloaded-jun-2026/03-group-chat-confirms.webp)
 
 같은 시각에 들어가 있는 개발자 단톡에서도 **같은 에러로 난리** 였다. **나만 그런 게 아니라 다수가 같은 증상.** 언제 풀리나 마냥 기다려야 하는 줄 알았는데, 단톡에서 **`status.claude.com`** 을 가보라는 단서를 얻었다.
 
@@ -55,7 +55,7 @@ duration_ms: 191200
 
 ## 4. status.claude.com — Anthropic 의 공식 상태 페이지
 
-![status.claude.com — Investigating 상태로 진행 중인 인시던트 표시](/assets/posts/claude-code-529-overloaded-jun-2026/04-status-claude-investigating.png)
+![status.claude.com — Investigating 상태로 진행 중인 인시던트 표시](/assets/posts/claude-code-529-overloaded-jun-2026/04-status-claude-investigating.webp)
 
 **UTC 00:37** = 한국 시간 오전 9:37. 현재 에러가 발생해서 **계속 조사 중 (Investigating)** 인 것으로 표시. 여기서 **"Resolved"** 가 뜨면 해결된 것.
 
@@ -63,7 +63,7 @@ duration_ms: 191200
 
 ## 5. 해결 — Opus 4.8 복구
 
-![Past Incidents 에서 Resolved 로 마무리된 기록 확인](/assets/posts/claude-code-529-overloaded-jun-2026/05-past-incident-resolved.png)
+![Past Incidents 에서 Resolved 로 마무리된 기록 확인](/assets/posts/claude-code-529-overloaded-jun-2026/05-past-incident-resolved.webp)
 
 Opus 4.8 이 풀리고 나서 바로 작업을 들어가서 **"Resolved" 가 뜨는 순간은 실시간으로 못 봤지만**, 나중에 **Past Incidents** 에서 확인 가능했다.
 

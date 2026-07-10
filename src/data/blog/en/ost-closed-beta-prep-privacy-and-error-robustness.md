@@ -70,7 +70,7 @@ While searching for how much legal counsel might cost, I found out that the **Pe
 
 After drafting the privacy notice, I added a **consent gate**. Even existing users who haven't consented now see the consent screen right after entry. I was still in dogfooding, but I ran into this new screen myself and had to click through it.
 
-![OST consent gate — checkbox UI for 3 items: (Required) personal information collection/use, (Required) sensitive information (emotion/feeling records) processing, (Optional) cross-border transfer of personal information](/assets/posts/ost-closed-beta-prep-privacy-and-error-robustness/01-consent-gate.png)
+![OST consent gate — checkbox UI for 3 items: (Required) personal information collection/use, (Required) sensitive information (emotion/feeling records) processing, (Optional) cross-border transfer of personal information](/assets/posts/ost-closed-beta-prep-privacy-and-error-robustness/01-consent-gate.webp)
 
 - (Required) General collection/use — service access restricted if refused
 - (Required) Sensitive information processing — journaling/analysis features restricted if refused

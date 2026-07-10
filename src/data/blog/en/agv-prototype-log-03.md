@@ -41,7 +41,7 @@ I almost stopped after checking just one pole. This is a **DPDT (Double Pole Dou
 
 ## 2. Battery + Rocker Switch Wiring Plan
 
-![Battery + rocker switch wiring plan](/assets/posts/agv-prototype-log-03/01-wiring-plan.png)
+![Battery + rocker switch wiring plan](/assets/posts/agv-prototype-log-03/01-wiring-plan.webp)
 
 I hand-drew how to connect the battery and rocker switch. The input is the battery's + terminal, and the output goes to the load side — STM32, motor driver, etc.
 
@@ -49,7 +49,7 @@ I hand-drew how to connect the battery and rocker switch. The input is the batte
 
 I finally managed to finish the soldering. Maybe it's because it had been a while since I last soldered, or because I'm not used to soldering at home, but on top of already having clumsy hands, I barely finished it while sweating buckets.
 
-![Completed battery + rocker switch soldering](/assets/posts/agv-prototype-log-03/02-soldering-result.png)
+![Completed battery + rocker switch soldering](/assets/posts/agv-prototype-log-03/02-soldering-result.webp)
 
 ## 4. Battery Voltage Measurement — 10.61V
 
@@ -94,7 +94,7 @@ Ultimately, this single magnet becomes the starting point for the data source th
 
 The neodymium magnet was so small that I figured I'd need tweezers to pick it up, but **the magnet just stuck straight to the tweezers.** I was caught off guard. Luckily, **the adhesive's grip was stronger than the magnetic pull between the magnet and the tweezers**, so I worked around it by applying adhesive to the magnet while it was still stuck to the tweezers, then transferring it onto the wheel.
 
-![Neodymium magnet attached to the inside of the wheel](/assets/posts/agv-prototype-log-03/03-magnet-on-wheel.png)
+![Neodymium magnet attached to the inside of the wheel](/assets/posts/agv-prototype-log-03/03-magnet-on-wheel.webp)
 
 ## What I Did Today
 

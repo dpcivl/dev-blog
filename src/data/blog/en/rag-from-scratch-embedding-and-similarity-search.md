@@ -22,7 +22,7 @@ Today's topic is **building RAG from scratch**. **R**etrieval-**A**ugmented **G*
 
 Roughly summarized as a diagram:
 
-![RAG core idea diagram — document embedding + query embedding + retrieval + context injection](/assets/posts/rag-from-scratch-embedding-and-similarity-search/01-rag-concept-1.png)
+![RAG core idea diagram — document embedding + query embedding + retrieval + context injection](/assets/posts/rag-from-scratch-embedding-and-similarity-search/01-rag-concept-1.webp)
 
 The core idea is **"retrieve documents the LLM doesn't know about from an external source and feed them in as context."** The unit of that retrieval is a **vector (embedding)** that compresses the meaning of text, and the comparison is done with **cosine similarity**.
 
@@ -30,7 +30,7 @@ The core idea is **"retrieve documents the LLM doesn't know about from an extern
 
 For RAG study, I **issued an OpenAI API key**. I'd already paid for Anthropic tokens, but apparently for embeddings, **OpenAI's `text-embedding-3-small` is the cost-effective standard**.
 
-![OpenAI dashboard — after adding a $5 credit payment, usage at 0](/assets/posts/rag-from-scratch-embedding-and-similarity-search/02-openai-dashboard.png)
+![OpenAI dashboard — after adding a $5 credit payment, usage at 0](/assets/posts/rag-from-scratch-embedding-and-similarity-search/02-openai-dashboard.webp)
 
 - **OpenAI embeddings = market standard** (the most widely used model)
 - `text-embedding-3-small`: **$0.02 per 1M tokens**

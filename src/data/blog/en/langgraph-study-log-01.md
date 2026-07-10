@@ -28,7 +28,7 @@ Today's post is my **first LangGraph log.**
 
 I've seen it described as "a tool for wiring up an agent's nervous system," but I had no idea what that meant at first. My rough understanding going in: **you build a graph out of nodes and edges, compile it, and the agent runs according to that design.** That was enough to get started.
 
-![LangGraph first import — StateGraph, add_conditional_edges, and various other modules](/assets/posts/langgraph-study-log-01/01-langgraph-imports.png)
+![LangGraph first import — StateGraph, add_conditional_edges, and various other modules](/assets/posts/langgraph-study-log-01/01-langgraph-imports.webp)
 
 Once I started implementing it, I noticed **there are a lot of imports.** Looks like there's a lot to learn here. At the same time, it made me wonder, **"how does a graph like this actually run?"** I figure I'll learn that as I go.
 
@@ -36,7 +36,7 @@ Once I started implementing it, I noticed **there are a lot of imports.** Looks 
 
 Since this was my first time working with it, there were a lot of unfamiliar terms.
 
-![LangGraph graph diagram — branching on Tool use and the call_llm node](/assets/posts/langgraph-study-log-01/02-graph-diagram.png)
+![LangGraph graph diagram — branching on Tool use and the call_llm node](/assets/posts/langgraph-study-log-01/02-graph-diagram.webp)
 
 I implemented it following the diagram above. Here's what I understood:
 

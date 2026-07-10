@@ -52,7 +52,7 @@ Parallelized a task that was previously processed sequentially, using **`Executo
 
 Actual run result:
 
-![ThreadDemo execution — sequential 3008ms vs concurrent (pool-1-thread-1/2/3) 1006ms](/assets/posts/java-study-log-03-exceptions-concurrency-and-gradle/01-thread-demo-output.png)
+![ThreadDemo execution — sequential 3008ms vs concurrent (pool-1-thread-1/2/3) 1006ms](/assets/posts/java-study-log-03-exceptions-concurrency-and-gradle/01-thread-demo-output.webp)
 
 **3008ms → 1006ms** — almost matches the theoretical value. The threads show up in the log as `pool-1-thread-1`, `pool-1-thread-2`, `pool-1-thread-3`, so parallel execution is visible.
 
@@ -98,7 +98,7 @@ Spring Boot projects are Gradle-based by default too, so it's a tool you have to
 
 ### Gradle Project Structure
 
-![gradle-demo project structure — app/build.gradle, gradle/wrapper, gradle.properties, gradlew, settings.gradle](/assets/posts/java-study-log-03-exceptions-concurrency-and-gradle/02-gradle-project-structure.png)
+![gradle-demo project structure — app/build.gradle, gradle/wrapper, gradle.properties, gradlew, settings.gradle](/assets/posts/java-study-log-03-exceptions-concurrency-and-gradle/02-gradle-project-structure.webp)
 
 - **`build.gradle`** — the core config file. Libraries are declared in `dependencies`
 - **`gradlew` / `gradlew.bat`** — per-project Gradle execution wrapper (eliminates worries about Gradle version mismatches between teammates)

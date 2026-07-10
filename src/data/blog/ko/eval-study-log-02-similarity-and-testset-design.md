@@ -131,7 +131,7 @@ Eval 이 아무리 잘 짜여도 **테스트셋 자체가 편향** 이면 아무
 
 이후에 **description 을 대충 쓴 V1** 과 **명확하게 쓴 V2** 를 비교하는 예제를 진행했다. 처음엔 이걸 **"회귀 테스트"** 라고 불렀는데 — 내가 아는 회귀 테스트는 다른 개념이라 이상해서 다시 물어봤다.
 
-![LLM 답변 — regression_eval.py 에서 한 것은 V1(70%) vs V2(90%) A/B 비교. 이건 엄밀히 말하면 회귀 테스트가 아니라 A/B 비교 또는 **개선 검증(improvement validation)**](/assets/posts/eval-study-log-02-similarity-and-testset-design/04-regression-test-terminology.png)
+![LLM 답변 — regression_eval.py 에서 한 것은 V1(70%) vs V2(90%) A/B 비교. 이건 엄밀히 말하면 회귀 테스트가 아니라 A/B 비교 또는 **개선 검증(improvement validation)**](/assets/posts/eval-study-log-02-similarity-and-testset-design/04-regression-test-terminology.webp)
 
 **답변:**
 

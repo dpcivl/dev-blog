@@ -11,7 +11,7 @@ draft: false
 featured: false
 ---
 
-![Claude Code agent call failure — 529 Overloaded error message](/assets/posts/claude-code-529-overloaded-jun-2026/01-claude-code-error.png)
+![Claude Code agent call failure — 529 Overloaded error message](/assets/posts/claude-code-529-overloaded-jun-2026/01-claude-code-error.webp)
 
 I was coding with Claude Code when it kept telling me **agent calls were failing due to server overload**. Here's a short log of tracking down what was going on.
 
@@ -36,7 +36,7 @@ Reading it at a glance, it looked like a **temporary server-side issue** — not
 
 ## 2. Checking the cause of 529 in the Claude API Docs
 
-![Claude API Docs — definition of 529 Overloaded and when it occurs](/assets/posts/claude-code-529-overloaded-jun-2026/02-claude-api-docs-529.png)
+![Claude API Docs — definition of 529 Overloaded and when it occurs](/assets/posts/claude-code-529-overloaded-jun-2026/02-claude-api-docs-529.webp)
 
 In summary:
 
@@ -47,7 +47,7 @@ This means the server side gets temporarily overloaded. Since I was working the 
 
 ## 3. A clue from the developer group chat — `status.claude.com`
 
-![Developer group chat — many people reporting the same error at the same time and sharing the status page](/assets/posts/claude-code-529-overloaded-jun-2026/03-group-chat-confirms.png)
+![Developer group chat — many people reporting the same error at the same time and sharing the status page](/assets/posts/claude-code-529-overloaded-jun-2026/03-group-chat-confirms.webp)
 
 In a developer group chat I'm in, people were dealing with **the same error at the same time** — chaos. **It wasn't just me — many people had the same symptom.** I thought I'd just have to sit and wait for it to clear up, but someone in the chat gave me the tip to check **`status.claude.com`**.
 
@@ -55,7 +55,7 @@ In a developer group chat I'm in, people were dealing with **the same error at t
 
 ## 4. status.claude.com — Anthropic's official status page
 
-![status.claude.com — showing an ongoing incident in Investigating status](/assets/posts/claude-code-529-overloaded-jun-2026/04-status-claude-investigating.png)
+![status.claude.com — showing an ongoing incident in Investigating status](/assets/posts/claude-code-529-overloaded-jun-2026/04-status-claude-investigating.webp)
 
 **UTC 00:37** = 9:37 AM Korea time. It showed that an error was currently occurring and was **still being investigated (Investigating)**. Once **"Resolved"** appears here, it means the issue is fixed.
 
@@ -63,7 +63,7 @@ In a developer group chat I'm in, people were dealing with **the same error at t
 
 ## 5. Resolution — Opus 4.8 recovered
 
-![Confirming the "Resolved" record in Past Incidents](/assets/posts/claude-code-529-overloaded-jun-2026/05-past-incident-resolved.png)
+![Confirming the "Resolved" record in Past Incidents](/assets/posts/claude-code-529-overloaded-jun-2026/05-past-incident-resolved.webp)
 
 Once Opus 4.8 recovered, I jumped right back into work, so **I didn't see the "Resolved" status appear in real time**, but I was able to confirm it later in **Past Incidents**.
 

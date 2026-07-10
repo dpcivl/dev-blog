@@ -32,7 +32,7 @@ featured: false
 
 ### 일반 에이전트 vs HITL 에이전트
 
-![일반 에이전트는 자동 실행 / HITL 에이전트는 위험 호출 시 중단 → 사람에게 보여줌 → 승인/거절 흐름](/assets/posts/langgraph-study-log-03-human-in-the-loop/01-hitl-pattern-diagram.png)
+![일반 에이전트는 자동 실행 / HITL 에이전트는 위험 호출 시 중단 → 사람에게 보여줌 → 승인/거절 흐름](/assets/posts/langgraph-study-log-03-human-in-the-loop/01-hitl-pattern-diagram.webp)
 
 | 일반 에이전트 | HITL 에이전트 |
 |---|---|
@@ -106,7 +106,7 @@ config = {"configurable": {"thread_id": "demo-1"}}
 
 ### 원인 — 시스템 프롬프트의 자체 규칙
 
-![시스템 프롬프트 안에 '위험 도구는 반드시 명확한 의도 확인 후 호출' 규칙이 있었다](/assets/posts/langgraph-study-log-03-human-in-the-loop/04-system-prompt-with-rule.png)
+![시스템 프롬프트 안에 '위험 도구는 반드시 명확한 의도 확인 후 호출' 규칙이 있었다](/assets/posts/langgraph-study-log-03-human-in-the-loop/04-system-prompt-with-rule.webp)
 
 시스템 프롬프트를 다시 보니 이 규칙이 박혀 있었다:
 

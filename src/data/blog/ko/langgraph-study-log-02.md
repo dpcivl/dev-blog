@@ -73,7 +73,7 @@ featured: false
 
 ## 5. "AI 가 기억한다" 의 정체 — Tool 이 아니라 메시지 누적
 
-![이름뿐인 memorize tool — 함수 본체엔 "기억하라" 라는 docstring 외 실질 동작 없음](/assets/posts/langgraph-study-log-02/03-fake-memory-tool.png)
+![이름뿐인 memorize tool — 함수 본체엔 "기억하라" 라는 docstring 외 실질 동작 없음](/assets/posts/langgraph-study-log-02/03-fake-memory-tool.webp)
 
 알고 보니 위의 tool 이 실제로 동작한 게 아니었다. **그냥 지난 메시지 목록에 내가 얘기했던 게 저장되어 있어서 기억하는 거** 였다. LLM 이 매 호출마다 전체 대화 히스토리를 컨텍스트로 받기 때문에, **별도 메모리 없이도 "기억하는 것처럼" 보인다.**
 

@@ -42,13 +42,13 @@ Since this was for learning, I started with a **Hello World-level example**.
 ros2 pkg create --build-type ament_python my_agv_pkg
 ```
 
-![ROS2 talker package structure creation + talker node code](/assets/posts/agv-prototype-log-02/01-ros2-talker-package-create.png)
+![ROS2 talker package structure creation + talker node code](/assets/posts/agv-prototype-log-02/01-ros2-talker-package-create.webp)
 
 I created a `talker` node that **sends "Hello AGV" to the `chatter` topic every second**.
 
 Then I had to register an **entry point** in `setup.py` so ROS2 could run the node via `ros2 run`.
 
-![The part of setup.py registering talker via entry_points](/assets/posts/agv-prototype-log-02/02-setup-py-entry-point.png)
+![The part of setup.py registering talker via entry_points](/assets/posts/agv-prototype-log-02/02-setup-py-entry-point.webp)
 
 After that, I built with `colcon build`.
 
@@ -57,7 +57,7 @@ After that, I built with `colcon build`.
 
 I listened on the same topic from another terminal and confirmed messages were flowing in every second.
 
-![Output showing talker publishing Hello AGV every second](/assets/posts/agv-prototype-log-02/03-talker-output.png)
+![Output showing talker publishing Hello AGV every second](/assets/posts/agv-prototype-log-02/03-talker-output.webp)
 
 ## 3. A standard message — `geometry_msgs/Twist`
 
@@ -65,11 +65,11 @@ Next, I used the **`geometry_msgs/Twist`** type directly. This is a standard mes
 
 The example itself is similar to talker, but the meaning is different. To actually move motors based on this message, you need **a separate motor control node** — I'll build that on the STM32 side. For now, I just published the message and checked the flow with `ros2 topic echo`.
 
-![Output of echoing the /cmd_vel topic with ros2 topic echo](/assets/posts/agv-prototype-log-02/04-cmd-vel-echo.png)
+![Output of echoing the /cmd_vel topic with ros2 topic echo](/assets/posts/agv-prototype-log-02/04-cmd-vel-echo.webp)
 
 I also checked the structure of the message type.
 
-![Structure of the Twist message — linear (x,y,z) + angular (x,y,z)](/assets/posts/agv-prototype-log-02/05-twist-message-structure.png)
+![Structure of the Twist message — linear (x,y,z) + angular (x,y,z)](/assets/posts/agv-prototype-log-02/05-twist-message-structure.webp)
 
 ### Publishing quickly without a build — `ros2 topic pub`
 
@@ -105,7 +105,7 @@ That's it for the ROS side today. I had some time left, so I warmed up with an *
 
 At first, the **PWM Generation CH1 option was grayed out** in the timer settings. After I **assigned PD12–PD15 to TIM4's respective channels** in the pinout section first, the PWM Generation option showed up properly.
 
-![TIM4 PWM configuration and parameter screen in STM32CubeMX](/assets/posts/agv-prototype-log-02/07-stm32cubemx-tim4-pwm.png)
+![TIM4 PWM configuration and parameter screen in STM32CubeMX](/assets/posts/agv-prototype-log-02/07-stm32cubemx-tim4-pwm.webp)
 
 ### Calculating Prescaler and Counter Period
 
