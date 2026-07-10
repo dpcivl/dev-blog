@@ -224,3 +224,4 @@ featured: true
 - **2026-07-10** (3차) — 포스트 하단 피드백 CTA (`Feedback.astro`) 추가. 댓글 시스템 없이 이메일 · GitHub Issue 로 실질 채널만 확보.
 - **2026-07-10** (4차) — 피드백 CTA UX 를 국내 사용자 기준으로 개편. `mailto:` 대신 "주소 복사 (Clipboard API)" + "Gmail 로 쓰기" + "GitHub Issue 열기" 3-트랙. 이메일 주소는 텍스트로 노출 + `user-select: all` 로 클릭 한 번 전체 선택. `docs/analytics-log.md` 관측 로그 신설 (첫 30일 스냅샷: Visitors 168 · Pages/Visitor 7.8 · Bounce 45%).
 - **2026-07-10** (5차) — 피드백 CTA 슬림화. Hick's law 관점에서 옵션 줄임. 이메일 pill 자체가 클릭 = 복사 (GitHub · Vercel · Notion 표준 패턴), copy 아이콘 → check 아이콘 스왑. Gmail 버튼 · 별도 "주소 복사" 버튼 · 이메일 라벨 전부 제거. 인트로 카피도 "오류/보충" defensive → "질문 · 코멘트 · 다른 시각 환영" 능동형으로.
+- **2026-07-10** (6차) — 사이드바 이메일 아이콘도 클릭 = 복사로 통일. `mailto:` href 는 폴백용으로 유지 (Clipboard API 실패 시 원 mailto 동작). fixed toast (bottom-center) 로 "이메일 주소가 복사됐어요" 알림. Ctrl/Cmd/Shift/Alt+click 은 native 동작 유지 (새 탭 등). 사이트 전체에서 이메일 UX 일관성 확보.
