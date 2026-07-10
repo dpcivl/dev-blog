@@ -15,6 +15,11 @@ import { SITE } from "./src/config";
 // https://astro.build/config
 export default defineConfig({
   site: SITE.website,
+  // Inline all page-scoped CSS into <style> tags → 외부 CSS 요청 제거
+  // (렌더링 차단 요소 하나 더 제거, FCP 개선)
+  build: {
+    inlineStylesheets: "always",
+  },
   integrations: [
     sitemap({
       filter: page => {
