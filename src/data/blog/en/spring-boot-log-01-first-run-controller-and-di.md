@@ -1,6 +1,6 @@
 ---
-title: "Spring Boot W3D1 — First Run (bootRun · Embedded Tomcat) · @RestController · Getting a Feel for Dependency Injection"
-description: "Wrapping up Java W2, I'm starting Spring Boot today. I pulled a hello-spring project from Spring Initializr and ran it with ./gradlew bootRun — the terminal looks stuck at \"80% EXECUTING\" but the server is actually already up on port 8080 (the Gradle daemon is holding onto the process, which is why the progress bar shows that way). Spring Boot has Tomcat embedded, so port 8080 comes up without installing a separate WAS. With no endpoint defined, hitting 8080 gives an error page — you need @RestController + @GetMapping to specify a path before a response is attached. Then, getting a feel for dependency injection (DI) — the reason a service gets injected into a controller without the controller ever calling new on it is that Spring creates one instance of the @Service class at startup, keeps it as a bean, and automatically plugs it into the controller's constructor. The interface sense I've been building since Java W1 — the contractual nature of using something handed to you without knowing its implementation — shows up here in an automated form within Spring. This is exactly why coupling goes down and testing gets easier."
+title: "Spring Boot #1 — First Run (bootRun · Embedded Tomcat) · @RestController · Getting a Feel for Dependency Injection"
+description: "Wrapping up Java #3 (Exceptions · Concurrency · Gradle), I'm starting Spring Boot today. I pulled a hello-spring project from Spring Initializr and ran it with ./gradlew bootRun — the terminal looks stuck at \"80% EXECUTING\" but the server is actually already up on port 8080 (the Gradle daemon is holding onto the process, which is why the progress bar shows that way). Spring Boot has Tomcat embedded, so port 8080 comes up without installing a separate WAS. With no endpoint defined, hitting 8080 gives an error page — you need @RestController + @GetMapping to specify a path before a response is attached. Then, getting a feel for dependency injection (DI) — the reason a service gets injected into a controller without the controller ever calling new on it is that Spring creates one instance of the @Service class at startup, keeps it as a bean, and automatically plugs it into the controller's constructor. The interface sense I've been building since Java #1 — the contractual nature of using something handed to you without knowing its implementation — shows up here in an automated form within Spring. This is exactly why coupling goes down and testing gets easier."
 pubDatetime: 2026-07-09T07:00:00Z
 tags:
   - 백엔드공부
@@ -13,7 +13,7 @@ draft: false
 featured: false
 ---
 
-Having wrapped up [Java W2 (Exceptions · Concurrency · Gradle)](/en/posts/java-study-w2-exceptions-concurrency-and-gradle), I'm starting **Spring Boot** today. Day one of W3: project scaffolding, first run, controllers, getting a feel for dependency injection.
+Having wrapped up [Java #3 (Exceptions · Concurrency · Gradle)](/en/posts/java-study-log-03-exceptions-concurrency-and-gradle), I'm starting **Spring Boot** today. First session: project scaffolding, first run, controllers, getting a feel for dependency injection.
 
 ## Table of contents
 
@@ -27,13 +27,13 @@ Spring projects are created with a tool called [Spring Initializr](https://start
 ./gradlew bootRun
 ```
 
-`gradlew` is the **Gradle Wrapper**. This is the same wrapper I [briefly mentioned in the W2 post](/en/posts/java-study-w2-exceptions-concurrency-and-gradle#6-gradle--why-is-it-needed), and here it's actually put to use — the project itself solves the problem of team members having mismatched Gradle versions.
+`gradlew` is the **Gradle Wrapper**. This is the same wrapper I [briefly mentioned in the Java #3 post](/en/posts/java-study-log-03-exceptions-concurrency-and-gradle#6-gradle--why-is-it-needed), and here it's actually put to use — the project itself solves the problem of team members having mismatched Gradle versions.
 
 `bootRun` is the standard Gradle task for running a Spring Boot application.
 
 ## The Trap — the Terminal Looks Stuck at "80% EXECUTING"
 
-![Spring Boot startup log — Tomcat initialized with port 8080, Starting service [Tomcat], Started HelloSpringApplication in 1.246 seconds, with a "80% EXECUTING [14m 55s]" progress bar staying at the bottom](/assets/posts/spring-boot-w3d1-first-run-controller-and-di/01-spring-boot-startup-80-executing.png)
+![Spring Boot startup log — Tomcat initialized with port 8080, Starting service [Tomcat], Started HelloSpringApplication in 1.246 seconds, with a "80% EXECUTING [14m 55s]" progress bar staying at the bottom](/assets/posts/spring-boot-log-01-first-run-controller-and-di/01-spring-boot-startup-80-executing.png)
 
 After running the command, the progress bar sits at **`80% EXECUTING [14m 55s]`** and doesn't move. At first I thought something was hanging, so I kept waiting.
 
@@ -112,7 +112,7 @@ In other words, the developer only declares "this class is needed", and Spring m
 
 ## The Automation of Interface Sense
 
-This picture reminded me of a familiar feeling — [the interfaces I learned in Java W1](/en/posts/java-study-w1-first-syntax-and-oop-basics#interfaces--only-the-spec-is-defined-implementation-belongs-to-the-inheriting-side). An interface is **a contract for using something handed to you without knowing its implementation**.
+This picture reminded me of a familiar feeling — [the interfaces I learned in Java #1](/en/posts/java-study-log-01-first-syntax-and-oop-basics#interfaces--only-the-spec-is-defined-implementation-belongs-to-the-inheriting-side). An interface is **a contract for using something handed to you without knowing its implementation**.
 
 DI is **Spring automatically handling this contract through beans**.
 
@@ -130,11 +130,11 @@ This structure gives two concrete benefits:
 
 ## Reflection
 
-Three things I picked up on day one of W3:
+Three things I picked up in the first session:
 
-1. **What I sensed coming in W2 is now actually being assembled** — thread pools (which Tomcat runs internally), exception handling (real exception flow in controllers), and other pieces that only existed in isolation are starting to come together in Spring.
-2. **`gradlew bootRun` = "so this is where what I learned about Gradle gets used"** — I got the wrapper concept under my fingers in the W2 post, and this became the first real point of application. The learning is building up in the right order.
-3. **DI is the automation of interface sense** — the contractual nature of Java, "you don't need to know the implementation as long as the spec is followed," which I've been building since W1, shows up here as something the framework handles automatically. It feels like going through Java syntax wasn't wasted effort.
+1. **What I sensed coming in the Java posts is now actually being assembled** — thread pools (which Tomcat runs internally), exception handling (real exception flow in controllers), and other pieces that only existed in isolation are starting to come together in Spring.
+2. **`gradlew bootRun` = "so this is where what I learned about Gradle gets used"** — I got the wrapper concept under my fingers in the Java #3 post, and this became the first real point of application. The learning is building up in the right order.
+3. **DI is the automation of interface sense** — the contractual nature of Java, "you don't need to know the implementation as long as the spec is followed," which I've been building since Java #1, shows up here as something the framework handles automatically. It feels like going through Java syntax wasn't wasted effort.
 
 ## Things to Study Further
 

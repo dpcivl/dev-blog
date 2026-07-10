@@ -1,5 +1,5 @@
 ---
-title: "자바 공부 W2 — 컬렉션 (List / Map / Set) · Stream 파이프라인 · Optional 로 null 안전 처리"
+title: "자바 공부 #2 — 컬렉션 (List / Map / Set) · Stream 파이프라인 · Optional 로 null 안전 처리"
 description: "자바 공부 2주차. Collection Framework 핵심 — List (ArrayList), Map (HashMap), Set 을 훑고, 각각 '인터페이스와 구현체' 패턴이 보임 (List<String> books = new ArrayList<>()). 이후 Stream 으로 넘어가 for 문 없이 filter → map → collect 파이프라인, method reference (System.out::println), groupingBy + counting 조합. 마지막은 Optional — get() 즉시 호출 대신 ifPresent / orElse / map 으로 값 없을 때를 항상 함께 처리해야 하는 감각."
 pubDatetime: 2026-07-06T05:00:00Z
 tags:
@@ -13,7 +13,7 @@ draft: false
 featured: false
 ---
 
-[자바 공부 W1](/posts/java-study-w1-first-syntax-and-oop-basics) 에 이어 W2. 오늘은 **컬렉션 · Stream · Optional** — 자바 백엔드에서 매일 만지는 3종.
+[자바 공부 #1](/posts/java-study-log-01-first-syntax-and-oop-basics) 에 이어서. 오늘은 **컬렉션 · Stream · Optional** — 자바 백엔드에서 매일 만지는 3종.
 
 ## Table of contents
 
@@ -34,7 +34,7 @@ List<String> books = new ArrayList<>();
 - **`List` 는 인터페이스** — 뭘 해야 하는지 규격만
 - **`ArrayList` 는 구현체** — 어떻게 할지 실제 코드
 
-바로 [W1 에서 배운 인터페이스 개념](/posts/java-study-w1-first-syntax-and-oop-basics#인터페이스--규격만-정하고-구현은-상속받는-쪽) 이 적용된다. 오른쪽 `ArrayList<>` 에서 `String` 을 굳이 안 써도 되는 이유 — 왼쪽에서 정했으니까 자동으로 타입 추론.
+바로 [#1 에서 배운 인터페이스 개념](/posts/java-study-log-01-first-syntax-and-oop-basics#인터페이스--규격만-정하고-구현은-상속받는-쪽) 이 적용된다. 오른쪽 `ArrayList<>` 에서 `String` 을 굳이 안 써도 되는 이유 — 왼쪽에서 정했으니까 자동으로 타입 추론.
 
 ## Map — 딕셔너리 감각
 
@@ -150,9 +150,9 @@ Optional<String> upperName = user.map(u -> u.getName().toUpperCase());
 
 ## 회고
 
-W2 에서 얻은 것 3가지:
+이번 편에서 얻은 것 3가지:
 
-1. **인터페이스/구현체 분리 패턴이 컬렉션 전반에 반복** — `List / ArrayList`, `Map / HashMap`, `Set / HashSet`. W1 에서 배운 개념이 실전에서 계속 재활용됨.
+1. **인터페이스/구현체 분리 패턴이 컬렉션 전반에 반복** — `List / ArrayList`, `Map / HashMap`, `Set / HashSet`. #1 에서 배운 개념이 실전에서 계속 재활용됨.
 2. **Stream 은 SQL 같은 감각** — filter/map/collect 를 조합하면 for 문 없이도 데이터 변형이 선언적으로 표현됨. `groupingBy` 는 SQL `GROUP BY` 그대로.
 3. **Optional 은 "없음을 명시하는 감각"** — 값이 없을 수 있다는 걸 타입으로 강제. Python 의 None 처리보다 훨씬 엄격해서 실수 여지가 적음.
 

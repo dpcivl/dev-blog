@@ -1,5 +1,5 @@
 ---
-title: "Java Study W1 — First Java Run · Syntax Overview · OOP Basics (Classes · Encapsulation · Inheritance · Interfaces)"
+title: "Java Study #1 — First Java Run · Syntax Overview · OOP Basics (Classes · Encapsulation · Inheritance · Interfaces)"
 description: "Starting Java study to fill in my lacking backend and production experience. In one day, I went from installing Java to covering the switch statement's -> arrow syntax, for-each, the need for double casting in integer division, the public class file rule, encapsulation with private + getter, the difference with and without static, the @Override annotation, and connecting interfaces with implements. Having Python / C++ experience, many concepts were already familiar."
 pubDatetime: 2026-07-03T08:30:00Z
 tags:
@@ -14,7 +14,7 @@ featured: false
 
 Starting today, I'm also studying **the backend concepts and production experience I'm lacking**, in parallel. This is the start of the "understanding WAS" track I briefly mentioned in [the retrospective for Eval Study #2](/en/posts/eval-study-log-02-similarity-and-testset-design#what-to-study-further).
 
-Since **Java wasn't installed** on my machine, I started by installing it, then spent W1 typing along with easy examples to experience the syntax.
+Since **Java wasn't installed** on my machine, I started by installing it, then spent the first session typing along with easy examples to experience the syntax.
 
 ## Table of contents
 

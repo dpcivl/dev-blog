@@ -1,6 +1,6 @@
 ---
-title: "Spring Boot W3D2 — REST API 로 CRUD · 레이어드 아키텍처 · 전역 예외 처리기"
-description: "W3D1 (첫 실행 · DI) 에 이어 W3D2 는 REST API 로 CRUD. REST 는 URL + HTTP 메서드의 조합이라는 정의부터 정리 (GET/POST/PUT/DELETE), 컨트롤러에 @GetMapping · @PostMapping · @PutMapping · @DeleteMapping 붙여서 todos CRUD 완성. curl 옵션 (-X 메서드 · -H 형식 · -d 데이터) 정리 및 5스텝 curl 흐름 검증 (생성 → 전체 조회 → 수정 → 삭제 → 최종 조회). 컨트롤러가 로직까지 다 들고 있으니 서비스로 분리 → 레이어드 아키텍처 (Controller = 요청/응답 / Service = 로직 / Repository = 저장). 예외 처리는 커스텀 예외 → 404 응답, 그리고 전역 예외 처리기 (Global Exception Handler) 를 두면 컨트롤러는 그냥 throw 만 하고 응답 매핑은 처리기가 담당 — W2 편에서 배운 \"throw 는 강제 전파\" 계약성이 실전으로 확장됨. 시행착오 2건 (참조 클래스 없이 서버 켜기 요청 · 라이브러리 추가 전 패키지 작성) 은 학습 지침에 반영해서 다음부터 재발 방지."
+title: "Spring Boot #2 — REST API 로 CRUD · 레이어드 아키텍처 · 전역 예외 처리기"
+description: "Spring Boot #1 (첫 실행 · DI) 에 이어 #2 는 REST API 로 CRUD. REST 는 URL + HTTP 메서드의 조합이라는 정의부터 정리 (GET/POST/PUT/DELETE), 컨트롤러에 @GetMapping · @PostMapping · @PutMapping · @DeleteMapping 붙여서 todos CRUD 완성. curl 옵션 (-X 메서드 · -H 형식 · -d 데이터) 정리 및 5스텝 curl 흐름 검증 (생성 → 전체 조회 → 수정 → 삭제 → 최종 조회). 컨트롤러가 로직까지 다 들고 있으니 서비스로 분리 → 레이어드 아키텍처 (Controller = 요청/응답 / Service = 로직 / Repository = 저장). 예외 처리는 커스텀 예외 → 404 응답, 그리고 전역 예외 처리기 (Global Exception Handler) 를 두면 컨트롤러는 그냥 throw 만 하고 응답 매핑은 처리기가 담당 — 자바 #3 편에서 배운 \"throw 는 강제 전파\" 계약성이 실전으로 확장됨. 시행착오 2건 (참조 클래스 없이 서버 켜기 요청 · 라이브러리 추가 전 패키지 작성) 은 학습 지침에 반영해서 다음부터 재발 방지."
 pubDatetime: 2026-07-10T02:30:00Z
 tags:
   - 백엔드공부
@@ -13,7 +13,7 @@ draft: false
 featured: false
 ---
 
-[Spring Boot W3D1 (첫 실행 · DI)](/posts/spring-boot-w3d1-first-run-controller-and-di) 에 이어 **W3D2 는 REST API 로 CRUD**. 오늘 목표는 todos 라는 간단한 리소스에 대해 생성 · 조회 · 수정 · 삭제를 다 만들고, 컨트롤러에 몰려있는 로직을 서비스로 분리하는 것.
+[Spring Boot #1 (첫 실행 · DI)](/posts/spring-boot-log-01-first-run-controller-and-di) 에 이어 **#2 는 REST API 로 CRUD**. 오늘 목표는 todos 라는 간단한 리소스에 대해 생성 · 조회 · 수정 · 삭제를 다 만들고, 컨트롤러에 몰려있는 로직을 서비스로 분리하는 것.
 
 ## Table of contents
 
@@ -87,7 +87,7 @@ public void delete(@PathVariable Long id) { /* ... */ }
 
 ### curl 5스텝으로 흐름 검증
 
-![curl 로 CRUD 흐름 실행 — POST 로 "공부"·"운동" 2개 생성, GET 전체 조회로 확인, PUT /todos/1 로 done=true 로 수정, DELETE /todos/2 로 삭제, 최종 GET 으로 id:1 만 done:true 로 남은 것 확인](/assets/posts/spring-boot-w3d2-rest-api-crud-and-layered-architecture/01-curl-crud-flow.png)
+![curl 로 CRUD 흐름 실행 — POST 로 "공부"·"운동" 2개 생성, GET 전체 조회로 확인, PUT /todos/1 로 done=true 로 수정, DELETE /todos/2 로 삭제, 최종 GET 으로 id:1 만 done:true 로 남은 것 확인](/assets/posts/spring-boot-log-02-rest-api-crud-and-layered-architecture/01-curl-crud-flow.png)
 
 **5스텝 CRUD** — 생성 2건 → 전체 조회 → 1번 수정 (done=true) → 2번 삭제 → 최종 조회. 각 스텝의 응답이 예상대로 맞물려서 CRUD 흐름이 뚫린 것을 확인.
 
@@ -112,7 +112,7 @@ public void delete(@PathVariable Long id) { /* ... */ }
 3개로 나누면:
 
 - **각 계층이 단일 책임** — 어디를 고쳐야 하는지 명확
-- **테스트가 쉬워짐** — Service 만 단위 테스트하고 싶으면 Repository 를 [W3D1 에서 배운 DI](/posts/spring-boot-w3d1-first-run-controller-and-di#의존성-주입-di--서비스컨트롤러-분리) 로 mock 주입
+- **테스트가 쉬워짐** — Service 만 단위 테스트하고 싶으면 Repository 를 [#1 에서 배운 DI](/posts/spring-boot-log-01-first-run-controller-and-di#의존성-주입-di--서비스컨트롤러-분리) 로 mock 주입
 - **수정 파급이 좁아짐** — DB 를 인메모리에서 실제 DB 로 바꿀 때 Repository 만 손봄
 
 ## Update 요청은 왜 파일 따로 뺄까
@@ -150,7 +150,7 @@ public class GlobalExceptionHandler {
 - **컨트롤러는 그냥 throw** 만
 - **어떻게 응답에 매핑할지는 처리기가 담당**
 
-[자바 W2 편에서 배운 "throw 는 호출 스택 상위로 강제 전파" 계약](/posts/java-study-w2-exceptions-concurrency-and-gradle#2-커스텀-예외--print-대신-예외를-쓰는-이유) 이 스프링에선 컨트롤러 → 전역 처리기 흐름으로 자동화된 형태. 자바 문법으로 배운 게 프레임워크에서 실전으로 얹어짐.
+[자바 #3 편에서 배운 "throw 는 호출 스택 상위로 강제 전파" 계약](/posts/java-study-log-03-exceptions-concurrency-and-gradle#2-커스텀-예외--print-대신-예외를-쓰는-이유) 이 스프링에선 컨트롤러 → 전역 처리기 흐름으로 자동화된 형태. 자바 문법으로 배운 게 프레임워크에서 실전으로 얹어짐.
 
 ## 시행착오 — 학습 지침에 반영
 
@@ -165,11 +165,11 @@ public class GlobalExceptionHandler {
 
 ## 회고
 
-W3D2 에서 잡은 감각 3가지:
+이번 편에서 잡은 감각 3가지:
 
 1. **REST API 는 URL × HTTP 메서드의 곱** — 정의가 정리되니까 CRUD 작성 자체는 오히려 빠름. 정의를 몰라서 미뤄뒀던 것.
-2. **레이어드 아키텍처는 [W3D1 인터페이스/DI 감각](/posts/spring-boot-w3d1-first-run-controller-and-di#인터페이스-감각의-자동화) 의 자연스러운 확장** — Controller 는 Service 인터페이스만 알면 되고, Service 는 Repository 인터페이스만 알면 됨. 각 계층이 다음 계층의 구현체를 모른다는 게 테스트/수정 용이성의 뿌리.
-3. **전역 예외 처리기 = W2 "throw 강제 전파" 의 실전 활용** — 컨트롤러가 그냥 던지면 위에서 처리하는 구조. 자바 W2 에서 배운 게 여기서 왜 필요한지 조립됨.
+2. **레이어드 아키텍처는 [#1 인터페이스/DI 감각](/posts/spring-boot-log-01-first-run-controller-and-di#인터페이스-감각의-자동화) 의 자연스러운 확장** — Controller 는 Service 인터페이스만 알면 되고, Service 는 Repository 인터페이스만 알면 됨. 각 계층이 다음 계층의 구현체를 모른다는 게 테스트/수정 용이성의 뿌리.
+3. **전역 예외 처리기 = 자바 #3 "throw 강제 전파" 의 실전 활용** — 컨트롤러가 그냥 던지면 위에서 처리하는 구조. 자바 #3 에서 배운 게 여기서 왜 필요한지 조립됨.
 
 ## 더 공부해볼 것
 

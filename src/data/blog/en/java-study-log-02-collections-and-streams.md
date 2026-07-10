@@ -1,5 +1,5 @@
 ---
-title: "Java Study W2 — Collections (List / Map / Set) · Stream Pipelines · Null-Safe Handling with Optional"
+title: "Java Study #2 — Collections (List / Map / Set) · Stream Pipelines · Null-Safe Handling with Optional"
 description: "Week 2 of studying Java. I go through the core of the Collection Framework — List (ArrayList), Map (HashMap), Set — and notice the 'interface and implementation' pattern in each of them (List<String> books = new ArrayList<>()). Then I move on to Stream, building filter → map → collect pipelines without for loops, method references (System.out::println), and combining groupingBy + counting. Finally, Optional — I learn to always handle the absence-of-value case with ifPresent / orElse / map instead of calling get() right away."
 pubDatetime: 2026-07-06T05:00:00Z
 tags:
@@ -13,7 +13,7 @@ draft: false
 featured: false
 ---
 
-Following up on [Java Study W1](/en/posts/java-study-w1-first-syntax-and-oop-basics), here's W2. Today's topics are **Collections, Stream, and Optional** — three things you touch every day in Java backend work.
+Following up on [Java Study #1](/en/posts/java-study-log-01-first-syntax-and-oop-basics). Today's topics are **Collections, Stream, and Optional** — three things you touch every day in Java backend work.
 
 ## Table of contents
 
@@ -34,7 +34,7 @@ Breaking this expression down:
 - **`List` is the interface** — it only specifies what needs to be done
 - **`ArrayList` is the implementation** — the actual code for how it's done
 
-This is exactly the [interface concept I learned in W1](/en/posts/java-study-w1-first-syntax-and-oop-basics#interfaces--only-the-spec-is-defined-implementation-belongs-to-the-inheriting-side) applied here. The reason you don't need to write `String` again in `ArrayList<>` on the right side is that it's already determined on the left — type inference happens automatically.
+This is exactly the [interface concept I learned in #1](/en/posts/java-study-log-01-first-syntax-and-oop-basics#interfaces--only-the-spec-is-defined-implementation-belongs-to-the-inheriting-side) applied here. The reason you don't need to write `String` again in `ArrayList<>` on the right side is that it's already determined on the left — type inference happens automatically.
 
 ## Map — the dictionary feel
 
@@ -150,9 +150,9 @@ Optional<String> upperName = user.map(u -> u.getName().toUpperCase());
 
 ## Retrospective
 
-Three things I got out of W2:
+Three things I got out of this post:
 
-1. **The interface/implementation separation pattern repeats throughout collections** — `List / ArrayList`, `Map / HashMap`, `Set / HashSet`. The concept I learned in W1 keeps getting reused in practice.
+1. **The interface/implementation separation pattern repeats throughout collections** — `List / ArrayList`, `Map / HashMap`, `Set / HashSet`. The concept I learned in #1 keeps getting reused in practice.
 2. **Stream feels like SQL** — combining filter/map/collect lets you express data transformations declaratively without for loops. `groupingBy` is exactly like SQL's `GROUP BY`.
 3. **Optional is a way of making "absence" explicit** — it enforces at the type level that a value may not exist. It's much stricter than Python's None handling, leaving less room for mistakes.
 

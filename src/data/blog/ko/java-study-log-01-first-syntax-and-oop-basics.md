@@ -1,5 +1,5 @@
 ---
-title: "자바 공부 W1 — 자바 첫 실행 · 문법 훑기 · OOP 기본 (클래스 · 캡슐화 · 상속 · 인터페이스)"
+title: "자바 공부 #1 — 자바 첫 실행 · 문법 훑기 · OOP 기본 (클래스 · 캡슐화 · 상속 · 인터페이스)"
 description: "부족한 백엔드 · 상용화 경험을 채우기 위해 자바 학습 시작. 자바 설치부터 시작해서 switch 의 -> 화살표 문법 · for-each · 정수 나눗셈에서 double 캐스팅 필요성 · public class 파일 규칙 · private + getter 로 캡슐화 · static 유무의 차이 · @Override 어노테이션 · implements 로 인터페이스 연동까지 하루에 훑음. Python / C++ 경험이 있어 개념적으로는 익숙한 부분이 많았음."
 pubDatetime: 2026-07-03T08:30:00Z
 tags:
@@ -14,7 +14,7 @@ featured: false
 
 오늘부터 **나의 부족한 부분인 백엔드 쪽 개념과 상용화 경험을 위한 공부** 도 병행한다. [Eval 공부 #2 의 회고](/posts/eval-study-log-02-similarity-and-testset-design#더-공부해볼-것) 에서 잠깐 짚었던 "WAS 이해" 흐름의 시작.
 
-일단 **자바가 안 깔려있어서** 자바부터 깔고, 쉬운 것들을 따라치면서 문법을 체험한 W1.
+일단 **자바가 안 깔려있어서** 자바부터 깔고, 쉬운 것들을 따라치면서 문법을 체험한 첫 회차.
 
 ## Table of contents
 

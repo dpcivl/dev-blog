@@ -1,6 +1,6 @@
 ---
-title: "Spring Boot W3D2 — CRUD with REST API · Layered Architecture · Global Exception Handler"
-description: "Following W3D1 (first run · DI), W3D2 covers CRUD with REST API. Starting from the definition that REST is a combination of URL + HTTP method (GET/POST/PUT/DELETE), I completed todos CRUD by attaching @GetMapping · @PostMapping · @PutMapping · @DeleteMapping to the controller. I organized curl options (-X method · -H format · -d data) and verified the flow with a 5-step curl sequence (create → list all → update → delete → final check). Since the controller was holding all the logic, I split it into a service → layered architecture (Controller = request/response / Service = logic / Repository = storage). For exception handling: custom exception → 404 response, and with a Global Exception Handler in place, the controller just throws while the handler takes care of the response mapping — extending into practice the \"throw forces propagation\" contract I learned in the W2 post. Two trial-and-error incidents (trying to start the server without a referenced class present · writing package code before adding the library) got folded into my study guidelines to prevent recurrence."
+title: "Spring Boot #2 — CRUD with REST API · Layered Architecture · Global Exception Handler"
+description: "Following Spring Boot #1 (first run · DI), #2 covers CRUD with REST API. Starting from the definition that REST is a combination of URL + HTTP method (GET/POST/PUT/DELETE), I completed todos CRUD by attaching @GetMapping · @PostMapping · @PutMapping · @DeleteMapping to the controller. I organized curl options (-X method · -H format · -d data) and verified the flow with a 5-step curl sequence (create → list all → update → delete → final check). Since the controller was holding all the logic, I split it into a service → layered architecture (Controller = request/response / Service = logic / Repository = storage). For exception handling: custom exception → 404 response, and with a Global Exception Handler in place, the controller just throws while the handler takes care of the response mapping — extending into practice the \"throw forces propagation\" contract I learned in the Java #3 post. Two trial-and-error incidents (trying to start the server without a referenced class present · writing package code before adding the library) got folded into my study guidelines to prevent recurrence."
 pubDatetime: 2026-07-10T02:30:00Z
 tags:
   - 백엔드공부
@@ -13,7 +13,7 @@ draft: false
 featured: false
 ---
 
-Following [Spring Boot W3D1 (first run · DI)](/en/posts/spring-boot-w3d1-first-run-controller-and-di), **W3D2 is CRUD with REST API**. Today's goal was to build create/read/update/delete for a simple resource called todos, and split the logic that had piled up in the controller out into a service.
+Following [Spring Boot #1 (first run · DI)](/en/posts/spring-boot-log-01-first-run-controller-and-di), **#2 is CRUD with REST API**. Today's goal was to build create/read/update/delete for a simple resource called todos, and split the logic that had piled up in the controller out into a service.
 
 ## Table of contents
 
@@ -87,7 +87,7 @@ public void delete(@PathVariable Long id) { /* ... */ }
 
 ### Verifying the flow with 5 curl steps
 
-![Running the CRUD flow with curl — POST creates 2 items ("study"·"exercise"), GET lists all to confirm, PUT /todos/1 updates done=true, DELETE /todos/2 removes it, final GET confirms only id:1 remains with done:true](/assets/posts/spring-boot-w3d2-rest-api-crud-and-layered-architecture/01-curl-crud-flow.png)
+![Running the CRUD flow with curl — POST creates 2 items ("study"·"exercise"), GET lists all to confirm, PUT /todos/1 updates done=true, DELETE /todos/2 removes it, final GET confirms only id:1 remains with done:true](/assets/posts/spring-boot-log-02-rest-api-crud-and-layered-architecture/01-curl-crud-flow.png)
 
 **5-step CRUD** — create 2 items → list all → update item 1 (done=true) → delete item 2 → final check. Each step's response lined up as expected, confirming the CRUD flow works end to end.
 
@@ -112,7 +112,7 @@ I moved the logic into a service and pulled the storage out into a repository. T
 Splitting into these 3 layers gives:
 
 - **Each layer has a single responsibility** — it's clear where you need to fix something
-- **Testing gets easier** — if you only want to unit test the Service, you can mock-inject the Repository using [the DI I learned in W3D1](/en/posts/spring-boot-w3d1-first-run-controller-and-di#dependency-injection-di--separating-service-and-controller)
+- **Testing gets easier** — if you only want to unit test the Service, you can mock-inject the Repository using [the DI I learned in #1](/en/posts/spring-boot-log-01-first-run-controller-and-di#dependency-injection-di--separating-service-and-controller)
 - **The blast radius of changes narrows** — when switching the DB from in-memory to a real DB, you only touch the Repository
 
 ## Why put update requests in a separate file
@@ -150,7 +150,7 @@ Now:
 - **The controller just throws**
 - **How to map it to a response is the handler's job**
 
-[The contract I learned in Java W2 — "throw forces propagation up the call stack"](/en/posts/java-study-w2-exceptions-concurrency-and-gradle#2-custom-exceptions--why-use-exceptions-instead-of-print) — turns out, in Spring, to be automated as the controller → global handler flow. Something I learned as Java syntax gets stacked on top in practice through the framework.
+[The contract I learned in Java #3 — "throw forces propagation up the call stack"](/en/posts/java-study-log-03-exceptions-concurrency-and-gradle#2-custom-exceptions--why-use-exceptions-instead-of-print) — turns out, in Spring, to be automated as the controller → global handler flow. Something I learned as Java syntax gets stacked on top in practice through the framework.
 
 ## Trial and error — folded back into study guidelines
 
@@ -165,11 +165,11 @@ The same trap shows up in real work — if you try to run code while references 
 
 ## Retrospective
 
-Three things I picked up on in W3D2:
+Three things I picked up on in this post:
 
 1. **REST API is the product of URL × HTTP method** — once the definition was clear, actually writing CRUD went fast. I'd been putting it off simply because I didn't know the definition.
-2. **Layered architecture is a natural extension of [the interface/DI sense from W3D1](/en/posts/spring-boot-w3d1-first-run-controller-and-di#the-automation-of-interface-sense)** — the Controller only needs to know the Service interface, and the Service only needs to know the Repository interface. Each layer not knowing the implementation of the next layer is the root of testability and ease of modification.
-3. **The global exception handler is a practical application of W2's "throw forces propagation"** — the controller just throws, and something above handles it. Something I learned in Java W2 clicks into place here, showing why it was needed.
+2. **Layered architecture is a natural extension of [the interface/DI sense from #1](/en/posts/spring-boot-log-01-first-run-controller-and-di#the-automation-of-interface-sense)** — the Controller only needs to know the Service interface, and the Service only needs to know the Repository interface. Each layer not knowing the implementation of the next layer is the root of testability and ease of modification.
+3. **The global exception handler is a practical application of Java #3's "throw forces propagation"** — the controller just throws, and something above handles it. Something I learned in Java #3 clicks into place here, showing why it was needed.
 
 ## Things to study further
 
