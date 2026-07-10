@@ -186,7 +186,7 @@ featured: true
 ### 15. 포스트 하단 피드백 CTA — 댓글 시스템 없이 채널만
 
 - **문제**: 이 블로그는 학습 일지 성격이라 댓글창을 붙일 정도의 상호작용 압력이 없다. 그런데 About 페이지는 nav · sidebar · footer 어디서도 링크되지 않아서 사실상 이력서 · 채용용 랜딩으로만 쓰이고, 방문자가 오류 지적 · 보충 의견을 남길 창구가 사이드바 이메일 아이콘 하나뿐이었다. 아이콘이 작아 존재를 인지하기 어렵다.
-- **해법**: [`src/components/Feedback.astro`](https://github.com/dpcivl/dev-blog/blob/main/src/components/Feedback.astro) — 각 포스트 하단에 dashed border 로 눈에 띄는 박스를 두고 두 개의 CTA 만 노출한다. **이메일** (제목에 포스트 제목 자동 prefill 된 `mailto:`) + **GitHub Issue 열기** (같은 방식으로 title prefill). i18n 대응 (KO/EN 문구 분기).
+- **해법**: [`src/components/Feedback.astro`](https://github.com/dpcivl/dev-blog/blob/main/src/components/Feedback.astro) — 각 포스트 하단에 dashed border 로 눈에 띄는 박스를 두고, 이메일 주소를 텍스트로 노출한 뒤 3가지 액션을 병렬 배치. **① 주소 복사** (Clipboard API + "복사됐어요!" 시각 피드백 · 실패 시 텍스트 selection 폴백) → 국내 사용자 (Naver · Kakao 메일) 대응. **② Gmail 로 쓰기** (Gmail 웹 컴포즈 URL, 제목 prefill) → 개발자 다수 대상. **③ GitHub Issue 열기** (제목 prefill). i18n 대응 (KO/EN 문구 분기). `mailto:` 는 국내 사용자가 잘 안 쓰기 때문에 의도적으로 배제.
 - **결과**: 댓글 시스템의 JS 로드 · 스팸 · 모더레이션 · 유령방 문제 없이 실질 피드백 채널만 확보. 성능 손실 0. 방문자가 "여기 저자에게 말할 수 있는 곳" 을 명시적으로 인지.
 - **참고**: 댓글 (giscus 등) 은 트래픽이 붙고 실제 피드백 압력이 생길 때 재검토. 지금은 CTA 만으로 충분하다는 판단.
 
@@ -217,4 +217,5 @@ featured: true
 
 - **2026-07-10** — 초판. 12개 기능 정리 (시리즈 · 플레이그라운드 · i18n · 번역 자동화 · 링크 체커 · Mermaid · Scratch/Inbox · 소프트 숨김 · pubDatetime 필터 · 보안 스크러빙 · Featured/시리즈 태그 · 리디자인)
 - **2026-07-10** (2차) — SEO 강화 (JSON-LD 페이지 유형별 분기 · 표준 필드 보강) + Perf 3종 (rehype 이미지 lazy loading · PNG → WebP 스크립트 · Pretendard CSS preload) 추가. README 도 AstroPaper 원본에서 커스텀으로 교체.
-- **2026-07-10** (3차) — 포스트 하단 피드백 CTA (`Feedback.astro`) 추가. 댓글 시스템 없이 이메일 · GitHub Issue 로 실질 채널만 확보 (JS 로드 0).
+- **2026-07-10** (3차) — 포스트 하단 피드백 CTA (`Feedback.astro`) 추가. 댓글 시스템 없이 이메일 · GitHub Issue 로 실질 채널만 확보.
+- **2026-07-10** (4차) — 피드백 CTA UX 를 국내 사용자 기준으로 개편. `mailto:` 대신 "주소 복사 (Clipboard API)" + "Gmail 로 쓰기" + "GitHub Issue 열기" 3-트랙. 이메일 주소는 텍스트로 노출 + `user-select: all` 로 클릭 한 번 전체 선택. `docs/analytics-log.md` 관측 로그 신설 (첫 30일 스냅샷: Visitors 168 · Pages/Visitor 7.8 · Bounce 45%).
