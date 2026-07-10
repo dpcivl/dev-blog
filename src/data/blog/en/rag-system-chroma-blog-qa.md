@@ -12,7 +12,7 @@ tags:
   - vector-db
   - 학습
 draft: false
-featured: true
+featured: false
 ---
 
 [Yesterday](./rag-from-scratch-embedding-and-similarity-search) I worked with the **parts** of RAG (embedding / cosine similarity / chunks). Today I **integrated those parts into a system**. Here's the order:

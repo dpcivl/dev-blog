@@ -11,7 +11,7 @@ tags:
   - 사이드프로젝트
   - 포트폴리오
 draft: false
-featured: true
+featured: false
 ---
 
 I started a self-driving car side project for my portfolio. Nothing fancy — just running ROS2 on a Raspberry Pi 5 and doing motor control over RS485 communication. This is part 1.

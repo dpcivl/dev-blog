@@ -10,7 +10,7 @@ tags:
   - 에이전트
   - 학습
 draft: false
-featured: true
+featured: false
 ---
 
 This is the session I said I'd cover at the end of my [previous post](./claude-api-streaming-ttft-and-events): "I'll try Tool Use next time." After actually trying it out, it turned out to be more than a simple "function calling feature" — it's a mechanism that patches the LLM's fundamental limitations by connecting it to the outside world.

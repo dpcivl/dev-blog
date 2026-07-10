@@ -8,7 +8,7 @@ tags:
   - 생산성
   - 포트폴리오
 draft: false
-featured: true
+featured: false
 ---
 
 On a day off, spending time with family, I found myself thinking about my career path. **The fact that I'd been developing for 3 years and "didn't have a single finished project"** kept nagging at me. Maybe I'd picked the wrong field. Maybe I needed to find a different path. I threw that question at an AI, and the conversation that followed unexpectedly led me to a conclusion that changed the way I develop altogether.

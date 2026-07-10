@@ -10,7 +10,7 @@ tags:
   - 학습
   - 일지
 draft: false
-featured: true
+featured: false
 ---
 
 At the end of my [study method post](./my-5-step-study-method-for-new-tech), I noted down **LangChain, Hermes agent, and local LLM** as candidates for my next study topic. I was planning to look at LangChain first, but while searching around, **LangGraph** kept coming up alongside it. Turns out it's a framework made by the same company (LangChain Inc).

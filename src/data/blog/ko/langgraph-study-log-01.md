@@ -10,7 +10,7 @@ tags:
   - 학습
   - 일지
 draft: false
-featured: true
+featured: false
 ---
 
 [공부 방법 글](./my-5-step-study-method-for-new-tech) 끝에 다음 학습 후보로 **LangChain · Hermes agent · 로컬 LLM** 을 적어뒀다. 그중 LangChain 부터 보려고 했는데, 검색하다 보니 **LangGraph** 가 같이 자주 나왔다. 알아보니 같은 회사 (LangChain Inc) 에서 만든 프레임워크다.

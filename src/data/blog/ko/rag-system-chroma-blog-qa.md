@@ -12,7 +12,7 @@ tags:
   - vector-db
   - 학습
 draft: false
-featured: true
+featured: false
 ---
 
 [어제](./rag-from-scratch-embedding-and-similarity-search) RAG 의 **부품들** (임베딩 / 코사인 유사도 / 청크) 을 만져봤다. 오늘은 그 부품을 **시스템으로 통합**. 순서:

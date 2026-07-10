@@ -10,7 +10,7 @@ tags:
   - 에이전트
   - 학습
 draft: false
-featured: true
+featured: false
 ---
 
 [지난 글](./claude-api-streaming-ttft-and-events) 끝에 "다음 차시 Tool Use 들어가면 해보겠다" 고 적어뒀던 그 차시다. 직접 만져보니 단순한 "함수 호출 기능"이 아니라, LLM의 본질적 한계를 외부와 연결해서 메우는 메커니즘이었다.
