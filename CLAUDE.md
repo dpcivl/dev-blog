@@ -159,3 +159,17 @@
 - 한국어 응답 기본
 - 이 저장소는 Windows + PowerShell 환경. Bash 도구도 쓸 수 있지만 경로 표기 주의 (`c:\dev\dev-blog\` ↔ `/c/dev/dev-blog/`)
 - 빌드 스크립트의 `cp -r dist/pagefind public/`는 Unix 명령이라 Windows 로컬 빌드 시 마지막 단계가 실패함. Vercel(Linux)에서는 정상.
+
+## Mermaid 다이어그램 워크플로우
+
+Vercel 빌드 환경에서 Chromium 실행이 불안정해 remark-mermaidjs 를 파이프라인에 넣으면 본문 유실 사고가 남 (2026-07-10 실제 발생). 그래서 **로컬에서 사전 렌더 → static asset 커밋** 방식으로 고정.
+
+1. 포스트 MD 에 ` ```mermaid ` 코드 블록으로 자유롭게 작성
+2. 첫 줄에 `%% alt: 다이어그램 설명` (접근성용, mermaid 는 `%%` 를 주석 처리)
+3. `pnpm mermaid:render` 실행 — 신규 블록만 로컬 Playwright 로 SVG 생성 (해시 캐싱)
+   - `public/assets/mermaid/<hash>.svg` 로 저장
+   - MD 의 mermaid 블록을 `<img src="/assets/mermaid/<hash>.svg" alt="..." style="max-width:100%;height:auto;" />` 로 자동 재작성
+4. `git commit` — SVG + 재작성된 MD 함께
+5. 필요 시 `pnpm mermaid:gc` 로 참조 없는 hash 파일 정리 (legacy 명명 SVG 는 안 건드림)
+
+**Astro 파이프라인엔 mermaid 플러그인 없음** — 재추가하지 말 것. Vercel 은 이미지만 서빙.
