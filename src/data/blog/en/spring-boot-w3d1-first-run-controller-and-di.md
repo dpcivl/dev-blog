@@ -27,7 +27,7 @@ Spring projects are created with a tool called [Spring Initializr](https://start
 ./gradlew bootRun
 ```
 
-`gradlew` is the **Gradle Wrapper**. This is the same wrapper I [briefly mentioned in the W2 post](/en/posts/java-study-w2-exceptions-concurrency-and-gradle#6-gradle--왜-필요한가), and here it's actually put to use — the project itself solves the problem of team members having mismatched Gradle versions.
+`gradlew` is the **Gradle Wrapper**. This is the same wrapper I [briefly mentioned in the W2 post](/en/posts/java-study-w2-exceptions-concurrency-and-gradle#6-gradle--why-is-it-needed), and here it's actually put to use — the project itself solves the problem of team members having mismatched Gradle versions.
 
 `bootRun` is the standard Gradle task for running a Spring Boot application.
 
@@ -112,7 +112,7 @@ In other words, the developer only declares "this class is needed", and Spring m
 
 ## The Automation of Interface Sense
 
-This picture reminded me of a familiar feeling — [the interfaces I learned in Java W1](/en/posts/java-study-w1-first-syntax-and-oop-basics#인터페이스--규격만-정하고-구현은-상속받는-쪽). An interface is **a contract for using something handed to you without knowing its implementation**.
+This picture reminded me of a familiar feeling — [the interfaces I learned in Java W1](/en/posts/java-study-w1-first-syntax-and-oop-basics#interfaces--only-the-spec-is-defined-implementation-belongs-to-the-inheriting-side). An interface is **a contract for using something handed to you without knowing its implementation**.
 
 DI is **Spring automatically handling this contract through beans**.
 
