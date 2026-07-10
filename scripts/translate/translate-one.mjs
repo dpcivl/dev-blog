@@ -3,6 +3,7 @@ import path from "node:path";
 import Anthropic from "@anthropic-ai/sdk";
 import { SYSTEM_PROMPT } from "./prompt.mjs";
 import { validateAll } from "./validate.mjs";
+import { rewriteAnchors } from "./anchor-rewrite.mjs";
 
 const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-5";
 const MAX_TOKENS = 8000;
@@ -46,11 +47,21 @@ ${koContent}
     ],
   });
 
-  const enContent = response.content
+  const rawEnContent = response.content
     .filter(b => b.type === "text")
     .map(b => b.text)
     .join("")
     .trim();
+
+  // Post-process: rewrite KR anchor slugs to EN heading slugs on internal links.
+  // The model preserves anchors verbatim (per prompt.mjs), so cross-post links
+  // land on the KR anchor which doesn't exist on the EN page.
+  const blogDir = path.resolve(path.dirname(koPath), "..");
+  const { content: enContent, rewrites } = await rewriteAnchors({
+    enContent: rawEnContent,
+    koContent,
+    blogDir,
+  });
 
   const validation = validateAll(koContent, enContent);
 
@@ -83,6 +94,7 @@ ${koContent}
     },
     cost,
     content: enContent,
+    anchorRewrites: rewrites,
   };
 }
 

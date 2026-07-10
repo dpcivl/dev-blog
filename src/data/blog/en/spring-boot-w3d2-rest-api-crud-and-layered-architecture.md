@@ -1,6 +1,6 @@
 ---
 title: "Spring Boot W3D2 — CRUD with REST API · Layered Architecture · Global Exception Handler"
-description: "W3D1 (first run · DI) 이어 W3D2 는 REST API 로 CRUD. REST 는 URL + HTTP 메서드의 조합이라는 정의부터 정리 (GET/POST/PUT/DELETE), 컨트롤러에 @GetMapping · @PostMapping · @PutMapping · @DeleteMapping 붙여서 todos CRUD 완성. curl 옵션 (-X 메서드 · -H 형식 · -d 데이터) 정리 및 5스텝 curl 흐름 검증 (생성 → 전체 조회 → 수정 → 삭제 → 최종 조회). 컨트롤러가 로직까지 다 들고 있으니 서비스로 분리 → 레이어드 아키텍처 (Controller = 요청/응답 / Service = 로직 / Repository = 저장). 예외 처리는 커스텀 예외 → 404 응답, 그리고 전역 예외 처리기 (Global Exception Handler) 를 두면 컨트롤러는 그냥 throw 만 하고 응답 매핑은 처리기가 담당 — W2 편에서 배운 \"throw 는 강제 전파\" 계약성이 실전으로 확장됨. 시행착오 2건 (참조 클래스 없이 서버 켜기 요청 · 라이브러리 추가 전 패키지 작성) 은 학습 지침에 반영해서 다음부터 재발 방지."
+description: "Following W3D1 (first run · DI), W3D2 covers CRUD with REST API. Starting from the definition that REST is a combination of URL + HTTP method (GET/POST/PUT/DELETE), I completed todos CRUD by attaching @GetMapping · @PostMapping · @PutMapping · @DeleteMapping to the controller. I organized curl options (-X method · -H format · -d data) and verified the flow with a 5-step curl sequence (create → list all → update → delete → final check). Since the controller was holding all the logic, I split it into a service → layered architecture (Controller = request/response / Service = logic / Repository = storage). For exception handling: custom exception → 404 response, and with a Global Exception Handler in place, the controller just throws while the handler takes care of the response mapping — extending into practice the \"throw forces propagation\" contract I learned in the W2 post. Two trial-and-error incidents (trying to start the server without a referenced class present · writing package code before adding the library) got folded into my study guidelines to prevent recurrence."
 pubDatetime: 2026-07-10T02:30:00Z
 tags:
   - 백엔드공부
@@ -13,13 +13,13 @@ draft: false
 featured: false
 ---
 
-Following [Spring Boot W3D1 (first run · DI)](/en/posts/spring-boot-w3d1-first-run-controller-and-di), **W3D2 is about CRUD with REST API**. Today's goal was to build create/read/update/delete for a simple resource called todos, and to separate the logic that had been piling up in the controller into a service.
+Following [Spring Boot W3D1 (first run · DI)](/en/posts/spring-boot-w3d1-first-run-controller-and-di), **W3D2 is CRUD with REST API**. Today's goal was to build create/read/update/delete for a simple resource called todos, and split the logic that had piled up in the controller out into a service.
 
 ## Table of contents
 
 ## What exactly is a REST API — sorting it out again
 
-I already knew CRUD meant "create/read/update/delete," and I only vaguely knew that a REST API had "something to do with URLs." The precise definition is this:
+I knew CRUD meant "create/read/update/delete," and I knew REST API had "something to do with URLs" — that's about it. The precise definition is this:
 
 > **REST API = a combination of URL (address) + HTTP method.**
 
@@ -27,16 +27,16 @@ Role of each HTTP method:
 
 | Method | Role | Spring annotation |
 |---|---|---|
-| **GET** | Read (retrieve) | `@GetMapping` |
+| **GET** | Read | `@GetMapping` |
 | **POST** | Create (add) | `@PostMapping` |
 | **PUT** | Update (change) | `@PutMapping` |
 | **DELETE** | Delete | `@DeleteMapping` |
 
-Even the same URL `/todos` behaves differently depending on the method. "What, where, and how" gets expressed as the product of the URL and the method.
+Even the same URL `/todos` behaves differently depending on the method. "What, where, how" is expressed as the product of URL and method.
 
 ## Starting CRUD in the controller
 
-First I built a store (an in-memory List), then had the controller handle **listing all · getting one · creating**:
+First I built a storage (an in-memory List), then had the controller handle **listing all · fetching one · creating**:
 
 ```java
 @RestController
@@ -61,19 +61,19 @@ public class TodoController {
 }
 ```
 
-- **`@RequestBody`** — automatically converts the JSON coming in via POST into a Java object. Jackson handles this behind the scenes.
+- **`@RequestBody`** — automatically converts JSON from a POST request into a Java object. Jackson handles this behind the scenes.
 
-## curl options, sorted out
+## Sorting out curl options
 
-For the examples I mostly sent requests with `curl`:
+In the examples, I mostly sent requests with `curl`:
 
-- **`-X`** — specifies the HTTP method (`-X POST`, `-X PUT`, `-X DELETE`)
-- **`-H`** — specifies a header (`-H "Content-Type: application/json"`)
+- **`-X`** — specify the HTTP method (`-X POST`, `-X PUT`, `-X DELETE`)
+- **`-H`** — specify a header (`-H "Content-Type: application/json"`)
 - **`-d`** — the body data (`-d '{"title": "study"}'`)
 
-Naturally, **the data after `-d` must match the format declared in the `-H` Content-Type.** If you declare JSON in the header but send XML, the server throws a 400.
+Naturally, **the data after `-d` has to match the format declared in the `-H` Content-Type.** If you declare JSON in the header but send XML, the server throws a 400.
 
-## Finishing CRUD with PUT · DELETE
+## Completing CRUD with PUT · DELETE
 
 I added update/delete to the controller as well:
 
@@ -87,51 +87,51 @@ public void delete(@PathVariable Long id) { /* ... */ }
 
 ### Verifying the flow with 5 curl steps
 
-![Running the CRUD flow with curl — creating 2 items ("study"·"exercise") via POST, checking with GET for all, updating /todos/1 to done=true via PUT, deleting /todos/2 via DELETE, and confirming with a final GET that only id:1 remains with done:true](/assets/posts/spring-boot-w3d2-rest-api-crud-and-layered-architecture/01-curl-crud-flow.png)
+![Running the CRUD flow with curl — POST creates 2 items ("study"·"exercise"), GET lists all to confirm, PUT /todos/1 updates done=true, DELETE /todos/2 removes it, final GET confirms only id:1 remains with done:true](/assets/posts/spring-boot-w3d2-rest-api-crud-and-layered-architecture/01-curl-crud-flow.png)
 
-**5-step CRUD** — create 2 items → list all → update item 1 (done=true) → delete item 2 → final read. Each step's response lined up as expected, confirming the CRUD flow works end to end.
+**5-step CRUD** — create 2 items → list all → update item 1 (done=true) → delete item 2 → final check. Each step's response lined up as expected, confirming the CRUD flow works end to end.
 
 ### Debugging a 400 error
 
-At one point I hit a 400 — **I could immediately check the cause from the stack trace in the server-side console**. For backend debugging, this console is the map. If you only look at the frontend, there's no way to know why you got a 400.
+At one point I hit a 400 — I **checked the cause immediately from the stack trace in the server-side console**. In backend debugging, this console is basically the map. If you're only looking at the frontend, there's no way to tell why a 400 happened.
 
-## The controller is doing all the logic too — separating out the service
+## The controller was doing all the logic too — splitting out a service
 
-Up to this point, **the store, the logic, and the response were all tangled together inside the controller.** The controller's original responsibility is just "receive a request and send a response," but right now it also holds business logic (issuing ids, todo update rules). This needs to be separated.
+Up to this point, **the storage, logic, and response were all mixed together inside the controller.** The controller's original responsibility is just "receive request, send response," but it was also holding business logic (issuing ids, todo update rules). This needed to be split.
 
 ## Layered Architecture — Controller / Service / Repository
 
-I moved the logic into a service and pulled the store out into a repository. This is called **Layered Architecture**:
+I moved the logic into a service and pulled the storage out into a repository. This is called **Layered Architecture**:
 
 | Layer | Responsibility |
 |---|---|
-| **Controller** | Request · response (HTTP touchpoint) |
+| **Controller** | Request · response (HTTP boundary) |
 | **Service** | Business logic |
-| **Repository** | Storage/retrieval (data touchpoint) |
+| **Repository** | Storage/retrieval (data boundary) |
 
-Splitting into these 3 gives you:
+Splitting into these 3 layers gives:
 
-- **Single responsibility per layer** — it's clear which part needs fixing
-- **Easier testing** — if you only want to unit-test the Service, you can inject a mock Repository using the [DI I learned in W3D1](/en/posts/spring-boot-w3d1-first-run-controller-and-di#dependency-injection-di--separating-service-and-controller)
-- **Narrower ripple effect from changes** — when swapping the DB from in-memory to a real database, only the Repository needs touching
+- **Each layer has a single responsibility** — it's clear where you need to fix something
+- **Testing gets easier** — if you only want to unit test the Service, you can mock-inject the Repository using [the DI I learned in W3D1](/en/posts/spring-boot-w3d1-first-run-controller-and-di#dependency-injection-di--separating-service-and-controller)
+- **The blast radius of changes narrows** — when switching the DB from in-memory to a real DB, you only touch the Repository
 
-## Why put the update request in its own file
+## Why put update requests in a separate file
 
-There's a **convention of keeping request-body containers, like `record TodoCreateRequest(String title) {}`, in their own separate files**. It's not mandatory, so why do it this way?
+There's a convention of **keeping the request body container in its own file**, like `record TodoCreateRequest(String title) {}`. It's not required, so why do it?
 
-- **The filename reveals the role** — seeing `TodoUpdateRequest.java` immediately tells you "this is the update request schema"
-- **Keeps controller/service files thin** — if record definitions are squeezed in, the actual logic gets pushed aside
-- **Easier reuse/version management** — when the schema diverges for API v2, you can just duplicate/branch the whole file
+- **The filename reveals the role** — seeing `TodoUpdateRequest.java` tells you instantly "this is the update request schema"
+- **The controller/service files stay thin** — if the record definition gets inserted in the middle, it pushes down the actual logic
+- **Easier to reuse/version** — if the schema diverges for API v2, you can duplicate/branch the whole file
 
-## Exception handling — custom exceptions + global exception handler
+## Exception handling — custom exception + global exception handler
 
-Previously, querying a nonexistent id returned an **empty response**. From the user's perspective there's no way to know "why isn't this working." I created a custom exception so it responds with **404 Not Found** instead:
+Previously, querying a non-existent id returned an **empty response**. From the user's perspective, there's no way to know "why isn't this working." I made a custom exception so it responds with **404 Not Found**:
 
 ```java
 public class TodoNotFoundException extends RuntimeException { ... }
 ```
 
-Should every controller method catch this and map it to a response code each time? That's tedious. With a **Global Exception Handler**, you handle it in one place:
+Catching this in every controller method and mapping the response code each time? That's tedious. With a **Global Exception Handler**, everything is handled in one place:
 
 ```java
 @RestControllerAdvice
@@ -148,36 +148,36 @@ public class GlobalExceptionHandler {
 Now:
 
 - **The controller just throws**
-- **How that maps to a response is the handler's job**
+- **How to map it to a response is the handler's job**
 
-The [contract from Java W2 that "throw forcibly propagates up the call stack"](/en/posts/java-study-w2-exceptions-concurrency-and-gradle#2-custom-exceptions--why-use-exceptions-instead-of-print) becomes, in Spring, an automated flow from controller → global handler. What I learned as Java syntax gets layered onto real framework practice.
+[The contract I learned in Java W2 — "throw forces propagation up the call stack"](/en/posts/java-study-w2-exceptions-concurrency-and-gradle#2-custom-exceptions--why-use-exceptions-instead-of-print) — turns out, in Spring, to be automated as the controller → global handler flow. Something I learned as Java syntax gets stacked on top in practice through the framework.
 
-## Trial and error — folded back into my learning guidelines
+## Trial and error — folded back into study guidelines
 
-I stumbled twice today:
+I stumbled twice while doing this today:
 
-1. **Trying to start the server while a referenced class doesn't exist yet** — the learning-exercise instructions kept telling me to run the server first, so compilation failed
-2. **Writing code that uses a library before adding the library** — same story, compilation failed
+1. **Trying to start the server without the referenced class present** — the study example instructions kept pushing me to run the server first, which failed to compile
+2. **Writing code that uses a library before adding the library** — same issue, compilation failure
 
-Both cases were **failing to follow the "code → dependency → run" order**. I added "before writing code, first confirm all necessary classes/dependencies exist" to my learning-exercise instructions (the prompt I give the AI), to prevent this from happening again.
+Both were cases of **not following the "code → dependency → run" order**. I added "before writing code, first check that all necessary classes/dependencies are in place" to the study example guidelines (the prompt I give the AI) to prevent this from happening again.
 
-The same trap shows up in real work too — trying to run code while references are broken mid-refactor wastes time on exactly this kind of compile failure.
+The same trap shows up in real work — if you try to run code while references are broken mid-refactor, you lose time to compilation failures like this.
 
 ## Retrospective
 
-Three things that clicked for me in W3D2:
+Three things I picked up on in W3D2:
 
-1. **A REST API is the product of URL × HTTP method** — once the definition was clear, writing the actual CRUD went quickly. I'd been putting it off simply because I didn't know the definition.
-2. **Layered architecture is a natural extension of the [interface/DI sense from W3D1](/en/posts/spring-boot-w3d1-first-run-controller-and-di#the-automation-of-interface-sense)** — the Controller only needs to know the Service interface, and the Service only needs to know the Repository interface. Each layer not knowing the implementation of the next layer is the root of both testability and ease of modification.
-3. **The global exception handler is the practical application of W2's "throw forcibly propagates"** — the controller just throws, and something above handles it. What I learned in Java W2 clicked into place here, showing why it was needed.
+1. **REST API is the product of URL × HTTP method** — once the definition was clear, actually writing CRUD went fast. I'd been putting it off simply because I didn't know the definition.
+2. **Layered architecture is a natural extension of [the interface/DI sense from W3D1](/en/posts/spring-boot-w3d1-first-run-controller-and-di#the-automation-of-interface-sense)** — the Controller only needs to know the Service interface, and the Service only needs to know the Repository interface. Each layer not knowing the implementation of the next layer is the root of testability and ease of modification.
+3. **The global exception handler is a practical application of W2's "throw forces propagation"** — the controller just throws, and something above handles it. Something I learned in Java W2 clicks into place here, showing why it was needed.
 
-## What to study further
+## Things to study further
 
-### 1. The convention of separating DTO files
+### 1. DTO file separation convention
 
-- How to split Request DTO · Response DTO · Domain model into three layers
+- How to split Request DTO · Response DTO · Domain model into 3 layers
 - How to manage schema evolution (v1 → v2)
-- Reference: [Baeldung — DTO pattern](https://www.baeldung.com/java-dto-pattern)
+- Reference: [Baeldung — DTO Pattern](https://www.baeldung.com/java-dto-pattern)
 
 ### 2. HTTP status code standards
 
@@ -190,11 +190,11 @@ Three things that clicked for me in W3D2:
 
 - Validating request body fields (`@NotNull`, `@Size(min=1)`, `@Email`, etc.)
 - Automatic 400 response on validation failure
-- How to route Bean Validation failures into the global exception handler
+- How to route Bean Validation failures through the global exception handler
 
-### 4. Different implementations of the Repository layer
+### 4. Various implementations of the Repository layer
 
-- Today it was in-memory (a List) — gone if the process restarts
+- Today it was in-memory (a List) — gone on process restart
 - **JPA / Hibernate** — the standard Java ORM
 - **Spring Data JPA** — just define the interface and CRUD methods are generated automatically
 

@@ -88,14 +88,24 @@ function normalizeEnUrlForCompare(url) {
     .replace(/^\/en\/?$/, "/");
 }
 
+// Strip anchor fragments before comparing — anchor-rewrite.mjs legitimately
+// swaps KR heading slugs for EN ones on the target post, so keeping anchors
+// would flag every rewrite as a diff.
+function stripAnchor(url) {
+  const i = url.indexOf("#");
+  return i === -1 ? url : url.slice(0, i);
+}
+
 export function validateLinkUrls(kr, en) {
   const krUrls = [];
   const enUrls = [];
   let m;
   const rxKr = new RegExp(MD_LINK.source, MD_LINK.flags);
-  while ((m = rxKr.exec(kr)) !== null) krUrls.push(m[2]);
+  while ((m = rxKr.exec(kr)) !== null) krUrls.push(stripAnchor(m[2]));
   const rxEn = new RegExp(MD_LINK.source, MD_LINK.flags);
-  while ((m = rxEn.exec(en)) !== null) enUrls.push(normalizeEnUrlForCompare(m[2]));
+  while ((m = rxEn.exec(en)) !== null) {
+    enUrls.push(stripAnchor(normalizeEnUrlForCompare(m[2])));
+  }
   const cmp = multisetEqual(krUrls, enUrls);
   if (!cmp.equal) {
     return {

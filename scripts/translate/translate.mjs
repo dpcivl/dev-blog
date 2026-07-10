@@ -56,8 +56,11 @@ async function translateSlug(slug, client, opts = {}) {
     const result = await translateOne({ koPath, enPath, client, dryRun });
     const secs = ((Date.now() - start) / 1000).toFixed(1);
     const status = result.ok ? "✓" : "✗";
+    const anchors = result.anchorRewrites?.length
+      ? ` | anchors=${result.anchorRewrites.length}`
+      : "";
     console.log(
-      `${status} ${secs}s | in=${fmt(result.usage.input)} out=${fmt(result.usage.output)} cache=r${fmt(result.usage.cache_read)}/w${fmt(result.usage.cache_write)} | $${result.cost.toFixed(4)}`
+      `${status} ${secs}s | in=${fmt(result.usage.input)} out=${fmt(result.usage.output)} cache=r${fmt(result.usage.cache_read)}/w${fmt(result.usage.cache_write)} | $${result.cost.toFixed(4)}${anchors}`
     );
     if (!result.ok) {
       for (const issue of result.issues) {
