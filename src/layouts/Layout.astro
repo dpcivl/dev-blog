@@ -108,17 +108,22 @@ const structuredData = pubDatetime
     }
 
     <!-- Pretendard 본문/헤딩 폰트 (CDN 동적 서브셋) -->
-    <!-- preconnect + preload → 브라우저가 폰트 CSS 를 조기 취득, LCP 개선 -->
+    <!-- 비동기 로드: preload as="style" + onload 로 stylesheet 승격
+         → 렌더링 블로킹 없음. Fallback 은 global.css 의 시스템 폰트 스택
+         (Apple SD, BlinkMac, Malgun) 이 담당 → FOUC 최소화 -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
     <link
       rel="preload"
       as="style"
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
-    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+      />
+    </noscript>
 
     <!-- Load Code Font -->
     <Font
