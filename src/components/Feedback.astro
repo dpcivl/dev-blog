@@ -13,30 +13,23 @@ const subject =
     ? `Feedback: ${postTitle}`
     : `[블로그 피드백] ${postTitle}`;
 
-// Gmail 웹 컴포즈 (Gmail 계정 사용자 · 대다수 개발자 대상). Naver/Kakao 사용자는 "이메일 복사" 사용.
-const gmailHref =
-  `https://mail.google.com/mail/?view=cm&fs=1&to=${emailAddress}` +
-  `&su=${encodeURIComponent(subject)}`;
-
 const issueHref =
   `https://github.com/dpcivl/dev-blog/issues/new?title=${encodeURIComponent(subject)}`;
 
 const copy =
   lang === "en"
     ? {
-        intro: "Found an error, or have something to add?",
-        emailLabel: "Email",
-        copyEmail: "Copy address",
+        intro: "Questions, comments, or a different take — welcome.",
+        emailAriaLabel: "Copy email address",
+        copyHint: "Click to copy",
         copied: "Copied!",
-        openGmail: "Open in Gmail",
         openIssue: "Open a GitHub Issue",
       }
     : {
-        intro: "이 글에 오류나 보충할 부분이 있으면 편하게 알려주세요.",
-        emailLabel: "이메일",
-        copyEmail: "주소 복사",
+        intro: "질문 · 코멘트 · 다른 시각 환영합니다.",
+        emailAriaLabel: "이메일 주소 복사",
+        copyHint: "클릭하면 복사",
         copied: "복사됐어요!",
-        openGmail: "Gmail 로 쓰기",
         openIssue: "GitHub Issue 열기",
       };
 ---
@@ -44,31 +37,50 @@ const copy =
 <aside class="feedback-cta" aria-label={lang === "en" ? "Feedback" : "피드백"}>
   <p class="feedback-intro">{copy.intro}</p>
 
-  <div class="feedback-email-row">
-    <span class="feedback-email-label">{copy.emailLabel}</span>
-    <code class="feedback-email" tabindex="0">{emailAddress}</code>
-  </div>
-
   <div class="feedback-actions">
     <button
       type="button"
-      class="feedback-btn feedback-copy-btn"
+      class="feedback-email-pill"
       data-email={emailAddress}
-      data-copy-label={copy.copyEmail}
       data-copied-label={copy.copied}
+      aria-label={copy.emailAriaLabel}
+      title={copy.copyHint}
     >
-      <span class="feedback-icon" aria-hidden="true">📋</span>
-      <span class="feedback-btn-label">{copy.copyEmail}</span>
+      <span class="feedback-email-text">{emailAddress}</span>
+      <span class="feedback-email-icon" aria-hidden="true">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="feedback-icon-copy"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path
+            d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+          ></path>
+        </svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="feedback-icon-check"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </span>
     </button>
-    <a
-      href={gmailHref}
-      target="_blank"
-      rel="noopener noreferrer"
-      class="feedback-btn"
-    >
-      <span class="feedback-icon" aria-hidden="true">✉</span>
-      <span>{copy.openGmail}</span>
-    </a>
     <a
       href={issueHref}
       target="_blank"
@@ -95,37 +107,79 @@ const copy =
     color: var(--foreground);
     line-height: 1.5;
   }
-  .feedback-email-row {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 0.75rem;
-    font-size: 0.85rem;
-  }
-  .feedback-email-label {
-    color: var(--muted);
-    font-weight: 500;
-  }
-  .feedback-email {
-    padding: 0.15rem 0.5rem;
-    background: var(--background);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    font-size: 0.85rem;
-    color: var(--foreground);
-    user-select: all; /* 클릭 한 번으로 전체 선택 → 수동 복사 지원 */
-    cursor: text;
-  }
-  .feedback-email:focus {
-    outline: 2px solid var(--accent);
-    outline-offset: 1px;
-  }
   .feedback-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 0.6rem;
+    align-items: center;
   }
+
+  /* 이메일 pill — 클릭 = 복사 */
+  .feedback-email-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.8rem;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: inherit;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      border-color 0.15s ease,
+      color 0.15s ease,
+      background 0.2s ease,
+      transform 0.15s ease;
+  }
+  .feedback-email-pill:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-1px);
+  }
+  .feedback-email-pill:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .feedback-email-text {
+    font-variant-numeric: tabular-nums;
+  }
+  .feedback-email-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    opacity: 0.7;
+    transition: opacity 0.15s ease;
+  }
+  .feedback-email-pill:hover .feedback-email-icon {
+    opacity: 1;
+  }
+  .feedback-icon-check {
+    display: none;
+  }
+
+  /* Copied 상태 */
+  .feedback-email-pill.is-copied {
+    background: var(--accent);
+    color: var(--background);
+    border-color: var(--accent);
+    transform: none;
+  }
+  .feedback-email-pill.is-copied .feedback-icon-copy {
+    display: none;
+  }
+  .feedback-email-pill.is-copied .feedback-icon-check {
+    display: inline-block;
+  }
+  .feedback-email-pill.is-copied .feedback-email-icon {
+    opacity: 1;
+  }
+
+  /* GitHub Issue 링크 */
   .feedback-btn {
     display: inline-flex;
     align-items: center;
@@ -138,27 +192,15 @@ const copy =
     color: inherit;
     font-size: 0.85rem;
     font-weight: 500;
-    font-family: inherit;
-    cursor: pointer;
     transition:
       border-color 0.15s ease,
       color 0.15s ease,
-      transform 0.15s ease,
-      background 0.2s ease;
+      transform 0.15s ease;
   }
   .feedback-btn:hover {
     border-color: var(--accent);
     color: var(--accent);
     transform: translateY(-1px);
-  }
-  .feedback-btn.is-copied {
-    background: var(--accent);
-    color: var(--background);
-    border-color: var(--accent);
-  }
-  .feedback-btn.is-copied:hover {
-    color: var(--background);
-    transform: none;
   }
   .feedback-icon {
     font-size: 0.95rem;
@@ -168,46 +210,41 @@ const copy =
 
 <script>
   function initFeedbackCopy() {
-    const buttons =
-      document.querySelectorAll<HTMLButtonElement>(".feedback-copy-btn");
-    buttons.forEach(btn => {
-      if (btn.dataset.bound === "1") return;
-      btn.dataset.bound = "1";
-      btn.addEventListener("click", async () => {
-        const email = btn.dataset.email ?? "";
-        const copyLabel = btn.dataset.copyLabel ?? "";
-        const copiedLabel = btn.dataset.copiedLabel ?? "";
-        const labelEl = btn.querySelector<HTMLElement>(".feedback-btn-label");
-        if (!email || !labelEl) return;
+    const pills =
+      document.querySelectorAll<HTMLButtonElement>(".feedback-email-pill");
+    pills.forEach(pill => {
+      if (pill.dataset.bound === "1") return;
+      pill.dataset.bound = "1";
+      const originalText = pill
+        .querySelector<HTMLElement>(".feedback-email-text")
+        ?.textContent ?? "";
+
+      pill.addEventListener("click", async () => {
+        const email = pill.dataset.email ?? "";
+        const copiedLabel = pill.dataset.copiedLabel ?? "";
+        const textEl = pill.querySelector<HTMLElement>(".feedback-email-text");
+        if (!email || !textEl) return;
 
         try {
           await navigator.clipboard.writeText(email);
-          labelEl.textContent = copiedLabel;
-          btn.classList.add("is-copied");
+          textEl.textContent = copiedLabel;
+          pill.classList.add("is-copied");
           window.setTimeout(() => {
-            labelEl.textContent = copyLabel;
-            btn.classList.remove("is-copied");
+            textEl.textContent = originalText;
+            pill.classList.remove("is-copied");
           }, 1500);
         } catch {
-          // Clipboard API 불가 (비-secure context 등). 이메일 span 을 선택시켜서
-          // Ctrl/Cmd+C 로 수동 복사 유도.
-          const emailSpan = btn
-            .closest(".feedback-cta")
-            ?.querySelector<HTMLElement>(".feedback-email");
-          if (emailSpan) {
-            const range = document.createRange();
-            range.selectNodeContents(emailSpan);
-            const sel = window.getSelection();
-            sel?.removeAllRanges();
-            sel?.addRange(range);
-            emailSpan.focus();
-          }
+          // Clipboard API 실패 (비-secure context 등). 이메일 텍스트 selection 폴백.
+          const range = document.createRange();
+          range.selectNodeContents(textEl);
+          const sel = window.getSelection();
+          sel?.removeAllRanges();
+          sel?.addRange(range);
         }
       });
     });
   }
 
   initFeedbackCopy();
-  // View transitions (ClientRouter) 후에도 다시 붙임
   document.addEventListener("astro:page-load", initFeedbackCopy);
 </script>
