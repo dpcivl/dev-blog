@@ -167,7 +167,7 @@ The same trap shows up in real work — if you try to run code while references 
 
 Three things I picked up on in this post:
 
-1. **REST API is the product of URL × HTTP method** — once the definition was clear, actually writing CRUD went fast. I'd been putting it off simply because I didn't know the definition.
+1. **REST API is a combination of URL and HTTP method** — once the definition was clear, actually writing CRUD went fast. I'd been putting it off simply because I didn't know the definition.
 2. **Layered architecture is a natural extension of [the interface/DI sense from #1](/en/posts/spring-boot-log-01-first-run-controller-and-di#the-automation-of-interface-sense)** — the Controller only needs to know the Service interface, and the Service only needs to know the Repository interface. Each layer not knowing the implementation of the next layer is the root of testability and ease of modification.
 3. **The global exception handler is a practical application of Java #3's "throw forces propagation"** — the controller just throws, and something above handles it. Something I learned in Java #3 clicks into place here, showing why it was needed.
 

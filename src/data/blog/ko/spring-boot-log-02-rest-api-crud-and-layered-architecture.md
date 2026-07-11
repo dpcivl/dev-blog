@@ -167,7 +167,7 @@ public class GlobalExceptionHandler {
 
 이번 편에서 잡은 감각 3가지:
 
-1. **REST API 는 URL × HTTP 메서드의 곱** — 정의가 정리되니까 CRUD 작성 자체는 오히려 빠름. 정의를 몰라서 미뤄뒀던 것.
+1. **REST API 는 URL 과 HTTP 메서드의 조합** — 정의가 정리되니까 CRUD 작성 자체는 오히려 빠름. 정의를 몰라서 미뤄뒀던 것.
 2. **레이어드 아키텍처는 [#1 인터페이스/DI 감각](/posts/spring-boot-log-01-first-run-controller-and-di#인터페이스-감각의-자동화) 의 자연스러운 확장** — Controller 는 Service 인터페이스만 알면 되고, Service 는 Repository 인터페이스만 알면 됨. 각 계층이 다음 계층의 구현체를 모른다는 게 테스트/수정 용이성의 뿌리.
 3. **전역 예외 처리기 = 자바 #3 "throw 강제 전파" 의 실전 활용** — 컨트롤러가 그냥 던지면 위에서 처리하는 구조. 자바 #3 에서 배운 게 여기서 왜 필요한지 조립됨.
 
