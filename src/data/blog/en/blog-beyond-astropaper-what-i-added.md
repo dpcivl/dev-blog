@@ -194,6 +194,16 @@ Three optimizations at once:
 - **Result**: A real feedback channel without the JS overhead, spam, moderation, or ghost-town issues of a comments system. Zero performance regression. Visitors explicitly see "this is where you talk to the author."
 - **Note**: Comments (giscus etc.) get re-evaluated once traffic grows and real feedback pressure appears. For now the CTA alone is judged enough.
 
+### 16. Markdown post-publish validator — accidental strikethrough detection
+
+- **Problem**: GFM parsers interpret patterns like `~1.5~2 weeks` (numeric range with tildes) as strikethrough (`~text~`), silently drawing a line through the number. Found on three already-published Korean posts (`claude-api-streaming-ttft-and-events`, `fems-project-log-01`, `rag-from-scratch-embedding-and-similarity-search`) — the kind of bug only human eyes catch, so systemic detection was needed.
+- **Solution**:
+  - **Convention**: Numeric ranges use en dash `–` (e.g. `1~2일` → `1–2일`). Leading approximate `~` becomes `약` in KR / stays `~` in EN as an unpaired prefix. Tilde is excluded from body text.
+  - **Detector**: [`scripts/translate/validate.mjs`](https://github.com/dpcivl/dev-blog/blob/main/scripts/translate/validate.mjs) gains `detectAccidentalStrikethrough(text)`. It strips code blocks, inline code, and intentional `~~strike~~` before scanning for single-tilde pairs. Returns line numbers and snippets.
+  - **Translation pipeline integration**: `validateAll(kr, en)` runs it on both texts independently, tagging issues with `[KO]` / `[EN]` prefixes. Catches accidents right after translation.
+  - **Standalone audit**: [`scripts/check-markdown.mjs`](https://github.com/dpcivl/dev-blog/blob/main/scripts/check-markdown.mjs) + `pnpm check:md` — scans every published post. CI-ready exit code (0/1).
+- **Result**: Full scan of 108 files surfaced the three pre-existing tildes, which got corrected. Future translations get caught automatically. Line-number accuracy required preserving newlines when blanking code regions (`m.replace(/[^\n]/g, " ")`) so the reported lines match the original file.
+
 ## Common principles
 
 Four things run through all of these features:
@@ -225,3 +235,4 @@ Four things run through all of these features:
 - **2026-07-10** (4th) — Reworked the feedback CTA UX for Korean users. Dropped `mailto:` in favor of three tracks: "Copy address" (Clipboard API), "Open in Gmail", and "Open a GitHub Issue." Email address is shown inline as text with `user-select: all` so a single click selects the whole address. Also created `docs/analytics-log.md` (first 30-day snapshot: 168 visitors, 7.8 pages/visitor, 45% bounce).
 - **2026-07-10** (5th) — Slimmed the feedback CTA. Fewer options per Hick's law. The email pill itself is now the copy button (GitHub / Vercel / Notion standard pattern), with a copy icon that swaps to a check icon on success. Removed the Gmail button, the standalone copy button, and the "Email" label. Intro copy switched from a defensive "corrections/additions" framing to an active "Questions, comments, or a different take — welcome."
 - **2026-07-10** (6th) — Made the sidebar mail icon consistent with the same click-to-copy behavior. The `mailto:` href is kept as a fallback (Clipboard API failure falls back to native mailto). A fixed bottom-center toast announces "Email address copied". Ctrl/Cmd/Shift/Alt+click preserves native behavior (new tab, etc.). Consistent email UX site-wide.
+- **2026-07-10** (7th) — Added a Markdown post-publish validator (`detectAccidentalStrikethrough`). GFM parses `~1.5~2 weeks`-style numeric-range tildes as strikethrough by mistake. Integrated into `validateAll` in the translation pipeline plus a standalone `pnpm check:md` script. A full 108-file scan surfaced tilde-strike bugs on three pre-existing posts, which got corrected. Convention: numeric ranges use en dash `–`, leading approximate becomes `약` in KR.

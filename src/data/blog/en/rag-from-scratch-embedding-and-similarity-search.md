@@ -63,7 +63,7 @@ Code: [`cosine_similarity.py`](https://github.com/dpcivl/ai-study-week1/blob/mai
 
 ### First experiment — suspicious results
 
-![First cosine similarity calculation — suspicious values in the 0.2~0.4 range](/assets/posts/rag-from-scratch-embedding-and-similarity-search/04-cosine-similarity-suspicious.png)
+![First cosine similarity calculation — suspicious values in the 0.2–0.4 range](/assets/posts/rag-from-scratch-embedding-and-similarity-search/04-cosine-similarity-suspicious.png)
 
 Something's off. **The values look randomly assigned somewhere between 0.2 and 0.4.** They weren't based on similarity at all.
 

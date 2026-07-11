@@ -180,6 +180,52 @@ export function validateHtmlTags(kr, en) {
   return { ok: true, issues: [] };
 }
 
+// Detects patterns that GFM parsers interpret as strikethrough by accident:
+// single-tilde pairs on the same line with short content between, most often
+// range notation like "1~2일" or "~1.5~2주". Use en dash "–" or "약" instead.
+//
+// Returns findings with 1-indexed line numbers relative to the ORIGINAL text
+// (before stripping code). Intentional strikethrough (~~text~~) is excluded.
+export function detectAccidentalStrikethrough(text) {
+  // Strip code blocks so tilde inside code doesn't false-fire.
+  // Preserve newlines inside multi-line regions so line numbers stay
+  // aligned with the original text — spaces for every non-newline char.
+  const blank = m => m.replace(/[^\n]/g, " ");
+  const scanned = text
+    .replace(CODE_FENCE, blank)
+    .replace(INLINE_CODE, blank)
+    // Blank out intentional double-tilde strikethrough. Must run before the
+    // single-tilde pair scan so ~~x~~ isn't caught.
+    .replace(/~~[^~\n]+~~/g, blank);
+
+  const findings = [];
+  const lines = scanned.split("\n");
+  // Single-tilde pair with 1-40 non-tilde chars between → accidental strike.
+  const pairRe = /~([^~\n]{1,40})~/g;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    let m;
+    pairRe.lastIndex = 0;
+    while ((m = pairRe.exec(line)) !== null) {
+      findings.push({
+        line: i + 1,
+        matched: `~${m[1]}~`,
+        snippet: line.trim().slice(0, 100),
+      });
+    }
+  }
+  return findings;
+}
+
+export function validateAccidentalStrikethrough(text) {
+  const findings = detectAccidentalStrikethrough(text);
+  const issues = findings.map(
+    f =>
+      `line ${f.line}: possible accidental strikethrough "${f.matched}" — use en dash '–' or '약'/'약' instead. context: ${f.snippet}`
+  );
+  return { ok: issues.length === 0, issues };
+}
+
 export function validateLengthRatio(kr, en, min = 0.5, max = 2.0) {
   if (kr.length === 0) return { ok: true, issues: [] };
   const ratio = en.length / kr.length;
@@ -197,6 +243,15 @@ export function validateLengthRatio(kr, en, min = 0.5, max = 2.0) {
 // ---------- combined ----------
 
 export function validateAll(kr, en) {
+  // Accidental-strikethrough is a per-text check, so it runs on kr and en
+  // independently and gets prefixed for clarity.
+  const koStrike = validateAccidentalStrikethrough(kr);
+  const enStrike = validateAccidentalStrikethrough(en);
+  const strikeIssues = [
+    ...koStrike.issues.map(i => `[KO] ${i}`),
+    ...enStrike.issues.map(i => `[EN] ${i}`),
+  ];
+
   const results = {
     codeBlocks: validateCodeBlocks(kr, en),
     linkUrls: validateLinkUrls(kr, en),
@@ -204,6 +259,10 @@ export function validateAll(kr, en) {
     headings: validateHeadings(kr, en),
     htmlTags: validateHtmlTags(kr, en),
     lengthRatio: validateLengthRatio(kr, en),
+    accidentalStrikethrough: {
+      ok: koStrike.ok && enStrike.ok,
+      issues: strikeIssues,
+    },
   };
   const allIssues = [];
   let ok = true;

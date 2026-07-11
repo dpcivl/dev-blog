@@ -194,6 +194,16 @@ featured: true
 - **결과**: 댓글 시스템의 JS 로드 · 스팸 · 모더레이션 · 유령방 문제 없이 실질 피드백 채널만 확보. 성능 손실 0. 방문자가 "여기 저자에게 말할 수 있는 곳" 을 명시적으로 인지.
 - **참고**: 댓글 (giscus 등) 은 트래픽이 붙고 실제 피드백 압력이 생길 때 재검토. 지금은 CTA 만으로 충분하다는 판단.
 
+### 16. Markdown 사후 검증기 — 우발적 strikethrough 감지
+
+- **문제**: GFM 파서가 `~1.5~2주` 같은 숫자 범위 tilde 를 strikethrough (`~text~`) 로 오파싱해서 글자에 취소선이 그어지는 사고. 실제 발행글 3편에서 발견 (`claude-api-streaming-ttft-and-events` · `fems-project-log-01` · `rag-from-scratch-embedding-and-similarity-search`) — 사용자 눈으로만 발견되던 부류라 시스템적 감지 필요.
+- **해법**:
+  - **컨벤션**: 숫자 범위는 en dash `–` 사용 (예: `1~2일` → `1–2일`). Leading approximate `~` 는 `약` 으로 (예: `~1.5초` → `약 1.5초`). Tilde 는 본문에서 원천 배제.
+  - **검증기**: [`scripts/translate/validate.mjs`](https://github.com/dpcivl/dev-blog/blob/main/scripts/translate/validate.mjs) 에 `detectAccidentalStrikethrough(text)` 추가. 코드블록 · inline code · 의도적 `~~strike~~` 제외 후 single-tilde 짝을 스캔. 라인 번호와 스니펫 반환.
+  - **번역 파이프라인 통합**: `validateAll(kr, en)` 이 KR/EN 각각 실행. `[KO]` · `[EN]` 프리픽스로 보고. 번역 직후 자동 검출.
+  - **Standalone 감사**: [`scripts/check-markdown.mjs`](https://github.com/dpcivl/dev-blog/blob/main/scripts/check-markdown.mjs) + `pnpm check:md` — 전체 발행글 일괄 스캔. CI 통합 가능한 exit code (0/1).
+- **결과**: 전체 108개 파일 스캔 → 기존 발행글 3편의 tilde 오파싱 자동 발견 · 수정. 앞으로 번역 시 자동 감지. 라인 번호 정렬을 위해 코드블록 스트라이핑 시 개행 보존 (`m.replace(/[^\n]/g, " ")`) 로 실제 파일 라인과 일치.
+
 ## 공통 원칙
 
 기능들을 관통하는 4가지:
@@ -225,3 +235,4 @@ featured: true
 - **2026-07-10** (4차) — 피드백 CTA UX 를 국내 사용자 기준으로 개편. `mailto:` 대신 "주소 복사 (Clipboard API)" + "Gmail 로 쓰기" + "GitHub Issue 열기" 3-트랙. 이메일 주소는 텍스트로 노출 + `user-select: all` 로 클릭 한 번 전체 선택. `docs/analytics-log.md` 관측 로그 신설 (첫 30일 스냅샷: Visitors 168 · Pages/Visitor 7.8 · Bounce 45%).
 - **2026-07-10** (5차) — 피드백 CTA 슬림화. Hick's law 관점에서 옵션 줄임. 이메일 pill 자체가 클릭 = 복사 (GitHub · Vercel · Notion 표준 패턴), copy 아이콘 → check 아이콘 스왑. Gmail 버튼 · 별도 "주소 복사" 버튼 · 이메일 라벨 전부 제거. 인트로 카피도 "오류/보충" defensive → "질문 · 코멘트 · 다른 시각 환영" 능동형으로.
 - **2026-07-10** (6차) — 사이드바 이메일 아이콘도 클릭 = 복사로 통일. `mailto:` href 는 폴백용으로 유지 (Clipboard API 실패 시 원 mailto 동작). fixed toast (bottom-center) 로 "이메일 주소가 복사됐어요" 알림. Ctrl/Cmd/Shift/Alt+click 은 native 동작 유지 (새 탭 등). 사이트 전체에서 이메일 UX 일관성 확보.
+- **2026-07-10** (7차) — Markdown 사후 검증기 (`detectAccidentalStrikethrough`) 도입. GFM 이 `~1.5~2주` 같은 숫자 범위 tilde 를 strikethrough 로 오파싱하는 문제. 번역 파이프라인 `validateAll` 에 통합 + standalone `pnpm check:md` 스크립트. 전체 108개 파일 스캔 → 기존 발행글 3편의 tilde 오파싱 자동 발견 후 수정. 컨벤션: 숫자 범위는 en dash `–`, leading approximate 는 `약` 으로.
