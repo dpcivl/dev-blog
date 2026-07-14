@@ -34,7 +34,7 @@ Separately, when the company started researching edge AI, we **adopted NXP iMX8M
 
 - **AGV Autonomous Robot Prototype** — Raspberry Pi 5 + STM32 + ROS2 + RS485. Build log runs as [a series](/series).
 - **Claude API · AI Agent study** — Directly experimenting with multi-turn, Tool Use, Prompt Caching, Vision, and more — accumulating [posts on the topic](/en/tags/claude-api).
-- **OneSmallThing — an achievement-only journal (Dogfooding in progress)** — Inverting the "first place or zero" pattern common in perfectionists: **a journal app that records only what went well**. The product grew out of my own [perfectionism retrospective](/en/posts/perfectionism-as-a-tool-vertical-slice-development). Stack: **Next.js (PWA) + Supabase Edge Functions (Deno)**.
+- **[Julgot (줄곧) — an achievement-only journal](https://julgot.com)** — Inverting the "first place or zero" pattern common in perfectionists: **a journal app that records only what went well**. The product grew out of my own [perfectionism retrospective](/en/posts/perfectionism-as-a-tool-vertical-slice-development). Stack: **Next.js (PWA) + Supabase Edge Functions (Deno)**. Web PWA v0.3.2 launched on 2026-07-13. Currently in beta with ongoing maintenance before native app development — see [launch day 1 retrospective](/en/posts/julgot-launched-day-1-retrospective).
 - **Blog infrastructure itself** — Astro + Tailwind 4. I decided the design direction, information architecture, and publishing workflow myself, and paired with Claude Code on the code side for a 7-phase modern redesign. Every page including this one is the result.
 
 ## Interests
