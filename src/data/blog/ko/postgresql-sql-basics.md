@@ -1,7 +1,7 @@
 ---
 title: "PostgreSQL 기초 — CRUD와 한글 정렬(COLLATE) 함정"
 description: "SQLite만 쓰다 PostgreSQL을 처음 잡았다. CREATE부터 CRUD 대응, 그리고 ORDER BY가 가나다 순으로 안 되던 collation 문제까지."
-pubDatetime: 2026-07-14T13:10:00Z
+pubDatetime: 2026-07-14T13:00:00Z
 tags:
   - postgresql
   - sql
