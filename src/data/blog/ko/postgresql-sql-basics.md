@@ -6,10 +6,13 @@ tags:
   - postgresql
   - sql
   - 데이터베이스
+  - 백엔드공부
   - 학습
 featured: false
 draft: false
 ---
+
+이 글은 자바 · Spring Boot 백엔드 학습 흐름의 한 갈래다. [Spring Boot #2 (REST API 로 CRUD · 레이어드 아키텍처)](/posts/spring-boot-log-02-rest-api-crud-and-layered-architecture) 에서는 CRUD 를 인메모리 List 로 처리했는데, 실제 DB 로 넘어가기 전에 **DB · SQL 자체를 먼저 손에 익히는 단계**가 이 글이다. 여기서 익힌 PostgreSQL 은 이후 [Spring Boot #3 (JPA 로 PostgreSQL 연결)](/posts/spring-boot-log-03-jpa-postgresql-entity-repository) 에서 자바(JPA)로 다시 연결한다.
 
 오늘은 PostgreSQL과 SQL 기초를 배웠다. 이전까지는 WSL2 환경에서 했는데, 오늘 중고로 맥북을 하나 구해서 macOS에서 학습했다. SQLite는 종종 써봤지만 PostgreSQL은 처음이라 문법이 좀 어색했다.
 
