@@ -152,7 +152,17 @@
 
 > 컨벤션 이유: 발행 완료 메모가 누적되면 루트에서 작성 중인 메모를 찾기 어려워짐. published/ 로 격리해서 작성자의 현재 진행 상태를 명확히 한다.
 
-**주의:** 스크래치 파일이 gitignored이므로 작성자가 직접 백업 정책을 결정해야 한다. 발행된 포스트 본문은 git에 들어가지만 원본 스크래치는 로컬에만 있음을 인지.
+**동기 · 백업 (2026-07-15~):** `src/scratch/` 는 main repo 에서는 계속 `.gitignore` 되지만, **별도 private repo (`dpcivl/dev-blog-scratch`) 로 백업 · 두 기기 (Windows + Mac) 간 동기**됨. 폴더 안에 nested `.git/` 존재.
+
+**Claude 가 scratch 파일 다룰 때:**
+
+- **읽기 · 신규 작성**: 그냥 `src/scratch/<file>` 접근 (nested repo 는 투명)
+- **발행 후 처리** (published/ 로 mv 등) 후에는 **scratch repo 에도 커밋 · 푸시** 하도록 사용자에게 안내:
+  ```bash
+  git -C src/scratch add . && git -C src/scratch commit -m "..." && git -C src/scratch push
+  ```
+- 사용자가 두 기기 사용 중이라 다른 기기 시작 시 `git -C src/scratch pull` 필요함을 종종 상기
+- Main repo commit 은 scratch 변경과 무관 (scratch 는 여전히 `.gitignore` 대상, `!src/scratch/README.md` 예외 하나만 추적)
 
 ## 🖋 발행 어투 · 컨벤션 (반드시 준수)
 
