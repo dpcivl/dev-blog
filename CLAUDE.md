@@ -4,6 +4,43 @@
 
 블로그 글은 마크다운 파일 기반이며, [src/data/blog/](src/data/blog/)에 `.md` 파일을 추가하면 자동으로 발행됩니다. (`draft: true` 면 비공개)
 
+## 🔄 세션 시작 루틴 (Claude 자동 수행)
+
+작성자가 Windows + macOS 두 기기를 사용하므로 세션 시작 시 두 repo (main dev-blog + nested `src/scratch/`) 를 동기하는 것이 필수. **첫 사용자 요청에 응답하기 전** 아래를 자동 실행하고 결과를 한 줄로 보고한다.
+
+**실행 순서 (Bash 하나로 배치):**
+
+```bash
+# 1. main repo pull (dirty 면 stash push -u → pull → stash pop)
+git status --short
+git pull --rebase
+# 2. scratch repo pull
+git -C src/scratch pull --rebase
+```
+
+**한 줄 보고 형식 (사용자 응답 앞에 붙임):**
+
+- ✓ 정상: `루틴 ✓ (main: up-to-date / scratch: up-to-date)`
+- ✓ 새 커밋 가져옴: `루틴 ✓ (main: +N커밋 pull / scratch: +M커밋 pull)`
+- ⚠ 실패: `루틴 ⚠ (main pull 실패 — <원인>, 사용자 개입 필요)`
+- skip: `루틴 skip (사용자 요청)`
+
+**Skip 조건:**
+
+- 사용자가 "루틴 스킵" · "오프라인이야" · "pull 안 해도 됨" 명시
+- 이미 이 세션에서 한 번 실행함 (동일 세션에서 반복 금지)
+- 사용자 첫 요청이 명백히 다른 저장소/디렉토리 대상 (예: `~/other-project` 경로 언급)
+
+**예외 처리:**
+
+- Main 에 uncommitted 변경 있으면 `git stash push -u -m "session-start"` → pull → `git stash pop`
+- Stash pop 시 conflict → 다른 작업 중단하고 사용자에게 알림 · 지시 요청
+- Scratch 에 uncommitted 변경 있고 pull 필요하면 우선 사용자에게 "scratch 에 미커밋 파일 있음, 커밋 후 계속할까요?" 확인
+- 네트워크 오프라인이면 한 줄 오프라인 보고 후 진행 (조용히 넘어가지 말 것)
+- `src/000-inbox.md` 는 사용자 개인 메모라 pull 이 안전할 것 (거의 상충 안 남), 상충 시 stash pop 실패 → 사용자에게 알림
+
+**루틴 이후:** 그 다음이 Inbox 워크플로우 (아래) → 실제 사용자 요청 처리 순.
+
 ## Inbox 워크플로우 — 매 세션 시작 시 수행
 
 작성자는 [src/000-inbox.md](src/000-inbox.md)에 그날그날 알게 된 내용을 자유로운 형식으로 적어둡니다. Claude의 책임은 이 메모를 정식 블로그 포스트로 다듬어 발행하는 것입니다.
