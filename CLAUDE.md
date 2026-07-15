@@ -63,7 +63,7 @@ git -C src/scratch pull --rebase
      ```
    - 영상 placeholder 컨벤션: 작성자가 `<여기에 <파일명> 영상>` 형태로 위치 지정하면 자동 인식 + 치환
 
-2. **포스트 작성** ([src/data/blog/<slug>.md](src/data/blog/))
+2. **포스트 작성** ([src/data/blog/ko/<slug>.md](src/data/blog/ko/))
    - frontmatter 필수 필드 ([src/content.config.ts](src/content.config.ts) 참고):
      - `title`, `description`, `pubDatetime` (ISO 8601, 예: `2026-05-05T13:00:00Z`)
      - `tags`: 한국어 태그 OK (예: `트러블슈팅`, `astro`)
@@ -91,8 +91,10 @@ git -C src/scratch pull --rebase
    - 디버깅이나 빌드 트리거용으로 만든 임시 포스트(`hello-world.md`, `test-*.md` 등)는 처리 후 삭제
    - 단, 사용자가 "남겨둬"라고 한 건 유지
 
-6. **Commit & Push**
-   - 한 번에 commit: 새 포스트 + 이미지 + inbox 업데이트 + 임시 파일 삭제 묶어서
+6. **EN 번역** — `pnpm translate one <slug>` 실행. 자세한 규칙은 아래 [## 번역 워크플로우 (KO → EN)](#번역-워크플로우-ko--en) 섹션. **KO 만 발행하고 EN 을 안 만들면 언어 스위치가 홈으로 fallback 됨.** 사용자가 명시적으로 "번역은 나중에" 라고 하지 않는 이상 매번 수행.
+
+7. **Commit & Push**
+   - 한 번에 commit: **KO + EN 두 파일 함께** + 이미지 + inbox 업데이트 + 임시 파일 삭제 묶어서
    - 메시지 예: `Publish post: <제목>`
    - push까지 완료
 
@@ -379,3 +381,66 @@ Vercel 빌드 환경에서 Chromium 실행이 불안정해 remark-mermaidjs 를 
 5. 필요 시 `pnpm mermaid:gc` 로 참조 없는 hash 파일 정리 (legacy 명명 SVG 는 안 건드림)
 
 **Astro 파이프라인엔 mermaid 플러그인 없음** — 재추가하지 말 것. Vercel 은 이미지만 서빙.
+
+## 번역 워크플로우 (KO → EN)
+
+이 블로그는 KO/EN 이중 언어 (`hreflang` 로 SEO · 사용자 언어 스위치 UI). **KO 발행 시 자동으로 EN 도 번역**하는 게 원칙 (draft 제외).
+
+### 폴더 구조
+
+- `src/data/blog/ko/<slug>.md` — 원본 (한국어). 사용자가 직접 작성 or Claude 가 스크래치/인박스에서 정돈
+- `src/data/blog/en/<slug>.md` — 번역 (`pnpm translate` 파이프라인이 생성)
+- 같은 slug 로 짝. 짝이 안 맞으면 언어 스위치가 홈으로 fallback → 방문자 이탈
+
+### 실행 명령
+
+```bash
+pnpm translate one <slug>       # 단일 포스트 번역 (신규 or 재번역). 가장 자주 씀.
+pnpm translate batch            # 아직 EN 없는 KO 포스트 일괄 번역
+pnpm translate sample           # 지정된 샘플 3편 (스모크 테스트)
+pnpm translate dry <slug>       # 번역 + validate 만, 파일 쓰기 X (검증용)
+```
+
+- **모델**: 기본 `claude-sonnet-5`. `.env` 의 `ANTHROPIC_MODEL` 로 override 가능
+- **비용**: 포스트 1개당 대략 $0.04–0.08 (프롬프트 캐시 hit 시 저렴)
+- **소요**: 30–60초 per post
+
+### 세팅 요구사항
+
+- `.env` 파일에 `ANTHROPIC_API_KEY=sk-ant-xxx` 필수 (`.env.example` 참조)
+- `.env` 는 `.gitignore` 대상 → **두 기기 각각 수동 세팅**. Mac 초기 세팅 시 Windows 쪽 값을 안전한 채널 (1Password · USB · AirDrop) 로 옮기고 `cp .env.example .env` 후 값 채우기
+- API 키 없으면 `translate` 명령이 즉시 실패 → 안내 에러 메시지 출력
+
+### 자동 검증 ([validate.mjs](scripts/translate/validate.mjs))
+
+번역 직후 자동 실행 — KR/EN 페어 대조:
+
+- 코드 블록 개수 · 내용 일치 (주석은 번역 허용)
+- 링크 URL 개수 · 매핑 (`/posts/` ↔ `/en/posts/` 등)
+- 이미지 경로 일치
+- 헤딩 개수 · 깊이 일치
+- HTML 태그 일치
+- 본문 길이 비율 (0.5× ~ 2.0×)
+- **우발적 strikethrough** (`~1.5~2주` 같은 tilde 오파싱) — KO/EN 각각
+
+이슈 발견 시 결과 요약에 `! [validator] <issue>` 로 표시. 실패한 번역은 재실행 or 수동 수정.
+
+### 앵커 자동 재작성 ([anchor-rewrite.mjs](scripts/translate/anchor-rewrite.mjs))
+
+포스트 안의 다른 KO 헤딩 anchor 링크는 EN 번역 시 자동으로 EN 헤딩 slug 로 재작성. 예: `[#인터페이스-감각의-자동화](/posts/spring-boot-log-01-...)` → `[#the-automation-of-interface-sense](/en/posts/spring-boot-log-01-...)`. 사용자 개입 불필요.
+
+### 권장 워크플로우
+
+1. `src/data/blog/ko/<slug>.md` 작성 (인박스 · 스크래치 · 사용자 요청 등에서)
+2. `pnpm translate one <slug>` — EN 생성
+3. `pnpm check:md` — 전체 tilde strikethrough 검사 (translate 도 페어 검증하지만 다른 KO 포스트 문제도 함께 잡음)
+4. `git add src/data/blog/{ko,en}/<slug>.md` — **KO + EN 함께 스테이지**
+5. `git commit -m "Publish post: <제목>"` + push
+
+### 자주 하는 실수
+
+- ❌ **KO 만 커밋** → EN 없어서 언어 스위치가 홈으로 fallback. 반드시 EN 도 함께 커밋.
+- ❌ **KO 대폭 수정 후 EN 안 갱신** → 두 버전 diverge. 수정하면 `pnpm translate one <slug>` 다시 실행 후 함께 커밋.
+- ❌ **frontmatter tags 를 영어로 번역** → 파이프라인은 tags 를 verbatim 유지 (한국어 태그는 그대로). 태그별 유입 통계 유지 목적.
+- ✅ **Draft (`draft: true`)** — 번역 skip. draft 벗을 때 함께 번역.
+- ✅ **사용자가 "번역은 나중에"** — 그 세션 skip. 다음에 처리하도록 알림.
