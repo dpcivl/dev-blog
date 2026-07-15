@@ -1,0 +1,50 @@
+# 모든 텍스트 파일은 저장소에 LF 로 저장하고, 체크아웃 시 LF 로 내보낸다.
+# Windows/macOS/Linux 어디서 편집하든 diff · commit warning 이 안 뜨게 통일.
+* text=auto eol=lf
+
+# 명시적 텍스트 파일 — 자동 감지 실패 대비
+*.md          text eol=lf
+*.markdown    text eol=lf
+*.mdx         text eol=lf
+*.astro       text eol=lf
+*.ts          text eol=lf
+*.tsx         text eol=lf
+*.js          text eol=lf
+*.mjs         text eol=lf
+*.cjs         text eol=lf
+*.jsx         text eol=lf
+*.json        text eol=lf
+*.jsonc       text eol=lf
+*.yaml        text eol=lf
+*.yml         text eol=lf
+*.css         text eol=lf
+*.scss        text eol=lf
+*.html        text eol=lf
+*.svg         text eol=lf
+*.xml         text eol=lf
+*.txt         text eol=lf
+*.sh          text eol=lf
+Dockerfile    text eol=lf
+.editorconfig text eol=lf
+.gitignore    text eol=lf
+.gitattributes text eol=lf
+
+# 바이너리 — 변환/diff 대상 아님
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.webp   binary
+*.avif   binary
+*.ico    binary
+*.mp4    binary
+*.mov    binary
+*.webm   binary
+*.woff   binary
+*.woff2  binary
+*.ttf    binary
+*.otf    binary
+*.eot    binary
+*.pdf    binary
+*.zip    binary
+*.tar.gz binary
