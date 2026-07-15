@@ -1,6 +1,6 @@
 ---
-title: "PostgreSQL Basics — CRUD and the Korean-Sorting (COLLATE) Trap"
-description: "Coming from SQLite, I picked up PostgreSQL for the first time. From CREATE to how CRUD maps onto SQL, and the collation problem where ORDER BY refused to sort Korean alphabetically."
+title: "PostgreSQL Basics — CRUD and the Korean Sorting (COLLATE) Trap"
+description: "I'd only used SQLite before, and this was my first time touching PostgreSQL. From CREATE to CRUD mapping, and a collation issue where ORDER BY wasn't sorting in Korean alphabetical order."
 pubDatetime: 2026-07-14T13:00:00Z
 tags:
   - postgresql
@@ -11,13 +11,13 @@ featured: false
 draft: false
 ---
 
-Today I learned the basics of PostgreSQL and SQL. Until now I'd been working in a WSL2 environment, but today I picked up a used MacBook and studied on macOS. I've used SQLite here and there, but PostgreSQL was new to me, so the syntax felt a little unfamiliar.
+Today I learned PostgreSQL and SQL basics. I'd been working in a WSL2 environment until now, but today I got a used MacBook and studied on macOS instead. I'd used SQLite here and there, but this was my first time with PostgreSQL, so the syntax felt a bit unfamiliar.
 
 ## Table of contents
 
-## Creating a database and connecting to it
+## Creating and Connecting to a Database
 
-After installing PostgreSQL, the first thing I did was `CREATE`. I created a database, connected to it with `\c`, and then made a table inside it.
+After installing PostgreSQL, the first thing I did was `CREATE`. I created a database, connected to it with `\c`, then created a table inside it.
 
 ```sql
 CREATE TABLE todos (
@@ -27,69 +27,69 @@ CREATE TABLE todos (
 );
 ```
 
-You can check the list of tables with `\dt` and a table's schema with `\d todos`.
+You can check the table list with `\dt`, and the schema with `\d todos`.
 
-![Checking the schema with \dt and \d todos after CREATE TABLE](/assets/posts/postgresql-sql-basics/01-create-table.png)
+![Screen showing schema check with \dt and \d todos after CREATE TABLE](/assets/posts/postgresql-sql-basics/01-create-table.png)
 
-When I set `BIGSERIAL` as the PRIMARY KEY, `\d todos` shows the default value as `nextval('todos_id_seq'::regclass)`. I could see with my own eyes that the equivalent of SQLite's `AUTOINCREMENT` is handled internally by PostgreSQL as a sequence.
+When I set `BIGSERIAL` as the PRIMARY KEY, `\d todos` showed the default value set to `nextval('todos_id_seq'::regclass)`. I could see with my own eyes that what corresponds to SQLite's `AUTOINCREMENT` is handled internally by PostgreSQL as a sequence.
 
-## How CRUD maps onto SQL
+## How CRUD Maps to SQL
 
-It struck me that the CRUD I'd done in Java maps directly onto the SQL I learned today.
+It struck me today that the CRUD operations I'd done in Java map directly onto the SQL I learned today.
 
-| SQL | Action | REST / method name |
+| SQL | Operation | REST / Method Name |
 | --- | --- | --- |
-| `INSERT INTO` | create | POST / create |
-| `SELECT` | read | GET / findAll |
-| `UPDATE ... SET` | update | PUT / update |
-| `DELETE FROM` | delete | DELETE / delete |
+| `INSERT INTO` | Create | POST / create |
+| `SELECT` | Read | GET / findAll |
+| `UPDATE ... SET` | Update | PUT / update |
+| `DELETE FROM` | Delete | DELETE / delete |
 
-And the clause that shows up almost every time you use these commands is `WHERE`. Since it decides **which rows you're targeting the operation at**, it attaches to updates, deletes, and reads alike. It was the most broadly useful of the bunch.
+And almost always accompanying these commands is `WHERE`. It's the clause that determines **which target the operation should act on**, so it attaches to updates, deletes, and reads alike. It turned out to be the most versatile part.
 
-## What actually matters isn't the SQL — it's the data structure design
+## What Actually Matters Isn't SQL Syntax, but Data Structure Design
 
-Working through all this, here's the thought I landed on. On the database side, being able to *sketch out the data structure* matters far more than memorizing this SQL syntax.
+Going through all this, I had a realization. In databases, what matters far more than memorizing SQL syntax is **the ability to design a data structure**.
 
-Once you've designed what data structure to store things in, implementing it in SQL is something AI can spit out quickly these days. But designing the structure to meet the requirements — honoring constraints like primary keys and foreign keys — is ultimately a judgment call a human has to make.
+Once you've designed which data structure to store things in, implementing it in SQL is something AI can do quickly these days. But designing the structure to satisfy requirements while respecting constraints like primary keys and foreign keys is ultimately something a human has to judge.
 
-## An interesting discovery — ORDER BY wasn't sorting alphabetically
+## An Interesting Discovery — ORDER BY Wasn't Sorting in Korean Alphabetical Order
 
-I ran into something interesting. I tried to sort titles alphabetically with `ORDER BY title ASC`, but **it didn't sort in Korean alphabetical order.**
+I ran into something interesting. I tried `ORDER BY title ASC` to sort titles in Korean alphabetical order, but **it wasn't sorted that way at all.**
 
-![The ORDER BY title ASC result isn't in Korean alphabetical order — 청소하기, 밥 먹기, 스프링 공부, 책 읽기](/assets/posts/postgresql-sql-basics/02-order-by-wrong.png)
+![Screen showing ORDER BY title ASC result not in Korean alphabetical order — order was 청소하기, 밥 먹기, 스프링 공부, 책 읽기](/assets/posts/postgresql-sql-basics/02-order-by-wrong.png)
 
-The output came out as "청소하기 → 밥 먹기 → 스프링 공부 → 책 읽기", which is nowhere near Korean alphabetical order (밥 → 스프링 → 청소 → 책).
+The result came out as "청소하기 → 밥 먹기 → 스프링 공부 → 책 읽기," which isn't Korean alphabetical order at all (which would be 밥 → 스프링 → 청소 → 책).
 
-To find the cause, I checked the database's collation (sort rule).
+To find the cause, I checked the database's collation.
 
 ```sql
 SELECT datcollate FROM pg_database WHERE datname = 'study';
 ```
 
-The result was `en_US.UTF-8`. In other words, this database was sorting on a US-English basis. Because it lined Korean characters up by something close to Unicode code-point order rather than by Korean rules, they looked all jumbled.
+The result was `en_US.UTF-8`. In other words, this database was sorting based on US English rules. It was laying out Korean text roughly by Unicode code point order rather than Korean language rules, so the result looked jumbled.
 
-So I looked for the Korean collations installed on the system.
+So I looked up which Korean collations were installed on the system.
 
 ```sql
 SELECT collname FROM pg_collation WHERE collname LIKE 'ko%';
 ```
 
-Thirteen showed up, and out of them I picked `ko-KR-x-icu`. (It's the Korean locale provided by the ICU library.) When I specified this with `COLLATE`, the sorting came out the way I wanted.
+Thirteen came up, and I picked `ko-KR-x-icu` (a Korean locale provided by the ICU library). Specifying this explicitly with `COLLATE` gave me the sort order I wanted.
 
 ```sql
 SELECT * FROM todos ORDER BY title COLLATE "ko-KR-x-icu" ASC;
 ```
 
-You can specify the sort rule ad hoc like this, per query with `COLLATE`, or you can bake it in at the column level or when creating the database. This time I just changed it once in the query.
+You can specify collation per query with `COLLATE` like this, or bake it in at the column or database creation level. This time, I just changed it for a single query.
 
-## Wrapping up
+## Retrospective
 
-The SQL commands themselves were familiar (thanks to my SQLite experience). Even so, I arrived at the same conclusion twice today — **the real thing worth studying is how you design the database structure, not the syntax.** The collation problem, too, was ultimately part of a design decision: "by what rules should this data be handled?"
+The SQL commands themselves felt familiar, thanks to my SQLite experience. Even so, I arrived at the same conclusion twice today — **what's really worth studying is how to design the database structure, not the syntax.** The collation issue, too, turned out to be part of a design decision: "what rules should govern how this data is handled?"
 
-## Further study
+## Things to Study Further
 
-- **How to avoid attaching a collation to every query** — writing `COLLATE "ko-KR-x-icu"` every time is tedious. Compare specifying a default sort rule in the column definition (`title VARCHAR(255) COLLATE "ko-KR-x-icu"`) or at database creation (`CREATE DATABASE ... LC_COLLATE`). → [PostgreSQL: Collation Support](https://www.postgresql.org/docs/current/collation.html)
-- **What `ko-KR-x-icu` really is** — the difference between an `x-icu`-suffixed collation and a libc-based one (like `en_US.UTF-8`), and why ICU is needed. → [PostgreSQL: ICU Collations](https://www.postgresql.org/docs/current/collation.html#ICU-COLLATIONS)
-- **`BIGSERIAL` vs `IDENTITY`** — the `nextval(...::regclass)` sequence approach I saw in `\d todos`. How it differs from `GENERATED ALWAYS AS IDENTITY`, which is recommended in recent PostgreSQL. → [PostgreSQL: Identity Columns](https://www.postgresql.org/docs/current/ddl-identity-columns.html)
-- **Practicing data structure design** — primary keys, foreign keys, normalization. Moving beyond a single `todos` table to exercises that tie multiple tables together with relationships (e.g. a user–todo relationship).
-- **Indexes** — `\d todos` already had `todos_pkey` set up as a btree index. How WHERE / ORDER BY performance connects to indexes.
+- **How to avoid attaching collation to every query** — Typing `COLLATE "ko-KR-x-icu"` every time is tedious. I want to compare specifying a default collation at the column definition level (`title VARCHAR(255) COLLATE "ko-KR-x-icu"`) versus at database creation time (`CREATE DATABASE ... LC_COLLATE`). → [PostgreSQL: Collation Support](https://www.postgresql.org/docs/current/collation.html)
+- **What `ko-KR-x-icu` actually is** — The difference between collations with the `x-icu` suffix and libc-based collations (like `en_US.UTF-8`). Why ICU is needed. → [PostgreSQL: ICU Collations](https://www.postgresql.org/docs/current/collation.html#ICU-COLLATIONS)
+- **`BIGSERIAL` vs `IDENTITY`** — The `nextval(...::regclass)` sequence approach I saw in `\d todos`. How this differs from `GENERATED ALWAYS AS IDENTITY`, which is recommended in modern PostgreSQL. → [PostgreSQL: Identity Columns](https://www.postgresql.org/docs/current/ddl-identity-columns.html)
+- **Practicing data structure design** — Primary keys, foreign keys, normalization. Moving beyond a single todos table to practice tying multiple tables together with relationships (e.g., a users–todos relationship).
+- **Indexes** — `\d todos` already showed `todos_pkey` set up as a btree index. How indexes connect to WHERE / ORDER BY performance.
