@@ -29,9 +29,10 @@ pnpm-debug.log*
 # claude code local settings
 .claude/
 
-# scratch notes (local-only, not pushed to GitHub)
-src/scratch/*
-!src/scratch/README.md
+# scratch notes — main repo 는 완전 무시.
+# 실제 관리는 별도 private repo (dpcivl/dev-blog-scratch) 가 함.
+# 세팅 방법은 CLAUDE.md 의 "스크래치 파일에서 포스트 생성" 섹션 참고.
+src/scratch/
 
 # pagefind
 
