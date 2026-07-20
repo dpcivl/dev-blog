@@ -32,7 +32,7 @@ CREATE TABLE todos (
 
 `\dt`로 테이블 목록을, `\d todos`로 스키마를 확인할 수 있다.
 
-![CREATE TABLE 후 \dt와 \d todos로 스키마를 확인한 화면](/assets/posts/postgresql-sql-basics/01-create-table.png)
+![CREATE TABLE 후 \dt와 \d todos로 스키마를 확인한 화면](/assets/posts/postgresql-sql-basics/01-create-table.webp)
 
 `BIGSERIAL`을 PRIMARY KEY로 잡으니 `\d todos`에서 초기값이 `nextval('todos_id_seq'::regclass)`로 잡혀 있는 게 보인다. SQLite의 `AUTOINCREMENT`에 해당하는 부분을, PostgreSQL은 내부적으로 시퀀스(sequence)로 처리한다는 걸 눈으로 확인할 수 있었다.
 
@@ -59,7 +59,7 @@ CREATE TABLE todos (
 
 한 가지 재밌는 걸 만났다. `ORDER BY title ASC`로 제목을 가나다 순 정렬하려 했는데, **가나다 순으로 정렬되지 않았다.**
 
-![ORDER BY title ASC 결과가 가나다 순이 아닌 화면 — 청소하기, 밥 먹기, 스프링 공부, 책 읽기 순](/assets/posts/postgresql-sql-basics/02-order-by-wrong.png)
+![ORDER BY title ASC 결과가 가나다 순이 아닌 화면 — 청소하기, 밥 먹기, 스프링 공부, 책 읽기 순](/assets/posts/postgresql-sql-basics/02-order-by-wrong.webp)
 
 "청소하기 → 밥 먹기 → 스프링 공부 → 책 읽기" 순으로 나왔는데, 가나다 순(밥 → 스프링 → 청소 → 책)이 전혀 아니다.
 

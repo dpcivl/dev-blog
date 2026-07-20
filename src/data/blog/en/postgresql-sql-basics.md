@@ -32,7 +32,7 @@ CREATE TABLE todos (
 
 You can check the list of tables with `\dt`, and the schema with `\d todos`.
 
-![Screen showing the schema checked via \dt and \d todos after CREATE TABLE](/assets/posts/postgresql-sql-basics/01-create-table.png)
+![Screen showing the schema checked via \dt and \d todos after CREATE TABLE](/assets/posts/postgresql-sql-basics/01-create-table.webp)
 
 Setting `BIGSERIAL` as the PRIMARY KEY, I noticed in `\d todos` that the default value was set to `nextval('todos_id_seq'::regclass)`. I could see firsthand that what corresponds to SQLite's `AUTOINCREMENT` is handled internally by PostgreSQL through a sequence.
 
@@ -59,7 +59,7 @@ Once you've designed which data structure to store things in, implementing it in
 
 I ran into something interesting. I tried `ORDER BY title ASC` to sort titles alphabetically, but **the sort order wasn't alphabetical at all.**
 
-![Screen showing ORDER BY title ASC result not sorted alphabetically — order was 청소하기, 밥 먹기, 스프링 공부, 책 읽기](/assets/posts/postgresql-sql-basics/02-order-by-wrong.png)
+![Screen showing ORDER BY title ASC result not sorted alphabetically — order was 청소하기, 밥 먹기, 스프링 공부, 책 읽기](/assets/posts/postgresql-sql-basics/02-order-by-wrong.webp)
 
 The result came out as "청소하기 → 밥 먹기 → 스프링 공부 → 책 읽기," which is nothing like the correct alphabetical order (밥 → 스프링 → 청소 → 책).
 
