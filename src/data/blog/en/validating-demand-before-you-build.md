@@ -8,7 +8,7 @@ tags:
   - 수요검증
   - 회고
   - 학습
-draft: false
+draft: true
 featured: false
 ---
 
