@@ -5,7 +5,7 @@ title: "About"
 
 **Park Hyoin (박효인)**
 
-Coming from **1 year of embedded HW and 2 years 2 months of embedded SW** experience, I'm now expanding into **Edge AI · Smart Factory · AI Agent** territory.
+Coming from **1 year of embedded HW and 2 years 2 months of embedded SW** experience plus edge AI project work, I'm now expanding my studies into **backend and Java**.
 
 <div class="cta-box">
   <a href="/portfolio" class="cta-btn cta-primary">
@@ -32,8 +32,8 @@ Separately, when the company started researching edge AI, we **adopted NXP iMX8M
 
 ## What I'm working on now
 
+- **Backend · Java study** — Digging into Spring Boot as the core — REST · JPA · transactions · Tomcat/thread pools · JVM/GC — kept as a [running series](/series). (Collected under the [Spring Boot](/en/tags/spring-boot) and [Java](/en/tags/java) tags.)
 - **AGV Autonomous Robot Prototype** — Raspberry Pi 5 + STM32 + ROS2 + RS485. Build log runs as [a series](/series).
-- **Claude API · AI Agent study** — Directly experimenting with multi-turn, Tool Use, Prompt Caching, Vision, and more — accumulating [posts on the topic](/en/tags/claude-api).
 - **[Julgot (줄곧) — an achievement-only journal](https://julgot.com)** — Inverting the "first place or zero" pattern common in perfectionists: **a journal app that records only what went well**. The product grew out of my own [perfectionism retrospective](/en/posts/perfectionism-as-a-tool-vertical-slice-development). Stack: **Next.js (PWA) + Supabase Edge Functions (Deno)**. Web PWA v0.3.2 launched on 2026-07-13. Currently in beta with ongoing maintenance before native app development — see [launch day 1 retrospective](/en/posts/julgot-launched-day-1-retrospective).
 - **Blog infrastructure itself** — Astro + Tailwind 4. I decided the design direction, information architecture, and publishing workflow myself, and paired with Claude Code on the code side for a 7-phase modern redesign. Every page including this one is the result.
 

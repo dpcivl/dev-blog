@@ -5,7 +5,7 @@ title: "About"
 
 **박효인 (Park Hyoin)**
 
-**임베디드 HW 1년 / 임베디드 SW 2년 2개월** 의 실무 경험을 바탕으로 **엣지 AI · 스마트 팩토리 · AI Agent** 영역으로 폭을 넓혀가는 중입니다.
+**임베디드 HW 1년 / 임베디드 SW 2년 2개월** 의 실무 경험과 엣지 AI 프로젝트 경험을 바탕으로, 지금은 **백엔드 · 자바** 로 학습의 폭을 넓혀가는 중입니다.
 
 <div class="cta-box">
   <a href="/portfolio" class="cta-btn cta-primary">
@@ -32,8 +32,8 @@ title: "About"
 
 ## 지금 하고 있는 것
 
+- **백엔드 · 자바 공부** — Spring Boot 를 축으로 REST · JPA · 트랜잭션 · 톰캣/스레드풀 · JVM/GC 까지 파고드는 학습 일지를 [시리즈로 진행 중](/series). ([Spring Boot](/tags/spring-boot) · [자바](/tags/java) 태그에 정리.)
 - **AGV 자율주행 프로토타입** — 라즈베리파이 5 + STM32 + ROS2 + RS485 조합. 빌드 일지를 [시리즈로 진행 중](/series).
-- **Claude API · AI Agent 학습** — 멀티턴 · Tool Use · Prompt Caching · Vision 등 직접 실험하면서 [관련 글](/tags/claude-api) 누적 중.
 - **[줄곧 (Julgot) — 성취 전용 일기](https://julgot.com)** — 완벽주의 성향에서 자주 보이는 "1등 아니면 0점" 패턴을 거꾸로 — **잘한 것만 기록하는 일기 앱**. 본인의 [완벽주의 회고](/posts/perfectionism-as-a-tool-vertical-slice-development) 에서 출발한 제품. **Next.js (PWA) + Supabase Edge Functions (Deno)** 스택. 2026-07-13 웹 PWA v0.3.2 배포. 네이티브 앱 개발 전 베타 테스트 단계로 지속적으로 유지보수 중 — [배포 1일차 회고](/posts/julgot-launched-day-1-retrospective) 참고.
 - **블로그 인프라 자체** — Astro + Tailwind 4 기반. 디자인 방향·정보 구조·발행 워크플로우는 직접 결정하고, 코드 구현은 Claude Code 와 페어 프로그래밍 방식으로 7 Phase 모던 리디자인을 진행. 이 페이지를 포함해 모든 페이지가 그 결과물.
 
