@@ -3,33 +3,10 @@ import { SOCIALS } from "@/constants";
 import LinkButton from "./LinkButton.astro";
 import IconRss from "@/assets/icons/IconRss.svg";
 
-interface Props {
-  koHref?: string;
-  enHref?: string;
-}
-
-const { koHref: koHrefProp, enHref: enHrefProp } = Astro.props;
-
+// KO/EN 스위처는 Header.astro 로 이동 (모든 페이지 공통이라 헤더가 맞는 자리).
 const pathname = Astro.url.pathname;
 const isEnglishPage =
-  pathname === "/en" ||
-  pathname === "/en/" ||
-  pathname.startsWith("/en/");
-
-// Naive URL swap between languages.
-// Post details override with explicit props when the counterpart exists.
-const defaultKoHref = isEnglishPage
-  ? pathname.replace(/^\/en(\/|$)/, "/") || "/"
-  : pathname;
-const defaultEnHref = isEnglishPage
-  ? pathname
-  : pathname === "/"
-    ? "/en/"
-    : `/en${pathname}`;
-
-const koHref = koHrefProp ?? defaultKoHref;
-const enHref = enHrefProp ?? defaultEnHref;
-
+  pathname === "/en" || pathname === "/en/" || pathname.startsWith("/en/");
 const currentLang: "ko" | "en" = isEnglishPage ? "en" : "ko";
 ---
 
@@ -54,30 +31,6 @@ const currentLang: "ko" | "en" = isEnglishPage ? "en" : "ko";
         ? "Embedded SW · AI Agent · Vibe coding"
         : "임베디드 SW · AI Agent · Vibe coding"}
     </p>
-    <div class="sidebar-lang-switch" role="group" aria-label="Language">
-      <a
-        href={koHref}
-        class:list={[
-          "sidebar-lang-btn",
-          { "sidebar-lang-active": currentLang === "ko" },
-        ]}
-        aria-current={currentLang === "ko" ? "true" : undefined}
-        aria-label="한국어로 보기"
-      >
-        KO
-      </a>
-      <a
-        href={enHref}
-        class:list={[
-          "sidebar-lang-btn",
-          { "sidebar-lang-active": currentLang === "en" },
-        ]}
-        aria-current={currentLang === "en" ? "true" : undefined}
-        aria-label="View in English"
-      >
-        EN
-      </a>
-    </div>
     <div class="sidebar-socials">
       {
         SOCIALS.map(social => (
@@ -85,6 +38,9 @@ const currentLang: "ko" | "en" = isEnglishPage ? "en" : "ko";
             href={social.href}
             title={social.linkTitle}
             class="sidebar-social-link"
+            data-mail-copy={
+              social.href.startsWith("mailto:") ? true : undefined
+            }
           >
             <social.icon class="sidebar-social-icon" />
             <span class="sr-only">{social.linkTitle}</span>
@@ -105,12 +61,6 @@ const currentLang: "ko" | "en" = isEnglishPage ? "en" : "ko";
   </div>
 </aside>
 
-<div
-  id="sidebar-copy-toast"
-  class="sidebar-toast"
-  role="status"
-  aria-live="polite"
-></div>
 
 <style>
   .sidebar {
@@ -151,37 +101,6 @@ const currentLang: "ko" | "en" = isEnglishPage ? "en" : "ko";
     max-width: 200px;
     margin: 0;
   }
-  .sidebar-lang-switch {
-    display: inline-flex;
-    margin-top: 0.5rem;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    overflow: hidden;
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.03em;
-  }
-  .sidebar-lang-btn {
-    padding: 0.25rem 0.6rem;
-    color: var(--muted);
-    text-decoration: none;
-    transition: background 0.15s ease, color 0.15s ease;
-  }
-  .sidebar-lang-btn + .sidebar-lang-btn {
-    border-left: 1px solid var(--border);
-  }
-  .sidebar-lang-btn:hover {
-    background: var(--accent-bg);
-    color: var(--foreground);
-  }
-  .sidebar-lang-active {
-    background: var(--foreground);
-    color: var(--background);
-  }
-  .sidebar-lang-active:hover {
-    background: var(--foreground);
-    color: var(--background);
-  }
   .sidebar-socials {
     display: flex;
     flex-wrap: wrap;
@@ -206,31 +125,6 @@ const currentLang: "ko" | "en" = isEnglishPage ? "en" : "ko";
     opacity: 0.85;
   }
 
-  /* Click-to-copy toast (bottom-center, fixed) */
-  .sidebar-toast {
-    position: fixed;
-    left: 50%;
-    bottom: 1.5rem;
-    transform: translateX(-50%) translateY(0.5rem);
-    padding: 0.55rem 1.1rem;
-    background: var(--foreground);
-    color: var(--background);
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    opacity: 0;
-    pointer-events: none;
-    box-shadow: 0 6px 20px -6px rgba(0, 0, 0, 0.25);
-    transition:
-      opacity 0.2s ease,
-      transform 0.2s ease;
-    z-index: 100;
-  }
-  .sidebar-toast.is-visible {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-
   /* Desktop: sticky sidebar */
   @media (min-width: 768px) {
     .sidebar {
@@ -251,54 +145,3 @@ const currentLang: "ko" | "en" = isEnglishPage ? "en" : "ko";
     }
   }
 </style>
-
-<script>
-  function showSidebarToast(msg: string) {
-    const toast = document.getElementById("sidebar-copy-toast");
-    if (!toast) return;
-    toast.textContent = msg;
-    toast.classList.add("is-visible");
-    const existing = (toast as HTMLElement & { _t?: number })._t;
-    if (existing) window.clearTimeout(existing);
-    (toast as HTMLElement & { _t?: number })._t = window.setTimeout(() => {
-      toast.classList.remove("is-visible");
-    }, 1800);
-  }
-
-  function initSidebarMailCopy() {
-    const langAttr = document.documentElement.lang;
-    const lang: "ko" | "en" = langAttr?.startsWith("en") ? "en" : "ko";
-    const copiedMsg =
-      lang === "en"
-        ? "Email address copied"
-        : "이메일 주소가 복사됐어요";
-
-    const mailLinks = document.querySelectorAll<HTMLAnchorElement>(
-      '.sidebar-socials a[href^="mailto:"]'
-    );
-    mailLinks.forEach(link => {
-      if (link.dataset.bound === "1") return;
-      link.dataset.bound = "1";
-      link.addEventListener("click", async (e: MouseEvent) => {
-        // Ctrl/Cmd+click 은 새 탭 등 native 동작 유지
-        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-
-        const href = link.getAttribute("href") ?? "";
-        const email = href.replace(/^mailto:/, "").split("?")[0];
-        if (!email) return;
-
-        e.preventDefault();
-        try {
-          await navigator.clipboard.writeText(email);
-          showSidebarToast(copiedMsg);
-        } catch {
-          // Clipboard 실패 → 원래 mailto 동작으로 폴백
-          window.location.href = href;
-        }
-      });
-    });
-  }
-
-  initSidebarMailCopy();
-  document.addEventListener("astro:page-load", initSidebarMailCopy);
-</script>

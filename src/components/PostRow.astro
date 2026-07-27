@@ -1,0 +1,35 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { getPath } from "@/utils/getPath";
+import { findSeriesOf } from "@/data/series";
+import { SITE } from "@/config";
+
+interface Props {
+  post: CollectionEntry<"blog">;
+}
+
+const { post } = Astro.props;
+const { title, pubDatetime, modDatetime, tags, featured } = post.data;
+
+// Datetime.astro 의 "D MMM, YYYY" 대신 쉼표 없는 "D MMM YYYY" (모노)
+const date = new Date(modDatetime ?? pubDatetime);
+const formatted = date
+  .toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: SITE.timezone,
+  })
+  .replace(",", "");
+
+const series = findSeriesOf(post);
+const label = series?.title ?? tags?.[0] ?? "";
+---
+
+<a href={getPath(post.id, post.filePath)} class="post-row">
+  <span class="post-row-date">{formatted}</span>
+  <span class="post-row-title">
+    {featured && <span aria-label="featured">★ </span>}{title}
+  </span>
+  <span class="post-row-series">{label}</span>
+</a>

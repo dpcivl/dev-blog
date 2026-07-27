@@ -314,7 +314,18 @@ CLAUDE.md 이관 규칙 (2026-07-14). 이전에는 `~/.claude/projects/*/memory/
 - 변호 톤 (방어적) 보다 confident 톤 ("2026년에 AI 안 쓰는 개발자가 더 드물지 않나요?")
 - About / 포트폴리오 다듬을 때 "이 줄이 적극적 신호인가, 방어적 해명인가" 자문
 
-### 5. 종료 프로젝트는 `_prefix` 소프트 숨김
+### 5. 포트폴리오 게재 기준 — 접속 가능한 사이트가 있는 것만
+
+`/portfolio` 에 노출하는 프로젝트는 **접속 가능한 사이트(배포된 웹/앱)가 있는 것만.** 공개 저장소 링크만 있는 프로젝트는 아래 `_prefix` 규칙으로 숨긴다.
+
+**Why:** 채용 담당자가 바로 열어볼 수 있는 결과물만 남겨야 페이지가 설득력을 갖는다. 저장소 링크는 "만들어봤다" 수준으로 읽힌다.
+
+**How to apply:**
+- "링크 있는 것만 남겨주세요" → 기준은 **저장소가 아니라 라이브 사이트**
+- 새 프로젝트 정보를 모을 때는 [docs/portfolio-intake.md](docs/portfolio-intake.md) 의 프롬프트를 해당 프로젝트 세션에 붙여넣어 받아온다
+- 판단이 애매하면 물어본다 (숨김은 되돌리기 쉬움 — `git mv` 한 줄)
+
+### 6. 종료 프로젝트는 `_prefix` 소프트 숨김
 
 포트폴리오의 어떤 프로젝트가 종료됐거나 "포트폴리오에 올릴 수준 아님" 으로 빼야 할 때 — **파일 자체를 삭제하지 말고** 다음 3단계로 처리:
 
@@ -329,7 +340,7 @@ CLAUDE.md 이관 규칙 (2026-07-14). 이전에는 `~/.claude/projects/*/memory/
 - "완전히 삭제해주세요" 라고 명시할 때만 `git rm`
 - 블로그 포스트도 비슷한 규칙 (blog loader 도 `[^_]*.md` 패턴) — 다만 blog 는 `draft: true` 가 더 자연스러움
 
-### 6. blog-beyond-astropaper 는 살아있는 문서
+### 7. blog-beyond-astropaper 는 살아있는 문서
 
 블로그 커스텀 기능 총정리 포스트: [src/data/blog/ko/blog-beyond-astropaper-what-i-added.md](src/data/blog/ko/blog-beyond-astropaper-what-i-added.md) (featured).
 

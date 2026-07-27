@@ -179,3 +179,188 @@ html[data-theme="dark"] {
 :target {
   scroll-margin-block: 1rem;
 }
+
+/*
+ * ===== 에디토리얼 리디자인 (홈 / 포트폴리오) =====
+ * docs/design-log.md "홈/포트폴리오 에디토리얼 리디자인 (1A)" 참고.
+ * 사이드바 없는 단일 컬럼 페이지에서만 사용.
+ */
+
+@utility page-narrow {
+  @apply mx-auto w-full max-w-5xl;
+  padding-inline: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .page-narrow {
+    padding-inline: 2.5rem;
+  }
+}
+
+/* 헤더 nav hover 언더라인 */
+.nav-l {
+  position: relative;
+  padding-bottom: 2px;
+}
+.nav-l::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.22s ease;
+}
+.nav-l:hover::after {
+  transform: scaleX(1);
+}
+
+/* 홈 글 목록 — 한 줄 인덱스 행 */
+.post-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 108px 1fr 152px;
+  gap: 1.5rem;
+  align-items: baseline;
+  padding: 0.85rem 0.75rem;
+  margin-inline: -0.75rem;
+  border-bottom: 1px solid var(--border);
+  transition:
+    background 0.18s ease,
+    padding-inline-start 0.18s ease;
+}
+.post-row::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 2px;
+  background: var(--accent);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.2s ease;
+}
+/* 라이트 모드 --accent-bg (#d8d4ea) 가 hover 배경으로는 진해서 톤다운 */
+.post-row:hover {
+  background: color-mix(in oklab, var(--accent-bg) 45%, var(--background));
+  padding-inline-start: 1.1rem;
+}
+.post-row:hover::before {
+  transform: scaleY(1);
+}
+.post-row:hover .post-row-title {
+  color: var(--accent);
+}
+.post-row-date {
+  font-family: var(--font-code);
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+.post-row-title {
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.post-row-series {
+  font-size: 0.74rem;
+  color: var(--muted);
+  text-align: end;
+}
+@media (max-width: 640px) {
+  .post-row {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
+  }
+  .post-row-series {
+    text-align: start;
+  }
+}
+
+/* 타일 (홈 프로젝트 / 포트폴리오 카드) */
+.tile {
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+.tile:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+.tile:hover .arw {
+  transform: translateX(5px);
+}
+.arw {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+/* 기술 배지 — 꽉 찬 보라에서 연한 쿼츠 칩으로 통일 (portfolio.astro 에서 이동) */
+.tech-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 4px;
+  background: var(--accent-bg);
+  color: color-mix(in oklab, var(--accent) 70%, black);
+  margin-right: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+html[data-theme="dark"] .tech-badge {
+  /* 다크의 --accent-bg 는 반투명 라벤더라 accent 를 그대로 얹으면 대비 확보됨 */
+  color: var(--accent);
+}
+
+/* 히어로 h1 형광펜 강조 (홈 KO/EN · 포트폴리오 공용) */
+.hl {
+  background: linear-gradient(transparent 62%, var(--accent-bg) 62%);
+}
+
+/* 링크 — dashed underline 대신 화살표 이동 */
+.arw-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+.arw-link:hover .arw {
+  transform: translateX(4px);
+}
+
+/* 진입 애니메이션 */
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise-init {
+  opacity: 0;
+}
+.rise {
+  animation: riseIn 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-l::after,
+  .tile,
+  .arw,
+  .post-row {
+    transition: none;
+  }
+  .tile:hover {
+    transform: none;
+  }
+  .rise-init {
+    opacity: 1;
+  }
+  .rise {
+    animation: none;
+  }
+}

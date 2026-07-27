@@ -1,13 +1,20 @@
 ---
-import type { CollectionEntry } from "astro:content";
+import { getCollection, type CollectionEntry } from "astro:content";
+import { filterByLang, stripLangPrefix } from "@/utils/i18n";
 
 type Props = {
   project: CollectionEntry<"portfolio">;
 };
 
 const { project } = Astro.props;
+
+// relatedPosts 는 slug 배열이라 실제 제목으로 바꿔 보여준다
+const koPosts = filterByLang(await getCollection("blog"), "ko");
+const titleOf = (slug: string) =>
+  koPosts.find(p => stripLangPrefix(p.id) === slug)?.data.title ?? slug;
 const {
   title,
+  status,
   period,
   role,
   techStack,
@@ -15,7 +22,16 @@ const {
   gallery,
   relatedPosts,
   links,
+  highlight,
 } = project.data;
+
+const STATUS_LABEL: Record<string, string> = {
+  "in-progress": "IN PROGRESS",
+  completed: "COMPLETED",
+  paused: "PAUSED",
+};
+const statusLabel = status ? STATUS_LABEL[status] : undefined;
+
 const hasFooter =
   gallery.length > 0 ||
   relatedPosts.length > 0 ||
@@ -23,78 +39,171 @@ const hasFooter =
   !!links?.demo;
 ---
 
-<article class="card">
-  <h3 class="text-xl font-semibold mb-4">{title}</h3>
+<article class="tile rounded-xl border border-border px-7 py-6">
+  <div class="grid gap-10 md:grid-cols-[1fr_240px]">
+    {/* ===== 좌: 서술 ===== */}
+    <div>
+      {
+        statusLabel && (
+          <div class="flex items-center gap-2">
+            <span class="status-dot" data-status={status} aria-hidden="true" />
+            <span class="font-code text-[0.68rem] tracking-[0.12em] text-muted">
+              {statusLabel}
+            </span>
+          </div>
+        )
+      }
 
-  <dl class="card-fields">
-    <div class="field-row">
-      <dt>기간</dt>
-      <dd>{period}</dd>
+      <h3 class="mt-3 text-[1.5rem] font-bold tracking-[-0.015em]">{title}</h3>
+
+      <p class="mt-3 text-[0.95rem] leading-[1.7] text-muted">{description}</p>
+
+      {
+        techStack.length > 0 && (
+          <div class="mt-4">
+            {techStack.map(t => (
+              <span class="tech-badge">{t}</span>
+            ))}
+          </div>
+        )
+      }
     </div>
-    {
-      role && (
-        <div class="field-row">
-          <dt>역할</dt>
-          <dd>{role}</dd>
+
+    {/* ===== 우: 지표 · 메타 ===== */}
+    <div
+      class="border-t border-border pt-5 md:border-t-0 md:border-l md:pt-0 md:pl-6"
+    >
+      {
+        highlight && (
+          <div class="mb-5">
+            <div class="text-[1.5rem] leading-[1.15] font-bold text-accent">
+              {highlight.value}
+            </div>
+            <div class="mt-1 text-[0.76rem] leading-[1.5] text-muted">
+              {highlight.label}
+            </div>
+          </div>
+        )
+      }
+      <dl class="flex flex-col gap-2 text-[0.82rem]">
+        <div class="flex gap-3">
+          <dt class="w-10 flex-none text-muted">기간</dt>
+          <dd class="m-0">{period}</dd>
         </div>
-      )
-    }
-    {
-      techStack.length > 0 && (
-        <div class="field-row">
-          <dt>기술 스택</dt>
-          <dd>
-            {techStack.map(t => <span class="tech-badge">{t}</span>)}
-          </dd>
-        </div>
-      )
-    }
-    <div class="field-row">
-      <dt>설명</dt>
-      <dd>{description}</dd>
+        {
+          role && (
+            <div class="flex gap-3">
+              <dt class="w-10 flex-none text-muted">역할</dt>
+              <dd class="m-0">{role}</dd>
+            </div>
+          )
+        }
+      </dl>
     </div>
-  </dl>
+  </div>
 
   {
     hasFooter && (
-      <div class="card-links">
+      <div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-border pt-4">
         {gallery.length > 0 && (
           <button
             type="button"
-            class="related-link gallery-trigger"
+            class="arw-link gallery-trigger"
             data-gallery-trigger
             data-gallery-images={JSON.stringify(gallery)}
             data-gallery-title={title}
           >
-            📷 사진 보기 ({gallery.length})
+            📷 사진 보기 ({gallery.length}) <span class="arw">→</span>
           </button>
         )}
-        {relatedPosts.map(slug => (
-          <a class="related-link" href={`/posts/${slug}`}>
-            관련 글 →
-          </a>
-        ))}
+        {relatedPosts.length > 0 && (
+          <details class="related-details">
+            <summary>관련 글 {relatedPosts.length}편</summary>
+            <ul>
+              {relatedPosts.map(slug => (
+                <li>
+                  <a href={`/posts/${slug}`}>{titleOf(slug)}</a>
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
         {links?.github && (
           <a
-            class="related-link"
+            class="arw-link"
             href={links.github}
             target="_blank"
             rel="noopener noreferrer"
           >
-            GitHub →
+            GitHub <span class="arw">→</span>
           </a>
         )}
         {links?.demo && (
           <a
-            class="related-link"
+            class="arw-link"
             href={links.demo}
             target="_blank"
             rel="noopener noreferrer"
           >
-            Live →
+            Live <span class="arw">→</span>
           </a>
         )}
       </div>
     )
   }
 </article>
+
+<style>
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background: var(--accent);
+    flex: none;
+  }
+  .status-dot[data-status="paused"] {
+    background: var(--muted);
+  }
+
+  button.gallery-trigger {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    color: var(--accent);
+  }
+
+  .related-details {
+    font-size: 0.85rem;
+  }
+  .related-details > summary {
+    cursor: pointer;
+    color: var(--accent);
+    list-style: none;
+  }
+  .related-details > summary::-webkit-details-marker {
+    display: none;
+  }
+  .related-details > summary::after {
+    content: " ▾";
+    font-size: 0.7rem;
+  }
+  .related-details[open] > summary::after {
+    content: " ▴";
+  }
+  .related-details ul {
+    margin: 0.5rem 0 0;
+    padding-left: 1rem;
+    list-style: disc;
+  }
+  .related-details li {
+    margin-bottom: 0.2rem;
+  }
+  .related-details a {
+    color: var(--foreground);
+  }
+  .related-details a:hover {
+    color: var(--accent);
+  }
+</style>

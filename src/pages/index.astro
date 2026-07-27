@@ -3,79 +3,245 @@ import { getCollection } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
-import Sidebar from "@/components/Sidebar.astro";
-import LinkButton from "@/components/LinkButton.astro";
-import Card from "@/components/Card.astro";
+import Grass from "@/components/Grass.astro";
+import StatGrid from "@/components/StatGrid.astro";
+import PostRow from "@/components/PostRow.astro";
+import ProjectTile from "@/components/ProjectTile.astro";
 import getSortedPosts from "@/utils/getSortedPosts";
+import { getPublishActivity } from "@/utils/getPublishActivity";
+import { getSeriesSummary } from "@/data/series";
 import { filterByLang } from "@/utils/i18n";
-import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
 import { SITE } from "@/config";
 
 const posts = filterByLang(await getCollection("blog"), "ko");
-
 const sortedPosts = getSortedPosts(posts);
-const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
-const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
+
+// 발행 활동 — weeks 를 넘기지 않으면 첫 발행일이 속한 주부터 오늘까지로 자동 산정
+const activity = getPublishActivity(posts);
+const series = getSeriesSummary(posts);
+
+const projects = await getCollection("portfolio");
+const liveProjects = projects
+  .filter(p => p.data.type === "side" && p.data.status === "in-progress")
+  .sort((a, b) => (b.data.order ?? 0) - (a.data.order ?? 0));
+
+const stats = [
+  { v: `${sortedPosts.length}편`, k: "공개 기록" },
+  { v: "2022.10 — 2025.12", k: "임베디드 HW · SW 경력" },
+  { v: `${liveProjects.length}개`, k: "직접 배포 · 운영 중인 제품" },
+  { v: `${series.length}개`, k: "학습 시리즈" },
+];
 ---
 
 <Layout>
   <Header />
-  <div class="page-shell page-grid">
-    <Sidebar />
+  <div class="page-narrow">
     <main id="main-content" data-layout="index">
-      {
-        featuredPosts.length > 0 && (
-          <section
-            id="featured"
-            class:list={[
-              "pt-6 pb-6 md:pt-8",
-              { "border-b border-border": recentPosts.length > 0 },
-            ]}
+      {/* ===== 히어로 ===== */}
+      <section class="grid gap-10 pt-16 pb-10 sm:grid-cols-[1fr_132px]">
+        <div class="order-2 sm:order-1">
+          <p
+            class="font-code text-[0.72rem] font-bold tracking-[0.16em] text-accent"
           >
-            <h2 class="text-2xl font-semibold tracking-wide">Featured</h2>
-            <ul>
-              {featuredPosts.map(
-                (data, index) =>
-                  index < SITE.featuredPostsPerIndex && (
-                    <Card variant="h3" {...data} />
-                  )
-              )}
-            </ul>
-          </section>
-        )
-      }
+            박효인 · PARK HYOIN
+          </p>
 
+          <h1
+            class="mt-4 text-[2.9rem] leading-[1.28] font-bold tracking-[-0.02em] text-balance"
+          >
+            만든 것과 <span class="hl">막힌 것</span>을 그때그때 기록합니다.
+          </h1>
+
+          <p class="mt-5 max-w-[44rem] text-[1.05rem] text-muted text-pretty">
+            {SITE.desc}
+          </p>
+
+          <div class="mt-7 flex flex-wrap gap-3">
+            <a href="/portfolio" class="hero-btn hero-btn-primary">
+              프로젝트 보기 <span class="arw">→</span>
+            </a>
+            <a
+              href={SITE.profile}
+              class="hero-btn"
+              target="_blank"
+              rel="noopener noreferrer">GitHub</a
+            >
+            <a href="mailto:dpcivl713@gmail.com" class="hero-btn" data-mail-copy>
+              이메일 복사
+            </a>
+          </div>
+        </div>
+
+        <img
+          src="/profile.webp"
+          alt="박효인"
+          width="132"
+          height="132"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          class="order-1 size-[132px] rounded-full border-2 border-border object-cover sm:order-2"
+        />
+      </section>
+
+      {/* ===== 지표 ===== */}
+      <StatGrid items={stats} />
+
+      {/* ===== 발행 기록 ===== */}
+      <section class="rise-init pt-12" data-rise>
+        <div class="mb-4 flex items-baseline justify-between gap-4">
+          <h2 class="text-[0.95rem] font-semibold">발행 기록</h2>
+          <span class="font-code text-[0.72rem] text-muted">
+            {activity.firstDate} — {activity.lastDate} · {activity.total}편
+          </span>
+        </div>
+        <Grass
+          data={activity.data}
+          dates={activity.dates}
+          total={activity.total}
+        />
+      </section>
+
+      {/* ===== 지금 만들고 있는 것 ===== */}
       {
-        recentPosts.length > 0 && (
-          <section id="recent-posts" class="pt-12 pb-6">
-            <h2 class="text-2xl font-semibold tracking-wide">Recent Posts</h2>
-            <ul>
-              {recentPosts.map(
-                (data, index) =>
-                  index < SITE.postPerIndex && <Card variant="h3" {...data} />
-              )}
-            </ul>
+        liveProjects.length > 0 && (
+          <section class="rise-init pt-12" data-rise>
+            <div class="mb-4 flex items-baseline justify-between gap-4">
+              <h2 class="text-[0.95rem] font-semibold">지금 만들고 있는 것</h2>
+              <a href="/portfolio" class="arw-link text-[0.8rem]">
+                전체 프로젝트 <span class="arw">→</span>
+              </a>
+            </div>
+            <div class="grid gap-5 sm:grid-cols-2">
+              {liveProjects.map(project => (
+                <ProjectTile project={project} />
+              ))}
+            </div>
           </section>
         )
       }
 
-      <div class="my-8 text-center">
-        <LinkButton href="/posts/">
-          All Posts
-          <IconArrowRight class="inline-block rtl:-rotate-180" />
-        </LinkButton>
-      </div>
+      {/* ===== 최근 기록 ===== */}
+      {
+        sortedPosts.length > 0 && (
+          <section class="rise-init pt-12" data-rise>
+            <div class="mb-2 flex items-baseline justify-between gap-4">
+              <h2 class="text-[0.95rem] font-semibold">최근 기록</h2>
+              <a href="/posts" class="arw-link text-[0.8rem]">
+                전체 {sortedPosts.length}편 <span class="arw">→</span>
+              </a>
+            </div>
+            <div>
+              {sortedPosts
+                .slice(0, SITE.postPerIndex)
+                .map(post => <PostRow post={post} />)}
+            </div>
+          </section>
+        )
+      }
+
+      {/* ===== 진행 중인 시리즈 ===== */}
+      {
+        series.length > 0 && (
+          <section class="rise-init pt-12 pb-16" data-rise>
+            <div class="mb-4 flex items-baseline justify-between gap-4">
+              <h2 class="text-[0.95rem] font-semibold">진행 중인 시리즈</h2>
+              <a href="/series" class="arw-link text-[0.8rem]">
+                시리즈 전체 <span class="arw">→</span>
+              </a>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-3">
+              {series.map(s => (
+                <a href={`/series#${s.id}`} class="tile rounded-xl border border-border p-5">
+                  <div class="text-[0.92rem] font-semibold">{s.title}</div>
+                  <div class="mt-1 font-code text-[0.74rem] text-muted">
+                    {s.count}편
+                  </div>
+                </a>
+              ))}
+            </div>
+          </section>
+        )
+      }
     </main>
   </div>
   <Footer />
 </Layout>
 
+<style>
+  .hero-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1.1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--foreground);
+    transition:
+      border-color 0.15s ease,
+      transform 0.15s ease;
+  }
+  .hero-btn:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+  .hero-btn:hover .arw {
+    transform: translateX(4px);
+  }
+  .hero-btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--background);
+    font-weight: 600;
+  }
+  .hero-btn-primary:hover {
+    opacity: 0.92;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-btn {
+      transition: none;
+    }
+    .hero-btn:hover {
+      transform: none;
+    }
+  }
+</style>
+
 <script>
-  document.addEventListener("astro:page-load", () => {
+  function initIndex() {
     const indexLayout = (document.querySelector("#main-content") as HTMLElement)
       ?.dataset?.layout;
     if (indexLayout) {
       sessionStorage.setItem("backUrl", "/");
     }
-  });
+
+    const targets = document.querySelectorAll<HTMLElement>("[data-rise]");
+    if (!targets.length) return;
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      targets.forEach(el => el.classList.remove("rise-init"));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          const el = entry.target as HTMLElement;
+          el.classList.remove("rise-init");
+          el.classList.add("rise");
+          observer.unobserve(el);
+        });
+      },
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.05 }
+    );
+
+    targets.forEach(el => observer.observe(el));
+  }
+
+  initIndex();
+  document.addEventListener("astro:page-load", initIndex);
 </script>

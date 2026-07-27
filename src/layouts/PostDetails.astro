@@ -139,10 +139,10 @@ const nextPost =
 ---
 
 <Layout {...layoutProps}>
-  <Header />
+  <Header {koHref} {enHref} />
   <BackButton />
   <div class="page-shell page-grid">
-    <Sidebar {koHref} {enHref} />
+    <Sidebar />
     <main
       id="main-content"
       class:list={["pb-12", { "mt-8": !SITE.showBackButton }]}

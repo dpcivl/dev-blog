@@ -12,6 +12,9 @@ techStack:
   - Deno
   - Supabase Auth (OAuth)
 description: "완벽주의 성향에서 자주 보이는 '1등 아니면 0점' 패턴을 거꾸로 — 잘한 것만 기록하는 일기 앱. 본인의 완벽주의 회고에서 출발한 제품으로, 부서별 Claude Code 세션을 운영해 멀티 세션 바이브코딩 방식으로 개발. 2026-07-13 웹 PWA v0.3.2 배포 (https://julgot.com). 네이티브 앱 개발 전 베타 테스트 단계로 지속적으로 유지보수 중."
+highlight:
+  value: "v0.3.2"
+  label: "2026-07-13 웹 PWA 배포 · julgot.com"
 gallery:
   - "/assets/portfolio/julgot/01-home.webp"
   - "/assets/portfolio/julgot/02-goals.webp"

@@ -6,8 +6,8 @@ export const SITE = {
   title: "Park Hyoin",
   ogImage: "",  // 빈 값 → src/pages/og.png.ts 의 동적 생성 사용
   lightAndDarkMode: true,
-  postPerIndex: 3,              // 홈의 Recent Posts 표시 갯수
-  featuredPostsPerIndex: 5,     // 홈의 Featured 표시 갯수
+  postPerIndex: 8,              // 홈의 "최근 기록" 표시 갯수
+  featuredPostsPerIndex: 5,     // (미사용) 홈 Featured 섹션 폐지 — featured 는 최근 기록에서 ★ 로 표시
   postPerPage: 4,
   scheduledPostMargin: 15 * 60 * 1000, // 15 minutes
   showArchives: true,
