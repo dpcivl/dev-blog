@@ -1,0 +1,38 @@
+---
+interface Props {
+  items: { v: string; k: string }[];
+}
+
+const { items } = Astro.props;
+
+/*
+ * 값이 긴 항목(기간 표기 "2022.10 — 2025.12" 등)은 1.85rem 으로 두면 두 줄로 깨지면서
+ * 다른 칸과 라벨 baseline 이 어긋난다. 길이에 따라 활자 크기를 낮춰 한 줄로 맞춘다.
+ */
+const sizeOf = (v: string) =>
+  v.length > 12
+    ? "text-[1.15rem]"
+    : v.length > 8
+      ? "text-[1.45rem]"
+      : "text-[1.85rem]";
+---
+
+<div class="grid grid-cols-2 border-y border-border sm:grid-cols-4">
+  {
+    items.map(s => (
+      <div class="flex flex-col gap-1 py-6 pr-5">
+        <div class="flex min-h-[2.05rem] items-end">
+          <span
+            class:list={[
+              "leading-[1.1] font-bold tracking-[-0.02em]",
+              sizeOf(s.v),
+            ]}
+          >
+            {s.v}
+          </span>
+        </div>
+        <div class="text-[0.78rem] text-muted">{s.k}</div>
+      </div>
+    ))
+  }
+</div>

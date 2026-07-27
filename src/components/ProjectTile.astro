@@ -1,0 +1,90 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  project: CollectionEntry<"portfolio">;
+  /** 타일에서 보여줄 짧은 설명 — 없으면 description 을 그대로 쓴다 */
+  summary?: string;
+  href?: string;
+}
+
+const { project, summary, href = "/portfolio" } = Astro.props;
+const { title, status, techStack, description, highlight, links } =
+  project.data;
+
+const STATUS_LABEL: Record<string, string> = {
+  "in-progress": "IN PROGRESS",
+  completed: "COMPLETED",
+  paused: "PAUSED",
+};
+const statusLabel = status ? STATUS_LABEL[status] : undefined;
+---
+
+<article class="tile rounded-xl border border-border p-6">
+  {
+    statusLabel && (
+      <div class="flex items-center gap-2">
+        <span class="status-dot" data-status={status} aria-hidden="true" />
+        <span class="font-code text-[0.68rem] tracking-[0.12em] text-muted">
+          {statusLabel}
+        </span>
+      </div>
+    )
+  }
+
+  <h3 class="mt-3 text-[1.15rem] font-bold tracking-[-0.01em]">{title}</h3>
+
+  <p class="mt-2 text-[0.9rem] leading-[1.65] text-muted">
+    {summary ?? description}
+  </p>
+
+  {
+    highlight && (
+      <p class="mt-3 text-[0.85rem] font-semibold text-accent">
+        {highlight.value}
+        <span class="font-normal text-muted"> · {highlight.label}</span>
+      </p>
+    )
+  }
+
+  {
+    techStack.length > 0 && (
+      <div class="mt-4">
+        {techStack.slice(0, 5).map(t => (
+          <span class="tech-badge">{t}</span>
+        ))}
+      </div>
+    )
+  }
+
+  <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
+    <a href={href} class="arw-link">
+      자세히 <span class="arw">→</span>
+    </a>
+    {
+      links?.demo && (
+        <a
+          href={links.demo}
+          class="arw-link"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Live <span class="arw">→</span>
+        </a>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background: var(--accent);
+    flex: none;
+  }
+  .status-dot[data-status="paused"] {
+    background: var(--muted);
+  }
+</style>

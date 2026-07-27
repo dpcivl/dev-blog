@@ -39,8 +39,26 @@ const portfolio = defineCollection({
       cover: z.string().optional(), // public/ 절대 경로 (예: /assets/portfolio/<slug>/cover.png)
       gallery: z.array(z.string()).default([]), // 카드 클릭 시 모달에 띄울 이미지 경로들
       relatedPosts: z.array(z.string()).default([]), // blog slugs
-      responsibilities: z.array(z.string()).default([]),
-      outcomes: z.array(z.string()).default([]),
+      // 카드 우측에 큰 활자로 세우는 대표 지표 (예: value "v0.3.2" / label "2026-07-13 배포")
+      highlight: z
+        .object({
+          value: z.string(),
+          label: z.string(),
+        })
+        .optional(),
+      // 담당 업무 — { k: 항목명, v: 내용 } 권장. 레거시 문자열도 받는다.
+      responsibilities: z
+        .array(z.union([z.string(), z.object({ k: z.string(), v: z.string() })]))
+        .default([]),
+      // 정량 성과 — { value: 수치, label: 설명 } 권장. 레거시 문자열도 받는다.
+      outcomes: z
+        .array(
+          z.union([
+            z.string(),
+            z.object({ value: z.string(), label: z.string() }),
+          ])
+        )
+        .default([]),
       links: z
         .object({
           github: z.string().optional(),

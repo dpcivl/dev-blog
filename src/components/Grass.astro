@@ -1,0 +1,95 @@
+---
+interface Props {
+  /** 열 우선(주 단위 7일씩) 일별 발행 편수 */
+  data: number[];
+  /** data 와 같은 순서의 날짜 (YYYY-MM-DD) — title 툴팁용 */
+  dates?: string[];
+  total: number;
+  label?: string;
+}
+
+const { data, dates = [], total, label } = Astro.props;
+
+const weeks = Math.ceil(data.length / 7);
+const level = (n: number) => (n === 0 ? 0 : n === 1 ? 2 : n === 2 ? 3 : 4);
+
+const ariaLabel =
+  label ?? `발행 활동 히트맵: ${weeks}주 동안 총 ${total}편`;
+---
+
+<div class="grass-wrap">
+  <div class="grass" role="img" aria-label={ariaLabel} style={`--weeks:${weeks}`}>
+    {
+      data.map((n, i) => (
+        <div
+          class="grass-cell"
+          data-lvl={level(n)}
+          title={dates[i] ? `${dates[i]} · ${n}편` : `${n}편`}
+          aria-hidden="true"
+        />
+      ))
+    }
+  </div>
+  <div class="grass-legend">
+    <span>적음</span>
+    <span class="grass-cell" data-lvl="0" aria-hidden="true"></span>
+    <span class="grass-cell" data-lvl="1" aria-hidden="true"></span>
+    <span class="grass-cell" data-lvl="2" aria-hidden="true"></span>
+    <span class="grass-cell" data-lvl="3" aria-hidden="true"></span>
+    <span class="grass-cell" data-lvl="4" aria-hidden="true"></span>
+    <span>많음</span>
+  </div>
+</div>
+
+<style>
+  .grass-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .grass {
+    display: grid;
+    grid-template-rows: repeat(7, 10px);
+    grid-auto-flow: column;
+    grid-auto-columns: 10px;
+    gap: 3px;
+    justify-content: start;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+  }
+  .grass-cell {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex: none;
+  }
+  .grass-cell[data-lvl="0"] {
+    background: color-mix(in oklab, var(--border) 70%, var(--background));
+  }
+  .grass-cell[data-lvl="1"] {
+    background: color-mix(in oklab, var(--accent) 20%, var(--background));
+  }
+  .grass-cell[data-lvl="2"] {
+    background: color-mix(in oklab, var(--accent) 40%, var(--background));
+  }
+  .grass-cell[data-lvl="3"] {
+    background: color-mix(in oklab, var(--accent) 68%, var(--background));
+  }
+  .grass-cell[data-lvl="4"] {
+    background: var(--accent);
+  }
+  .grass-legend {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 3px;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+  .grass-legend > span:first-child {
+    margin-right: 0.35rem;
+  }
+  .grass-legend > span:last-child {
+    margin-left: 0.35rem;
+  }
+</style>
