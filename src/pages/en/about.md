@@ -34,6 +34,7 @@ Separately, when the company started researching edge AI, we **adopted NXP iMX8M
 
 - **Backend · Java study** — Digging into Spring Boot as the core — REST · JPA · transactions · Tomcat/thread pools · JVM/GC — kept as a [running series](/series). (Collected under the [Spring Boot](/en/tags/spring-boot) and [Java](/en/tags/java) tags.)
 - **[Julgot (줄곧) — an achievement-only journal](https://julgot.com)** — Inverting the "first place or zero" pattern common in perfectionists: **a journal app that records only what went well**. The product grew out of my own [perfectionism retrospective](/en/posts/perfectionism-as-a-tool-vertical-slice-development). Stack: **Next.js (PWA) + Supabase Edge Functions (Deno)**. Web PWA v0.3.2 launched on 2026-07-13. Currently in beta with ongoing maintenance before native app development — see [launch day 1 retrospective](/en/posts/julgot-launched-day-1-retrospective).
+- **[presearch](https://presearch-kr.web.app)** — A watchlist that surfaces mid-cap Korean stocks where search interest has risen but the price is still quiet. It covers the 400 tickers ranked 101–300 by market cap on KOSPI and KOSDAQ.
 - **Blog infrastructure itself** — Astro + Tailwind 4. I decided the design direction, information architecture, and publishing workflow myself, and paired with Claude Code on the code side for a 7-phase modern redesign. Every page including this one is the result.
 
 ## Contact
