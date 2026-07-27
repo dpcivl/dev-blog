@@ -33,7 +33,6 @@ title: "About"
 ## 지금 하고 있는 것
 
 - **백엔드 · 자바 공부** — Spring Boot 를 축으로 REST · JPA · 트랜잭션 · 톰캣/스레드풀 · JVM/GC 까지 파고드는 학습 일지를 [시리즈로 진행 중](/series). ([Spring Boot](/tags/spring-boot) · [자바](/tags/java) 태그에 정리.)
-- **AGV 자율주행 프로토타입** — 라즈베리파이 5 + STM32 + ROS2 + RS485 조합. 빌드 일지를 [시리즈로 진행 중](/series).
 - **[줄곧 (Julgot) — 성취 전용 일기](https://julgot.com)** — 완벽주의 성향에서 자주 보이는 "1등 아니면 0점" 패턴을 거꾸로 — **잘한 것만 기록하는 일기 앱**. 본인의 [완벽주의 회고](/posts/perfectionism-as-a-tool-vertical-slice-development) 에서 출발한 제품. **Next.js (PWA) + Supabase Edge Functions (Deno)** 스택. 2026-07-13 웹 PWA v0.3.2 배포. 네이티브 앱 개발 전 베타 테스트 단계로 지속적으로 유지보수 중 — [배포 1일차 회고](/posts/julgot-launched-day-1-retrospective) 참고.
 - **블로그 인프라 자체** — Astro + Tailwind 4 기반. 디자인 방향·정보 구조·발행 워크플로우는 직접 결정하고, 코드 구현은 Claude Code 와 페어 프로그래밍 방식으로 7 Phase 모던 리디자인을 진행. 이 페이지를 포함해 모든 페이지가 그 결과물.
 
@@ -42,7 +41,6 @@ title: "About"
 - **스마트 팩토리** — 산업 현장 데이터 · 머신 비전 · 결함 검출 · 공정 자동화
 - **임베디드 + ML 융합** — 엣지 디바이스에서 실시간 추론하는 시스템
 - **자율주행** — AGV 같은 모바일 로봇 · ROS2 · 센서·모터 통합
-- **AI Agent 디자인** — 멀티 세션 운영 · 도구 설계 · 시스템 프롬프트 전략
 - **메타인지 · 학습 방법론** — 새 도메인 진입 효율, 어휘 정리, 회고 패턴
 
 ## 연락
