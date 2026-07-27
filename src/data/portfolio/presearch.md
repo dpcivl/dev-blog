@@ -37,6 +37,8 @@ outcomes:
     label: "자동 테스트(Python 1,110 + 프론트 416). 로컬 pytest·vitest 실행 기준(2026-07-28). 이 중 1건은 날짜를 하드코딩한 기존 테스트 실패로 백로그 등재 상태"
   - value: "864 → 144회/일"
     label: "BigQuery 조회 횟수. TTL 10분→1시간 변경에 따른 계산값(실측 아님). 6개 테이블 × 하루 갱신 횟수 기준"
+relatedPosts:
+  - presearch-daily-collection-target-date-assumption
 links:
   # 저장소는 비공개라 github 링크 없음
   demo: "https://presearch-kr.web.app"
