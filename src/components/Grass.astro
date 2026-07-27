@@ -6,15 +6,32 @@ interface Props {
   dates?: string[];
   total: number;
   label?: string;
+  /** 편수 단위 (KO "편" / EN "posts") */
+  unit?: string;
+  legendLow?: string;
+  legendHigh?: string;
 }
 
-const { data, dates = [], total, label } = Astro.props;
+const {
+  data,
+  dates = [],
+  total,
+  label,
+  unit = "편",
+  legendLow = "적음",
+  legendHigh = "많음",
+} = Astro.props;
 
 const weeks = Math.ceil(data.length / 7);
+
+/*
+ * 0편 / 1편 / 2편 / 3편+ 의 4단계만 쓴다 (lvl 1 은 결번).
+ * 범례도 실제로 나타나는 단계와 같은 수로 맞춰야 "안 쓰는 색" 이 생기지 않는다.
+ */
+const LEVELS = [0, 2, 3, 4] as const;
 const level = (n: number) => (n === 0 ? 0 : n === 1 ? 2 : n === 2 ? 3 : 4);
 
-const ariaLabel =
-  label ?? `발행 활동 히트맵: ${weeks}주 동안 총 ${total}편`;
+const ariaLabel = label ?? `발행 활동 히트맵: ${weeks}주 동안 총 ${total}${unit}`;
 ---
 
 <div class="grass-wrap">
@@ -24,20 +41,20 @@ const ariaLabel =
         <div
           class="grass-cell"
           data-lvl={level(n)}
-          title={dates[i] ? `${dates[i]} · ${n}편` : `${n}편`}
+          title={dates[i] ? `${dates[i]} · ${n}${unit}` : `${n}${unit}`}
           aria-hidden="true"
         />
       ))
     }
   </div>
   <div class="grass-legend">
-    <span>적음</span>
-    <span class="grass-cell" data-lvl="0" aria-hidden="true"></span>
-    <span class="grass-cell" data-lvl="1" aria-hidden="true"></span>
-    <span class="grass-cell" data-lvl="2" aria-hidden="true"></span>
-    <span class="grass-cell" data-lvl="3" aria-hidden="true"></span>
-    <span class="grass-cell" data-lvl="4" aria-hidden="true"></span>
-    <span>많음</span>
+    <span>{legendLow}</span>
+    {
+      LEVELS.map(l => (
+        <span class="grass-cell" data-lvl={l} aria-hidden="true" />
+      ))
+    }
+    <span>{legendHigh}</span>
   </div>
 </div>
 
