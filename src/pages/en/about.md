@@ -5,7 +5,7 @@ title: "About"
 
 **Park Hyoin (박효인)**
 
-After **1 year in embedded HW and 2 years 2 months in embedded SW**, I'm now moving toward **backend and Java**. My work was inside the device — producing data and shipping it up to a server. Now I want to handle the other side, where that data is received, stored, and served, so I'm digging into Spring Boot, JPA, and the JVM.
+1 year in embedded HW, 2 years 2 months in embedded SW (2022-10 – 2025-12). I currently build and run [Julgot](https://julgot.com) and [this blog](https://parkhyo.in), and I keep a Spring Boot and PostgreSQL study log as [a series](/series).
 
 <div class="cta-box">
   <a href="/portfolio" class="cta-btn cta-primary">
@@ -22,27 +22,24 @@ After **1 year in embedded HW and 2 years 2 months in embedded SW**, I'm now mov
   </a>
 </div>
 
-## Career
+## Experience
 
-I started my career in **embedded hardware design** (OrCAD · PCB testing and debugging) coming from a humanities background, then **self-taught C** and earned the Korean Industrial Engineer Information Processing certification to expand my scope.
+**Previous employer** (environmental instrumentation · embedded AI R&D) · 2022-10 – 2025-12
+Embedded HW engineer → embedded SW engineer
 
-Later I picked up Python to read my company's embedded SW code, and after the SW developer left I **took over embedded SW maintenance** (rain-gauge datalogger SW, village-broadcast receiver firmware, and similar systems). I replaced the datalogger's 0.3-second polling bounce detection with a threading-based approach, and traced the MQTT structure to fix values drifting apart between the dashboard and the logger.
+I come from a humanities background. I self-taught C and earned the Korean Industrial Engineer Information Processing certification, then picked up Python to read the company's embedded SW code. After the SW developer left, I took over embedded SW maintenance.
 
-When edge AI research started, I owned **NPU object detection and transfer learning from Roboflow's public fire dataset on NXP iMX8M Plus and iMX93 boards**, verifying that real-time inference held up on the hardware (fire detection mAP 85.50%).
-
-Across those three years, what kept catching me was what happened after the data left the device. MQTT broker structure, keeping dashboard and logger values in sync, choosing collection intervals — the problems didn't stop at the edge of the device. Wanting to handle that side properly is what pointed me at backend.
+- **Rain-gauge datalogger HW** — Owned circuit design in OrCAD along with PCB testing and debugging. Replaced an overheating chip in the power section following the datasheet reference, which resolved the heat problem, and completed handoff to the production team for mass production (sales fell short, so mass production never went ahead).
+- **Rain-gauge datalogger SW** — Replaced 0.3-second polling bounce detection with a threading-based approach. Traced the MQTT structure and fixed values drifting apart between the dashboard and the logger through JS changes, and added a new 10-minute rainfall data field.
+- **Edge AI fire detection** — Ran object detection on the NPU of NXP iMX8M Plus and iMX93 boards, applied transfer learning with Roboflow's public fire dataset, and verified detection against tablet footage. mAP 85.50% (at IoU 0.50 · fire AP 86.22% / smoke AP 84.79%).
+- **LoRa communication suitability testing** — Built an unattended test rig from a RAK7248 gateway and RAK3272S nodes (nodes logged transmissions to an SD card; the gateway verified reception over MQTT topics). Walking measurements in a park showed data loss beginning around the 2 km mark.
+- **Village-broadcast receiver firmware** — Took a GD32 main chip through boot and peripheral verification with PlatformIO and a PowerWriter debugger. Work ended mid-LVGL UI development when the lab closed.
 
 ## What I'm working on now
 
-- **Backend · Java** (my current focus) — Working through Spring Boot in order — REST · JPA · transactions · embedded Tomcat/thread pools · JVM/GC — kept as a [running series](/series). I'm also covering PostgreSQL and SQL fundamentals so I can work with queries directly. (Collected under the [Spring Boot](/en/tags/spring-boot) and [Java](/en/tags/java) tags.)
-- **[Julgot (줄곧) — an achievement-only journal](https://julgot.com)** — Inverting the "first place or zero" pattern common in perfectionists: **a journal app that records only what went well**. The product grew out of my own [perfectionism retrospective](/en/posts/perfectionism-as-a-tool-vertical-slice-development). Stack: **Next.js (PWA) + Supabase Edge Functions (Deno)**. Web PWA v0.3.2 launched on 2026-07-13. Currently in beta with ongoing maintenance before native app development — see [launch day 1 retrospective](/en/posts/julgot-launched-day-1-retrospective).
-- **Blog infrastructure itself** — Astro + Tailwind 4. I decided the design direction, information architecture, and publishing workflow myself, and paired with Claude Code on the code side for a 7-phase modern redesign. Every page including this one is the result.
-
-## Interests
-
-- **Backend** — API design · transactions and concurrency · how the JVM behaves · query performance
-- **Where devices meet servers** — IoT data collection · MQTT · inference at the edge. The continuation of three embedded years, and my reason for choosing backend
-- **Metacognition · learning methodology** — Efficiency in entering new domains, vocabulary organization, retrospective patterns
+- **[Julgot (줄곧)](https://julgot.com)** — A journal app that records only what went well. Built on Next.js (PWA) with Supabase Edge Functions (Deno). Web PWA v0.3.2 shipped on 2026-07-13 and is in beta testing. → [launch day 1 retrospective](/en/posts/julgot-launched-day-1-retrospective)
+- **[This blog](https://parkhyo.in)** — Astro 5 + Tailwind CSS 4 + Vercel. I decided the design direction, information architecture, and publishing workflow myself, and paired with Claude Code on the code side. → [what I added on top](/en/posts/blog-beyond-astropaper-what-i-added)
+- **Study log** — Working through Spring Boot (REST · JPA · transactions · embedded Tomcat/thread pools · JVM/GC) and PostgreSQL/SQL fundamentals as [a series](/series). ([Spring Boot](/en/tags/spring-boot) · [Java](/en/tags/java) tags)
 
 ## Contact
 
