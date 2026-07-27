@@ -3,7 +3,6 @@ import { getCollection } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
-import Sidebar from "@/components/Sidebar.astro";
 import { SERIES } from "@/data/series";
 import { filterByLang } from "@/utils/i18n";
 import { getPath } from "@/utils/getPath";
@@ -36,8 +35,7 @@ function formatDate(d?: Date) {
 
 <Layout title={`시리즈 | ${SITE.title}`}>
   <Header />
-  <div class="page-shell page-grid">
-    <Sidebar />
+  <div class="page-narrow">
     <main id="main-content">
       <section class="series-hero">
         <h1>시리즈</h1>

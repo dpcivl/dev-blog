@@ -3,7 +3,6 @@ import { getCollection, render, type CollectionEntry } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
-import Sidebar from "@/components/Sidebar.astro";
 import Tag from "@/components/Tag.astro";
 import Datetime from "@/components/Datetime.astro";
 import EditPost from "@/components/EditPost.astro";
@@ -141,11 +140,13 @@ const nextPost =
 <Layout {...layoutProps}>
   <Header {koHref} {enHref} />
   <BackButton />
-  <div class="page-shell page-grid">
-    <Sidebar />
+  <div class="page-narrow">
     <main
       id="main-content"
-      class:list={["pb-12", { "mt-8": !SITE.showBackButton }]}
+      class:list={[
+        "w-full max-w-app pb-12",
+        { "mt-8": !SITE.showBackButton },
+      ]}
       data-pagefind-body
     >
     <h1

@@ -2,7 +2,6 @@
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
-import Sidebar from "@/components/Sidebar.astro";
 import { SITE } from "@/config";
 
 const PLAYGROUNDS = [
@@ -47,8 +46,7 @@ const PLAYGROUNDS = [
 
 <Layout title={`플레이그라운드 | ${SITE.title}`}>
   <Header />
-  <div class="page-shell page-grid">
-    <Sidebar />
+  <div class="page-narrow">
     <main id="main-content">
       <section class="pg-hero">
         <h1>플레이그라운드</h1>

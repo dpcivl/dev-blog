@@ -1,6 +1,5 @@
 ---
 import Breadcrumb from "@/components/Breadcrumb.astro";
-import Sidebar from "@/components/Sidebar.astro";
 import { SITE } from "@/config";
 
 type StringTitle = { pageTitle: string };
@@ -14,8 +13,7 @@ const backUrl = SITE.showBackButton ? Astro.url.pathname : "/";
 ---
 
 <Breadcrumb />
-<div class="page-shell page-grid">
-  <Sidebar />
+<div class="page-narrow">
   <main
     data-backUrl={backUrl}
     id="main-content"
