@@ -42,7 +42,5 @@ outcomes:
     label: "LoRa 데이터 손실 시작 거리 — 마을방송 수신기 양방향 통신 적합성 검토 근거"
   - value: "polling → 스레딩"
     label: "데이터로거 SW 전환 + 10분 강우량 항목 도입으로 실시간성·운영 가시성 개선"
-relatedPosts:
-  - ndt-defect-classification-pytorch-resnet18
 order: 20
 ---
