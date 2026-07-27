@@ -25,6 +25,15 @@ const {
   highlight,
 } = project.data;
 
+/*
+ * outcomes 는 스키마가 레거시 문자열도 받으므로 정규화한다.
+ * highlight 로 이미 큰 활자로 세운 값은 중복이라 제외.
+ */
+type Outcome = { value: string; label: string };
+const results: Outcome[] = project.data.outcomes
+  .map(o => (typeof o === "string" ? { value: "", label: o } : o))
+  .filter(o => !highlight || o.value !== highlight.value);
+
 const STATUS_LABEL: Record<string, string> = {
   "in-progress": "IN PROGRESS",
   completed: "COMPLETED",
@@ -103,6 +112,28 @@ const hasFooter =
   </div>
 
   {
+    results.length > 0 && (
+      <section class="mt-6">
+        <h4 class="section-label">측정된 성과</h4>
+        <div class="mt-3 grid gap-3 sm:grid-cols-3">
+          {results.map(r => (
+            <div class="rounded-lg border border-border p-4">
+              {r.value && (
+                <div class="text-[1.05rem] leading-[1.2] font-bold text-accent">
+                  {r.value}
+                </div>
+              )}
+              <div class="mt-1 text-[0.76rem] leading-[1.5] text-muted">
+                {r.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  {
     hasFooter && (
       <div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-border pt-4">
         {gallery.length > 0 && (
@@ -163,6 +194,14 @@ const hasFooter =
   }
   .status-dot[data-status="paused"] {
     background: var(--muted);
+  }
+
+  .section-label {
+    font-family: var(--font-code);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
   }
 
   button.gallery-trigger {
