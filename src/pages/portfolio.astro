@@ -68,16 +68,10 @@ const lastUpdated = new Date().toLocaleDateString("ko-KR", {
           <span class="unlisted-badge">UNLISTED</span>
         </div>
 
-        {/*
-          TODO(카피): 아래 h1 은 작성자가 직접 쓸 문장으로 교체할 자리다.
-          지시서 초안("측정한 결과와, 고치지 못한 것까지 남긴 작업들") 은
-          Claude 가 쓴 카피라 넣지 않았다.
-          리드 문단은 기존 포트폴리오 페이지에 있던 문장을 그대로 옮겼다.
-        */}
         <h1
           class="mt-4 text-[2.6rem] leading-[1.3] font-bold tracking-[-0.02em] text-balance"
         >
-          <span class="copy-todo">[포트폴리오 제목 — 직접 쓰실 문장을 넣어주세요]</span>
+          직접 만들고 <span class="hl">배포한 것들</span>
         </h1>
 
         <p class="mt-5 max-w-[42rem] text-[1.02rem] leading-[1.75] text-muted">
@@ -172,17 +166,6 @@ const lastUpdated = new Date().toLocaleDateString("ko-KR", {
     border: 1px solid var(--border);
     border-radius: 4px;
     padding: 0.1rem 0.4rem;
-  }
-
-  .copy-todo {
-    display: inline-block;
-    color: var(--muted);
-    font-size: 1.1rem;
-    font-weight: 500;
-    letter-spacing: 0;
-    border: 1px dashed var(--border);
-    border-radius: 8px;
-    padding: 0.6rem 0.9rem;
   }
 
   .pf-btn {

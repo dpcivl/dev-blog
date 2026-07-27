@@ -312,6 +312,11 @@ html[data-theme="dark"] .tech-badge {
   color: var(--accent);
 }
 
+/* 히어로 h1 형광펜 강조 (홈 KO/EN · 포트폴리오 공용) */
+.hl {
+  background: linear-gradient(transparent 62%, var(--accent-bg) 62%);
+}
+
 /* 링크 — dashed underline 대신 화살표 이동 */
 .arw-link {
   display: inline-flex;

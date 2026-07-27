@@ -46,21 +46,10 @@ const stats = [
             박효인 · PARK HYOIN
           </p>
 
-          {/*
-            TODO(카피): 아래 h1 은 작성자가 직접 쓸 문장으로 교체할 자리다.
-            지시서 초안("임베디드 펌웨어에서 시작해 지금은 AI 에이전트 제품을
-            혼자 만들고 출시합니다")은 사실과 달라 넣지 않았고, Claude 가 대신
-            문장을 쓰지 않기로 했다 (줄곧은 성취 기록 일기 앱이고, 포트폴리오에
-            AI 에이전트 제품은 없다).
-            강조하고 싶은 구간은 <span class="hl"> 로 감싸면 형광펜이 적용된다.
-            리드 문단은 우선 SITE.desc (기존 문장) 를 그대로 쓴다.
-          */}
           <h1
             class="mt-4 text-[2.9rem] leading-[1.28] font-bold tracking-[-0.02em] text-balance"
           >
-            <span class="copy-todo">
-              [히어로 제목 — 직접 쓰실 한두 문장을 넣어주세요]
-            </span>
+            만든 것과 <span class="hl">막힌 것</span>을 그때그때 기록합니다.
           </h1>
 
           <p class="mt-5 max-w-[44rem] text-[1.05rem] text-muted text-pretty">
@@ -180,23 +169,6 @@ const stats = [
 </Layout>
 
 <style>
-  /* 형광펜 강조 — 히어로 h1 안에서 사용 */
-  .hl {
-    background: linear-gradient(transparent 62%, var(--accent-bg) 62%);
-  }
-
-  /* 카피 미정 자리 — 채워지면 이 span 과 스타일을 같이 지운다 */
-  .copy-todo {
-    display: inline-block;
-    color: var(--muted);
-    font-size: 1.15rem;
-    font-weight: 500;
-    letter-spacing: 0;
-    border: 1px dashed var(--border);
-    border-radius: 8px;
-    padding: 0.6rem 0.9rem;
-  }
-
   .hero-btn {
     display: inline-flex;
     align-items: center;
