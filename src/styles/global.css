@@ -76,6 +76,10 @@ html[data-theme="dark"] {
     font-feature-settings:
       "ss06" on,
       "tnum" on;
+    /* 한국어 단어 중간 줄바꿈 방지 ("자세한" → "자" / "세한" 으로 쪼개지던 문제).
+       keep-all 만 쓰면 띄어쓰기 없는 긴 문자열(URL 등) 이 넘치므로 break-word 를 함께 둔다. */
+    word-break: keep-all;
+    overflow-wrap: break-word;
   }
   a,
   button {
