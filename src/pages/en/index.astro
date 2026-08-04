@@ -16,7 +16,7 @@ const sortedPosts = getSortedPosts(enPosts);
 
 // 잔디는 KO 원본 발행 흐름을 보여준다 (EN 은 번역본이라 발행일이 KO 를 따라옴)
 const koPosts = filterByLang(await getCollection("blog"), "ko");
-const activity = getPublishActivity(koPosts);
+const activity = getPublishActivity(koPosts, 90);
 
 const projects = await getCollection("portfolio");
 const liveProjects = projects.filter(
@@ -86,7 +86,7 @@ const stats = [
       <section class="rise-init pt-12" data-rise>
         <div class="mb-4 flex items-baseline justify-between gap-4">
           <h2 class="text-[0.95rem] font-semibold">Publishing activity</h2>
-          <span class="font-code text-[0.72rem] text-muted">
+          <span class="font-code text-[0.72rem] text-muted" data-grass-summary>
             {activity.firstDate} — {activity.lastDate} · {activity.total} posts
           </span>
         </div>
@@ -94,6 +94,8 @@ const stats = [
           data={activity.data}
           dates={activity.dates}
           total={activity.total}
+          counts={activity.counts}
+          days={90}
           unit=" posts"
           label={`Publishing activity heatmap: ${activity.total} posts over ${activity.weeks} weeks`}
           legendLow="Less"

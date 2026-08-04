@@ -1,12 +1,18 @@
 ---
+import { SITE } from "@/config";
+
 interface Props {
   /** 열 우선(주 단위 7일씩) 일별 발행 편수 */
   data: number[];
   /** data 와 같은 순서의 날짜 (YYYY-MM-DD) — title 툴팁용 */
   dates?: string[];
   total: number;
+  /** 발행이 있었던 날짜만 담은 맵 — 클라이언트가 오늘 기준으로 창을 다시 계산한다 */
+  counts?: Record<string, number>;
+  /** 창 길이(일). 주 단위로 올림된다 */
+  days?: number;
   label?: string;
-  /** 편수 단위 (KO "편" / EN "posts") */
+  /** 편수 단위 (KO "편" / EN " posts") */
   unit?: string;
   legendLow?: string;
   legendHigh?: string;
@@ -16,6 +22,8 @@ const {
   data,
   dates = [],
   total,
+  counts = {},
+  days = 90,
   label,
   unit = "편",
   legendLow = "적음",
@@ -35,7 +43,18 @@ const ariaLabel = label ?? `발행 활동 히트맵: ${weeks}주 동안 총 ${to
 ---
 
 <div class="grass-wrap">
-  <div class="grass" role="img" aria-label={ariaLabel} style={`--weeks:${weeks}`}>
+  <div
+    class="grass"
+    role="img"
+    aria-label={ariaLabel}
+    style={`--weeks:${weeks}`}
+    data-grass
+    data-counts={JSON.stringify(counts)}
+    data-days={days}
+    data-unit={unit}
+    data-tz={SITE.timezone}
+    data-label-tpl={label ? "en" : "ko"}
+  >
     {
       data.map((n, i) => (
         <div
@@ -110,3 +129,76 @@ const ariaLabel = label ?? `발행 활동 히트맵: ${weeks}주 동안 총 ${to
     margin-left: 0.35rem;
   }
 </style>
+
+<script>
+  /*
+   * 정적 사이트라 빌드 시점의 "오늘" 이 HTML 에 박제된다. 배포를 안 하면
+   * 잔디가 그 주에서 멈춘 것처럼 보이므로, 방문 시점에 창을 다시 계산한다.
+   * 발행 날짜 맵(data-counts)만 있으면 재배포 없이 매일 앞으로 나아간다.
+   */
+  function initGrass() {
+    document.querySelectorAll<HTMLElement>("[data-grass]").forEach(el => {
+      let counts: Record<string, number>;
+      try {
+        counts = JSON.parse(el.dataset.counts || "{}");
+      } catch {
+        return;
+      }
+
+      const days = Number(el.dataset.days || 90);
+      const unit = el.dataset.unit || "편";
+      const tz = el.dataset.tz || "Asia/Seoul";
+      const isEn = el.dataset.labelTpl === "en";
+
+      // 발행 캘린더는 블로그 기준 시간대(KST)를 따른다 — 서버 집계와 동일
+      const key = (d: Date) =>
+        d.toLocaleDateString("en-CA", { timeZone: tz });
+
+      const today = new Date(`${key(new Date())}T00:00:00`);
+      const lastCell = new Date(today);
+      lastCell.setDate(lastCell.getDate() + (6 - lastCell.getDay()));
+
+      const cells = el.querySelectorAll<HTMLElement>(".grass-cell");
+      const cellCount = cells.length || Math.ceil(days / 7) * 7;
+      const start = new Date(lastCell);
+      start.setDate(start.getDate() - (cellCount - 1));
+
+      const level = (n: number) => (n === 0 ? 0 : n === 1 ? 2 : n === 2 ? 3 : 4);
+
+      let total = 0;
+      let firstKey = "";
+      let lastKey = "";
+
+      cells.forEach((cell, i) => {
+        const d = new Date(start);
+        d.setDate(d.getDate() + i);
+        const k = key(d);
+        const n = counts[k] ?? 0;
+        total += n;
+        if (i === 0) firstKey = k;
+        if (i === cells.length - 1) lastKey = k;
+        cell.dataset.lvl = String(level(n));
+        cell.title = `${k} · ${n}${unit}`;
+      });
+
+      const weeks = Math.ceil(cellCount / 7);
+      el.setAttribute(
+        "aria-label",
+        isEn
+          ? `Publishing activity heatmap: ${total} posts over ${weeks} weeks`
+          : `발행 활동 히트맵: ${weeks}주 동안 총 ${total}${unit}`
+      );
+
+      // 섹션 헤더의 기간 · 편수 요약도 같이 갱신
+      const summary = document.querySelector<HTMLElement>(
+        "[data-grass-summary]"
+      );
+      if (summary) {
+        summary.textContent = `${firstKey} — ${lastKey} · ${total}${unit}`;
+      }
+    });
+  }
+
+  initGrass();
+  document.addEventListener("astro:page-load", initGrass);
+</script>
