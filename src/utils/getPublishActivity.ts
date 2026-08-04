@@ -30,8 +30,9 @@ function localDateKey(d: Date): string {
 /**
  * 발행 활동 히트맵 데이터를 만든다.
  *
- * - 주 시작 요일은 일요일. 마지막 열은 오늘이 속한 주.
- * - `days` 만큼의 기간을 주 단위로 올림해서 채운다 (기본 90일 → 13주 = 91칸).
+ * - 마지막 칸은 **오늘**. 아직 오지 않은 날짜는 그리지 않는다 (마지막 열이 짧아진다).
+ * - 시작일은 `today - (days-1)` 을 그 주 일요일까지 당긴 날 — 첫 열은 꽉 찬 한 주가 되고,
+ *   결과적으로 `days` 이상을 덮는다.
  * - 예약 발행 · draft 는 postFilter 로 제외.
  */
 export function getPublishActivity(
@@ -47,15 +48,19 @@ export function getPublishActivity(
     counts[key] = (counts[key] ?? 0) + 1;
   }
 
-  // 오늘이 속한 주의 토요일(마지막 칸)까지 채운다
   const today = new Date(`${localDateKey(new Date())}T00:00:00`);
-  const lastCell = new Date(today);
-  lastCell.setDate(lastCell.getDate() + (6 - lastCell.getDay()));
+  const lastCell = today;
 
-  const weeks = Math.max(1, Math.ceil(days / 7));
-  const cellCount = weeks * 7;
-  const start = new Date(lastCell);
-  start.setDate(start.getDate() - (cellCount - 1));
+  // days 일 전으로 간 뒤 그 주 일요일까지 당긴다
+  const start = new Date(today);
+  start.setDate(start.getDate() - (days - 1));
+  start.setDate(start.getDate() - start.getDay());
+
+  const cellCount =
+    Math.round(
+      (lastCell.getTime() - start.getTime()) / (24 * 60 * 60 * 1000)
+    ) + 1;
+  const weeks = Math.ceil(cellCount / 7);
 
   const data: number[] = [];
   const dates: string[] = [];

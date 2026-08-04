@@ -154,16 +154,30 @@ const ariaLabel = label ?? `발행 활동 히트맵: ${weeks}주 동안 총 ${to
       const key = (d: Date) =>
         d.toLocaleDateString("en-CA", { timeZone: tz });
 
+      // 마지막 칸은 오늘. 아직 오지 않은 날짜는 그리지 않는다.
       const today = new Date(`${key(new Date())}T00:00:00`);
-      const lastCell = new Date(today);
-      lastCell.setDate(lastCell.getDate() + (6 - lastCell.getDay()));
+      const start = new Date(today);
+      start.setDate(start.getDate() - (days - 1));
+      start.setDate(start.getDate() - start.getDay());
 
-      const cells = el.querySelectorAll<HTMLElement>(".grass-cell");
-      const cellCount = cells.length || Math.ceil(days / 7) * 7;
-      const start = new Date(lastCell);
-      start.setDate(start.getDate() - (cellCount - 1));
+      const DAY = 24 * 60 * 60 * 1000;
+      const cellCount =
+        Math.round((today.getTime() - start.getTime()) / DAY) + 1;
 
       const level = (n: number) => (n === 0 ? 0 : n === 1 ? 2 : n === 2 ? 3 : 4);
+
+      // 서버가 그린 칸 수와 오늘 기준 칸 수가 다를 수 있으므로 개수를 맞춘다
+      const cells = Array.from(
+        el.querySelectorAll<HTMLElement>(".grass-cell")
+      );
+      const template = cells[0];
+      if (!template) return;
+      while (cells.length > cellCount) cells.pop()!.remove();
+      while (cells.length < cellCount) {
+        const clone = template.cloneNode(false) as HTMLElement;
+        el.appendChild(clone);
+        cells.push(clone);
+      }
 
       let total = 0;
       let firstKey = "";
