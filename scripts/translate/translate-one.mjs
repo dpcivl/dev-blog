@@ -6,7 +6,9 @@ import { validateAll } from "./validate.mjs";
 import { rewriteAnchors } from "./anchor-rewrite.mjs";
 
 const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-5";
-const MAX_TOKENS = 8000;
+// 살아있는 문서(blog-beyond-astropaper-what-i-added 등)가 계속 길어져서 8000 으로는
+// 잘린다. 출력 토큰은 실제 사용분만 과금되므로 상한을 넉넉히 둔다.
+const MAX_TOKENS = Number(process.env.TRANSLATE_MAX_TOKENS || 32000);
 // Pricing per 1M tokens (Sonnet 5 intro pricing through 2026-08-31: $2/$10)
 const PRICE_IN = 2;
 const PRICE_OUT = 10;
@@ -25,9 +27,12 @@ const PRICE_CACHE_READ = 0.2;  // 0.1x input
 export async function translateOne({ koPath, enPath, client, dryRun = false }) {
   const koContent = await fs.readFile(koPath, "utf8");
 
-  const response = await client.messages.create({
-    model: MODEL,
-    max_tokens: MAX_TOKENS,
+  // 스트리밍으로 받는다 — max_tokens 가 크면 SDK 가 non-streaming 요청을
+  // "Streaming is required (10분 초과 가능)" 으로 거부한다.
+  const response = await client.messages
+    .stream({
+      model: MODEL,
+      max_tokens: MAX_TOKENS,
     system: [
       {
         type: "text",
@@ -35,17 +40,27 @@ export async function translateOne({ koPath, enPath, client, dryRun = false }) {
         cache_control: { type: "ephemeral" },
       },
     ],
-    messages: [
-      {
-        role: "user",
-        content: `Translate the following Korean markdown blog post to English. Return only the translated markdown, starting with the YAML frontmatter block.
+      messages: [
+        {
+          role: "user",
+          content: `Translate the following Korean markdown blog post to English. Return only the translated markdown, starting with the YAML frontmatter block.
 
 <post>
 ${koContent}
 </post>`,
-      },
-    ],
-  });
+        },
+      ],
+    })
+    .finalMessage();
+
+  // 출력 상한에 걸리면 응답이 문장 중간에서 끊긴다. 그대로 쓰면 EN 포스트가
+  // 반쪽짜리로 발행되므로 여기서 멈춘다 (validator 경고만으로는 놓친다).
+  if (response.stop_reason === "max_tokens") {
+    throw new Error(
+      `translation truncated: hit max_tokens (${MAX_TOKENS}). ` +
+        `Raise TRANSLATE_MAX_TOKENS or split the post. File not written: ${enPath}`
+    );
+  }
 
   const rawEnContent = response.content
     .filter(b => b.type === "text")
