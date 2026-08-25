@@ -42,6 +42,13 @@ export const SERIES: SeriesDef[] = [
       "AI에게 정확히 시키기 위한 영역별 어휘 정리. 본문 + 인터랙티브 playground 패턴으로 진행 중.",
     tag: "용어정리",
   },
+  {
+    id: "port",
+    title: "항만 도메인 공부",
+    description:
+      "스마트항만 · 해양물류 과정에서 들은 항만 도메인 기록. 데이터 분석을 하려면 도메인부터 알아야 한다는 말에서 출발해, 항만의 구조와 수출입 업무 흐름을 정리한다.",
+    tag: "항만도메인공부",
+  },
 ];
 
 export interface SeriesSummary extends SeriesDef {
