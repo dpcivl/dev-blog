@@ -112,7 +112,6 @@ Demurrage is a structure where **delays in data processing translate directly in
 - **What bulk carriers look like** — comparing them side by side with container ships should help clarify why the unloading methods differ
 - **Whether liquid cargo like oil counts as bulk** — my lecture notes listed oil as a bulk example, but I've also seen liquids classified separately under tankers. Need to check the classification criteria
 - **On-site names for yard cranes** — if STS cranes are called QCs on-site, what are yard cranes called? I didn't get an answer written down in my notes
-- **화물 vs 하물** — I noted "화물 (=하물)" but need to confirm whether the two terms are actually synonymous
 - **What other kinds of data resemble smart port data in nature** — a structure where multiple parties each generate their own data and time delays translate into cost. Airports or hospital emergency rooms might be similar
 - **The Busan New Port plan** — how far along it currently is and what it aims to automate
 - **The precise definitions of TEU / FEU** — I want to get a real sense of scale for what 24,000 TEU actually means
