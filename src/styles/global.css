@@ -209,6 +209,11 @@ html[data-theme="dark"] {
 .nav-l:hover::after {
   transform: scaleX(1);
 }
+/* 활성 항목은 이미 물결 밑줄(.active-nav)로 표시된다. hover 직선까지 그리면
+   두 줄이 겹쳐 보이므로 활성 항목에서는 직선을 그리지 않는다. */
+.nav-l.active-nav::after {
+  content: none;
+}
 
 /* 홈 글 목록 — 한 줄 인덱스 행 */
 .post-row {

@@ -41,6 +41,9 @@ const BLOG_DIR = path.join(ROOT, "src", "data", "blog");
 const ASSET_DIR = path.join(ROOT, "public", "assets", "mermaid");
 
 const MERMAID_BLOCK = /```mermaid\r?\n([\s\S]*?)\r?\n```/g;
+// 이미 <img> 로 치환된 참조. 블록은 1회 렌더 후 사라지므로, 이 참조까지
+// 세지 않으면 GC 가 살아 있는 SVG 를 전부 고아로 판정한다.
+const IMG_REF = /\/assets\/mermaid\/([0-9a-f]{16})\.svg/g;
 // Only touch hash-shaped filenames on orphan cleanup; leave legacy named SVGs alone.
 const HASH_FILE = /^[0-9a-f]{16}\.svg$/;
 
@@ -88,8 +91,12 @@ async function main() {
 
   // Collect all mermaid blocks up-front so we can batch-render.
   const jobs = []; // { file, source, hash, alt, index, matchLen }
+  const referenced = new Set(); // 이미 <img> 로 박혀 있는 해시
   for (const file of files) {
     const content = await readFile(file, "utf8");
+    const ref = new RegExp(IMG_REF.source, IMG_REF.flags);
+    let rm;
+    while ((rm = ref.exec(content)) !== null) referenced.add(rm[1]);
     const rx = new RegExp(MERMAID_BLOCK.source, MERMAID_BLOCK.flags);
     let m;
     while ((m = rx.exec(content)) !== null) {
@@ -109,7 +116,7 @@ async function main() {
 
   if (jobs.length === 0) {
     console.log("No ```mermaid``` blocks found in src/data/blog/**/*.md.");
-    await runGc(new Set());
+    await runGc(referenced);
     return;
   }
 
@@ -152,7 +159,7 @@ async function main() {
 
   if (dryRun) {
     console.log(`\n(--dry) Skipping MD rewrite. ${jobs.length} block(s) would be replaced with <img> tags.`);
-    if (gc) await runGc(seenHashes);
+    if (gc) await runGc(new Set([...seenHashes, ...referenced]));
     return;
   }
 
@@ -188,7 +195,7 @@ async function main() {
   console.log(`  Cache hits:   ${seenHashes.size - toRender.length}`);
   console.log(`  MD blocks →   <img>: ${replaced}`);
 
-  await runGc(seenHashes);
+  await runGc(new Set([...seenHashes, ...referenced]));
 }
 
 async function runGc(usedHashes) {

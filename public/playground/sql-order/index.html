@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SQL 절 순서 playground — Park Hyoin</title>
+    <meta
+      name="description"
+      content="SELECT · FROM · WHERE 를 적는 순서와 실제로 실행되는 순서는 다르다. 절을 직접 배치해보고, 실행 단계를 하나씩 밟아보는 playground."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      :root {
+        --bg: #fafafa;
+        --surface: #ffffff;
+        --border: #e5e5e5;
+        --text: #1a1a1a;
+        --text-muted: #666666;
+        --primary: #6a5acd;
+        --primary-dark: #574bb0;
+        --primary-bg: #ede9f7;
+        --danger: #dc2626;
+        --danger-bg: #fef2f2;
+        --success: #16a34a;
+        --success-bg: #f0fdf4;
+        --code-bg: #f4f4f5;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.7;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+      }
+      .wrap { max-width: 780px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+      h1 { font-size: 1.75rem; margin: 0 0 0.5rem; letter-spacing: -0.02em; }
+      .lead { color: var(--text-muted); margin: 0 0 1rem; }
+      .back { display: inline-block; font-size: 0.85rem; color: var(--primary); text-decoration: none; }
+      .back:hover { text-decoration: underline; }
+      section {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 1.75rem;
+        box-shadow: var(--shadow-sm);
+      }
+      h2 { font-size: 1.1rem; margin: 0 0 0.35rem; }
+      .hint { font-size: 0.86rem; color: var(--text-muted); margin: 0 0 1.1rem; }
+      code, .mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+      .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+      button {
+        font: inherit; cursor: pointer; border-radius: 8px;
+        border: 1px solid var(--border); background: var(--surface);
+        padding: 0.45rem 0.9rem; transition: all 0.15s ease;
+      }
+      button:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+      button:disabled { opacity: 0.4; cursor: not-allowed; }
+      .chip { font-family: ui-monospace, monospace; font-weight: 600; }
+      .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+      .btn-primary:hover:not(:disabled) { background: var(--primary-dark); color: #fff; }
+      .editor {
+        margin: 1rem 0;
+        min-height: 96px;
+        background: var(--code-bg);
+        border: 1px dashed var(--border);
+        border-radius: 8px;
+        padding: 0.9rem 1rem;
+        font-family: ui-monospace, monospace;
+        font-size: 0.92rem;
+        white-space: pre-wrap;
+      }
+      .editor .ph { color: var(--text-muted); }
+      .result { margin-top: 0.9rem; padding: 0.8rem 1rem; border-radius: 8px; font-size: 0.9rem; }
+      .result.err { background: var(--danger-bg); border: 1px solid #fecaca; color: var(--danger); }
+      .result.ok { background: var(--success-bg); border: 1px solid #bbf7d0; color: var(--success); }
+      table { border-collapse: collapse; width: 100%; font-size: 0.88rem; margin-top: 0.9rem; }
+      th, td { border: 1px solid var(--border); padding: 0.4rem 0.6rem; text-align: left; }
+      th { background: var(--code-bg); font-weight: 600; }
+      tr.dropped { opacity: 0.28; text-decoration: line-through; }
+      tr.kept { background: var(--primary-bg); }
+      td.dim { color: var(--text-muted); opacity: 0.35; }
+      .steps { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.4rem; }
+      .step-note {
+        margin-top: 0.9rem; padding: 0.8rem 1rem; background: var(--primary-bg);
+        border-radius: 8px; font-size: 0.9rem;
+      }
+      .order-row { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-top: 0.75rem; }
+      .order-row .lbl { font-size: 0.82rem; color: var(--text-muted); min-width: 5.2rem; }
+      .seq { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+      .seq span {
+        font-family: ui-monospace, monospace; font-size: 0.82rem; font-weight: 600;
+        background: var(--code-bg); border: 1px solid var(--border);
+        border-radius: 6px; padding: 0.15rem 0.5rem;
+      }
+      .seq span.hl { background: var(--primary); color: #fff; border-color: var(--primary); }
+      footer { margin-top: 2.5rem; font-size: 0.85rem; color: var(--text-muted); }
+      footer a { color: var(--primary); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <a class="back" href="/playground/">← 플레이그라운드</a>
+      <h1>SQL 절 순서 playground</h1>
+      <p class="lead">
+        <code>SELECT</code> · <code>FROM</code> · <code>WHERE</code> 는
+        <strong>적는 순서</strong>와 <strong>실행되는 순서</strong>가 다르다.
+        둘을 직접 만져보는 페이지.
+      </p>
+
+      <!-- 1 -->
+      <section>
+        <h2>1. 적는 순서 — 아무렇게나 놓으면 안 된다</h2>
+        <p class="hint">절을 눌러 쿼리를 만들어보세요. 순서가 틀리면 실제 DB 가 내는 것과 같은 종류의 문법 에러가 납니다.</p>
+        <div class="chips" id="clauseBtns"></div>
+        <div class="editor" id="editor"><span class="ph">여기에 절이 쌓입니다…</span></div>
+        <div class="chips">
+          <button class="btn-primary" id="runBtn">실행</button>
+          <button id="resetBtn">지우기</button>
+        </div>
+        <div id="syntaxResult"></div>
+      </section>
+
+      <!-- 2 -->
+      <section>
+        <h2>2. 실행되는 순서 — <span class="mono">FROM → WHERE → SELECT</span></h2>
+        <p class="hint">같은 쿼리를 DB 가 처리하는 순서대로 한 단계씩 밟아봅니다.</p>
+        <div class="editor mono">SELECT ROUND(AVG(DAILY_FEE)) AS AVERAGE_FEE
+FROM CAR_RENTAL_COMPANY_CAR
+WHERE CAR_TYPE = 'SUV'</div>
+        <div class="order-row">
+          <span class="lbl">적는 순서</span>
+          <div class="seq"><span>SELECT</span><span>FROM</span><span>WHERE</span></div>
+        </div>
+        <div class="order-row">
+          <span class="lbl">실행 순서</span>
+          <div class="seq" id="execSeq"><span data-s="1">FROM</span><span data-s="2">WHERE</span><span data-s="3">SELECT</span></div>
+        </div>
+        <div class="steps" style="margin-top:1rem">
+          <button data-step="1">1. FROM</button>
+          <button data-step="2">2. WHERE</button>
+          <button data-step="3">3. SELECT</button>
+          <button id="stepReset">처음으로</button>
+        </div>
+        <table id="tbl">
+          <thead>
+            <tr><th>CAR_ID</th><th>CAR_TYPE</th><th>DAILY_FEE</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div class="step-note" id="stepNote">버튼을 눌러 단계를 진행하세요.</div>
+      </section>
+
+      <!-- 3 -->
+      <section>
+        <h2>3. 그래서 <span class="mono">WHERE</span> 에서 별칭을 못 쓴다</h2>
+        <p class="hint">
+          <code>SELECT</code> 에서 붙인 <code>AS AVERAGE_FEE</code> 를
+          <code>WHERE</code> 에서 쓰면 왜 실패하는지 확인해보세요.
+        </p>
+        <div class="chips">
+          <button id="aliasBtn">WHERE 에서 별칭 써보기</button>
+        </div>
+        <div id="aliasResult"></div>
+      </section>
+
+      <footer>
+        관련 글 —
+        <a href="/posts/programmers-sql-01-select-from-where-order/">프로그래머스 SQL #1 — SELECT · FROM · WHERE 는 순서가 있다</a>
+      </footer>
+    </div>
+
+    <script>
+      // ===== 1. 적는 순서 =====
+      const CLAUSES = ["SELECT", "FROM", "WHERE"];
+      const CORRECT = ["SELECT", "FROM", "WHERE"];
+      let picked = [];
+
+      const editor = document.getElementById("editor");
+      const syntaxResult = document.getElementById("syntaxResult");
+      const clauseBtns = document.getElementById("clauseBtns");
+
+      const BODY = {
+        SELECT: "ROUND(AVG(DAILY_FEE)) AS AVERAGE_FEE",
+        FROM: "CAR_RENTAL_COMPANY_CAR",
+        WHERE: "CAR_TYPE = 'SUV'",
+      };
+
+      CLAUSES.forEach(c => {
+        const b = document.createElement("button");
+        b.className = "chip";
+        b.textContent = c;
+        b.addEventListener("click", () => {
+          if (picked.includes(c)) return;
+          picked.push(c);
+          render();
+        });
+        clauseBtns.appendChild(b);
+      });
+
+      function render() {
+        if (picked.length === 0) {
+          editor.innerHTML = '<span class="ph">여기에 절이 쌓입니다…</span>';
+        } else {
+          editor.textContent = picked.map(c => `${c} ${BODY[c]}`).join("\n");
+        }
+        syntaxResult.innerHTML = "";
+        [...clauseBtns.children].forEach(b => {
+          b.disabled = picked.includes(b.textContent);
+        });
+      }
+
+      document.getElementById("resetBtn").addEventListener("click", () => {
+        picked = [];
+        render();
+      });
+
+      document.getElementById("runBtn").addEventListener("click", () => {
+        if (picked.length === 0) return;
+        const div = document.createElement("div");
+        const missing = CORRECT.filter(c => !picked.includes(c));
+        if (missing.length > 0) {
+          div.className = "result err";
+          div.innerHTML = `절이 빠졌습니다: <code>${missing.join(", ")}</code>`;
+        } else if (picked.join(",") === CORRECT.join(",")) {
+          div.className = "result ok";
+          div.innerHTML = "실행 성공 — <code>AVERAGE_FEE</code> 한 줄이 나옵니다. 아래 2번에서 실제 처리 순서를 보세요.";
+        } else {
+          // 순서가 처음으로 어긋나는 지점을 찾아 그 절을 짚어준다
+          let i = 0;
+          while (picked[i] === CORRECT[i]) i++;
+          const wrong = picked[i];
+          const expected = CORRECT[i];
+          div.className = "result err";
+          div.innerHTML =
+            `<strong>문법 에러.</strong> <code>${wrong}</code> 가 <code>${expected}</code> 보다 앞에 올 수 없습니다.<br />` +
+            `SQL 은 절을 아는 것과 별개로 <code>SELECT → FROM → WHERE</code> 순서를 지켜야 합니다.`;
+        }
+        syntaxResult.innerHTML = "";
+        syntaxResult.appendChild(div);
+      });
+
+      render();
+
+      // ===== 2. 실행 순서 =====
+      const ROWS = [
+        { id: 1, type: "SUV", fee: 16000 },
+        { id: 2, type: "세단", fee: 12000 },
+        { id: 3, type: "SUV", fee: 21000 },
+        { id: 4, type: "트럭", fee: 30000 },
+        { id: 5, type: "SUV", fee: 18000 },
+        { id: 6, type: "세단", fee: 9000 },
+      ];
+      const tbody = document.querySelector("#tbl tbody");
+      const stepNote = document.getElementById("stepNote");
+      const execSeq = document.getElementById("execSeq");
+
+      function drawTable(step) {
+        tbody.innerHTML = "";
+        ROWS.forEach(r => {
+          const tr = document.createElement("tr");
+          const isSuv = r.type === "SUV";
+          if (step >= 2) tr.className = isSuv ? "kept" : "dropped";
+          const dim = step >= 3 ? " class=\"dim\"" : "";
+          tr.innerHTML =
+            `<td${dim}>${r.id}</td><td${dim}>${r.type}</td><td>${r.fee.toLocaleString()}</td>`;
+          tbody.appendChild(tr);
+        });
+        [...execSeq.children].forEach(s => {
+          s.classList.toggle("hl", Number(s.dataset.s) === step);
+        });
+      }
+
+      const NOTES = {
+        0: "버튼을 눌러 단계를 진행하세요.",
+        1: "<strong>FROM</strong> — 먼저 테이블을 가져옵니다. 아직 아무것도 거르지 않았습니다. 6행 전부.",
+        2: "<strong>WHERE</strong> — 여기서 걸러냅니다. <code>CAR_TYPE = 'SUV'</code> 인 3행만 남습니다. 이 시점에 SELECT 는 아직 실행되지 않았습니다.",
+        3: "<strong>SELECT</strong> — 마지막에 남은 3행에서 <code>DAILY_FEE</code> 만 꺼내 <code>AVG</code> 로 평균 내고 <code>ROUND</code> 로 반올림합니다. (16000 + 21000 + 18000) / 3 = 18333.33… → <strong>18333</strong>",
+      };
+
+      document.querySelectorAll("[data-step]").forEach(b => {
+        b.addEventListener("click", () => {
+          const s = Number(b.dataset.step);
+          drawTable(s);
+          stepNote.innerHTML = NOTES[s];
+        });
+      });
+      document.getElementById("stepReset").addEventListener("click", () => {
+        drawTable(0);
+        stepNote.innerHTML = NOTES[0];
+      });
+      drawTable(0);
+
+      // ===== 3. 별칭 함정 =====
+      document.getElementById("aliasBtn").addEventListener("click", () => {
+        const box = document.getElementById("aliasResult");
+        box.innerHTML =
+          '<div class="editor mono">SELECT ROUND(AVG(DAILY_FEE)) AS AVERAGE_FEE\nFROM CAR_RENTAL_COMPANY_CAR\nWHERE AVERAGE_FEE > 10000</div>' +
+          '<div class="result err"><strong>에러 — <code>AVERAGE_FEE</code> 라는 컬럼이 없습니다.</strong><br />' +
+          "<code>WHERE</code> 는 <code>SELECT</code> 보다 <em>먼저</em> 실행됩니다. " +
+          "WHERE 가 돌 때는 별칭이 아직 만들어지지 않았습니다. 2번의 실행 순서를 다시 보세요.</div>";
+      });
+    </script>
+  </body>
+</html>
