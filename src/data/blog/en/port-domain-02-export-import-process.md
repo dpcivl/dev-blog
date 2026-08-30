@@ -55,6 +55,8 @@ You'd think import is just export in reverse, but it isn't. First, the 8 export 
 
 The carrier doesn't really know the contents of the container. In consolidation, multiple companies are tied together, so only one representative party issues the B/L, and insurance is taken out against that.
 
+<img src="/assets/mermaid/a57ffe04fc5f2fd6.svg" alt="수출 업무 8단계 흐름 — 운송예약에서 부킹 번호, 컨테이너 확보에서 컨테이너 번호, 적입에서 봉인 번호와 VGM, 수출신고에서 HS Code, 선적 준비에서 베이 플랜, 출항 후 B/L 이 발급된다" style="max-width:100%;height:auto;" />
+
 > Summary: Booking → Securing container → Stuffing → Export declaration → Terminal gate-in → Loading preparation → Loading → Departure and document completion
 
 ## The import process
@@ -72,6 +74,8 @@ For export, you just need to receive an empty container, but import doesn't work
 **5. Release** — The container transport company dispatches a truck to pick up the container. There's a time limit here. If you say you'll release it but don't pick it up, **storage fees kick in after the designated storage period**.
 
 **6. Container return** — The container is the carrier's asset. Once it's done being used, the forwarder takes it back and returns it to the carrier.
+
+<img src="/assets/mermaid/7dc36d7febc6c823.svg" alt="수입 업무 6단계 흐름 — 입항 24시간 전 문서 제출로 MRN 이 발급되고, 입항과 양하 후 보세구역에 장치되며, 수입신고와 운임 정산으로 D/O 를 받아야 반출할 수 있고 마지막에 컨테이너를 반납한다" style="max-width:100%;height:auto;" />
 
 > Summary: Document submission → Arrival and unloading → Import declaration → Freight settlement → Release → Container return
 
