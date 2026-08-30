@@ -138,6 +138,8 @@ Checking every single item is inefficient, so I do **a first-pass filter with au
 
 Among the auto-detected results, **suspect pages get a full review**, while the rest are checked via **random sampling** to estimate overall quality.
 
+<img src="/assets/mermaid/5bfe879093530a69.svg" alt="RAG 데이터 준비 파이프라인 — 데이터 선정, 클렌징, 청킹과 메타데이터 부착, 아날로그 데이터의 OCR 처리를 거쳐 벡터 저장소에 적재되며, 품질 관리는 한 번으로 끝나지 않고 되먹임된다" style="max-width:100%;height:auto;" />
+
 ## 5. Data quality management — it's not a one-and-done task
 
 Data preparation runs as **a loop**. It's not just indexing once and being done:

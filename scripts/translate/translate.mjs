@@ -114,6 +114,35 @@ function summarize(results) {
   console.log(`  total cost: $${total.toFixed(4)}`);
 }
 
+/*
+ * 번역 중단 킬스위치 (2026-08-30~).
+ *
+ * 작성자 지시로 EN 자동 번역을 중단했고, Anthropic API 토큰이 의도치 않게
+ * 소모되는 것을 막는다. CLAUDE.md 의 지침만으로는 사람/세션이 잊으면 그대로
+ * 호출되므로 코드에서 차단한다.
+ *
+ * 다시 켜려면: TRANSLATE_ENABLED=1 pnpm translate one <slug>
+ * 상시로 켜려면 이 블록을 지우고 CLAUDE.md 의 중단 배너도 함께 걷을 것.
+ */
+function assertTranslateEnabled() {
+  if (process.env.TRANSLATE_ENABLED === "1") return;
+  console.error(
+    [
+      "",
+      "🛑 번역 파이프라인이 중단 상태입니다 (2026-08-25~).",
+      "   Anthropic API 를 호출하지 않고 종료합니다. 토큰이 소모되지 않았습니다.",
+      "",
+      "   의도적으로 실행하려면:",
+      "     TRANSLATE_ENABLED=1 pnpm translate one <slug>",
+      "",
+      "   상시로 다시 켜려면 CLAUDE.md 의 '자동 번역 중단' 배너와",
+      "   scripts/translate/translate.mjs 의 assertTranslateEnabled 를 함께 해제하세요.",
+      "",
+    ].join("\n")
+  );
+  process.exit(2);
+}
+
 async function main() {
   const cmd = process.argv[2];
   if (!cmd) {
@@ -126,6 +155,8 @@ async function main() {
     );
     process.exit(1);
   }
+
+  assertTranslateEnabled();
 
   const client = makeClient();
 

@@ -99,6 +99,8 @@ public void delete(@PathVariable Long id) { /* ... */ }
 
 여기까지는 **컨트롤러 안에 저장소 · 로직 · 응답이 다 뒤섞여 있다.** 컨트롤러의 원래 책임은 "요청 받고 응답 뱉기" 뿐인데 지금은 비즈니스 로직 (id 발급, todo 갱신 규칙) 도 들고 있음. 분리가 필요.
 
+<img src="/assets/mermaid/c0ec09d442545a4e.svg" alt="레이어드 아키텍처 — 요청이 컨트롤러로 들어와 서비스의 비즈니스 로직을 거쳐 리포지토리의 데이터 접근으로 내려간다. 분리 전에는 컨트롤러 하나가 이 세 책임을 모두 들고 있었다" style="max-width:100%;height:auto;" />
+
 ## 레이어드 아키텍처 — Controller / Service / Repository
 
 로직을 서비스로 옮기고, 저장소를 리포지토리로 뽑아냈다. 이걸 **레이어드 아키텍처 (Layered Architecture)** 라고 부른다:

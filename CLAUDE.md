@@ -421,6 +421,11 @@ Vercel 빌드 환경에서 Chromium 실행이 불안정해 remark-mermaidjs 를 
 >
 > 작성자 지시로 **EN 번역을 자동 수행하지 않는다.** 새 글을 발행할 때 `pnpm translate` 를 돌리지 말고 KO 만 커밋한다.
 > 작성자가 **명시적으로 "번역 켜라 / 번역해줘" 라고 할 때만** 실행한다. 그 전까지는 먼저 제안하지도 않는다.
+>
+> **코드로도 막아뒀다 (2026-08-30).** `scripts/translate/translate.mjs` 의 `assertTranslateEnabled()` 가 Anthropic 클라이언트 생성 전에 종료시킨다.
+> 지침만으로는 세션이 바뀌면 잊고 호출할 수 있어서, API 토큰이 실제로 소모되지 않도록 코드에서 차단한다.
+> 의도적으로 한 번 실행하려면 `TRANSLATE_ENABLED=1 pnpm translate one <slug>`.
+> **상시로 다시 켤 때는 이 배너와 `assertTranslateEnabled` 를 함께 해제**할 것 (한쪽만 풀면 다른 쪽이 계속 막는다).
 > 이 기간 동안 KO 만 있는 글이 쌓이는 것은 의도된 상태다 (언어 스위치가 홈으로 fallback 되는 것도 감수).
 
 이 블로그는 KO/EN 이중 언어 (`hreflang` 로 SEO · 사용자 언어 스위치 UI). 아래는 번역을 다시 켰을 때의 규칙이다.

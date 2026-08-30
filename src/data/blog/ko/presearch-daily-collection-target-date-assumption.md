@@ -27,6 +27,8 @@ presearch 는 매일 아침 08시(KST)에 검색량과 주가를 모아 BigQuery
 
 400개 종목 중 목표일 데이터를 확보한 게 0개라는 뜻이다. 커버리지가 부족하면 화면에 반쪽짜리 데이터를 올리지 않고 멈추도록 게이트를 걸어뒀는데, 그 게이트가 작동한 것이다.
 
+<img src="/assets/mermaid/d1c0d3e23595e49f.svg" alt="presearch 수집 파이프라인 — Cloud Scheduler 가 매일 08시 Cloud Run Job 을 깨우고, 네이버 검색량과 주가를 모아 BigQuery 에 적재한다. 커버리지 게이트가 목표일 데이터 확보율을 검사해 부족하면 발행을 멈춘다" style="max-width:100%;height:auto;" />
+
 ## 시도 — 인프라부터 의심했다
 
 처음 떠올린 건 인프라였다. Cloud Run 콜드스타트로 작업이 중간에 끊겼거나, 네이버 API 가 일시적으로 죽었거나.
