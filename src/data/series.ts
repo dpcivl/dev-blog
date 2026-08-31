@@ -49,6 +49,13 @@ export const SERIES: SeriesDef[] = [
       "스마트항만 · 해양물류 과정에서 들은 항만 도메인 기록. 데이터 분석을 하려면 도메인부터 알아야 한다는 말에서 출발해, 항만의 구조와 수출입 업무 흐름을 정리한다.",
     tag: "항만도메인공부",
   },
+  {
+    id: "programmers",
+    title: "프로그래머스 SQL 풀이",
+    description:
+      "SQL 을 실제로 쓰면서 배우려고 프로그래머스 문제를 하나씩 푼 기록. 정답 코드보다 그 문제에서 처음 알게 된 절 · 함수와 막혔던 지점을 남긴다.",
+    tag: "프로그래머스",
+  },
 ];
 
 export interface SeriesSummary extends SeriesDef {
