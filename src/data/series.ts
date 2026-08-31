@@ -56,6 +56,13 @@ export const SERIES: SeriesDef[] = [
       "SQL 을 실제로 쓰면서 배우려고 프로그래머스 문제를 하나씩 푼 기록. 정답 코드보다 그 문제에서 처음 알게 된 절 · 함수와 막혔던 지점을 남긴다.",
     tag: "프로그래머스",
   },
+  {
+    id: "data-analysis",
+    title: "데이터 분석 공부",
+    description:
+      "스마트항만 · 해양물류 과정에서 듣는 데이터 분석 강의 기록. 데이터를 어떻게 이해하고 나누는지부터 시작해, pandas 로 직접 만져보는 실습까지 같이 남긴다.",
+    tag: "데이터분석공부",
+  },
 ];
 
 export interface SeriesSummary extends SeriesDef {
