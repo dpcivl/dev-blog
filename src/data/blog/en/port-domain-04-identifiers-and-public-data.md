@@ -3,6 +3,7 @@ title: "Studying the Port Domain #4 — Identifiability, and Public Data Is Just
 description: "An IMO number never changes until the ship is scrapped. I went through the code systems for ships, cargo, and equipment, looked at how to get data from PORT-MIS and UNI-PASS, and worked out why public data can't be used for analysis as-is."
 pubDatetime: 2026-08-25T07:05:00Z
 tags:
+  - K-뉴딜아카데미
   - 항만도메인공부
   - 공공데이터
   - 데이터분석

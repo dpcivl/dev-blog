@@ -3,6 +3,7 @@ title: "Studying the Port Domain #1 — What Containerization Changed, and Smart
 description: "I was told that even if you know databases and coding, you can't do analysis without understanding trade. So I started with the port domain. Notes from my first lecture on why ports became so complex, what containerization changed, and why smart ports became necessary."
 pubDatetime: 2026-08-25T06:20:00Z
 tags:
+  - K-뉴딜아카데미
   - 항만도메인공부
   - 스마트항만
   - 물류

@@ -3,6 +3,7 @@ title: "Studying the Port Domain #3 — Transshipment Is About Connecting Time a
 description: "Transshipment is the main business of Busan Port. I looked at why cargo that just switches ships without crossing the customs line is tricky, and traced the full procedure a ship goes through from arrival notification to departure settlement. Port stay time turns out to be the go-to metric for port efficiency."
 pubDatetime: 2026-08-25T06:55:00Z
 tags:
+  - K-뉴딜아카데미
   - 항만도메인공부
   - 환적
   - 물류

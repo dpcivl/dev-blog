@@ -3,6 +3,7 @@ title: "Studying the Port Domain #2 — Import/Export Processes and Identifiers"
 description: "Shippers, forwarders, carriers, and terminal operators each generate their own data. Following the 8 export stages and 6 import stages, I mapped out where booking numbers, container numbers, B/Ls, and MRNs are issued. It turns out import isn't just export in reverse."
 pubDatetime: 2026-08-25T06:40:00Z
 tags:
+  - K-뉴딜아카데미
   - 항만도메인공부
   - 물류
   - 무역실무
