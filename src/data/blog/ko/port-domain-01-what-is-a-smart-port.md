@@ -13,7 +13,7 @@ draft: false
 featured: false
 ---
 
-[데이터 엔지니어링 공부](/posts/de-study-01-dirty-data-and-staging)와 함께 스마트항만 · 해양물류 과정을 듣고 있다. 첫 강의에서 들은 말이 이거였다.
+[데이터 엔지니어링 공부](/posts/de-study-01-dirty-data-and-staging)와 함께 **SK플래닛 부산 스마트항만 · 해양물류 데이터 실무 과정**(K-뉴딜 아카데미)을 듣고 있다. 첫 강의에서 들은 말이 이거였다.
 
 > 데이터베이스나 코딩을 할 줄 알아도 무역을 모르면 데이터 분석이 안 된다.
 

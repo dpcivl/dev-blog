@@ -11,7 +11,7 @@ draft: false
 featured: false
 ---
 
-I started studying data engineering. I'm currently taking a practical course on smart port and maritime logistics data, and aptitude tests like the Birkman assessment and MBTI both suggested that data engineering suits me well. I also have a collaborative project starting in October, so I started this partly to prepare for that too.
+I started studying data engineering. I'm currently taking the **SK Planet Busan Smart Port & Maritime Logistics Data course** (SK플래닛 부산 스마트항만 · 해양물류 데이터 실무 과정, K-New Deal Academy), and aptitude tests like the Birkman assessment and MBTI both suggested that data engineering suits me well. I also have a collaborative project starting in October, so I started this partly to prepare for that too.
 
 ## Table of contents
 

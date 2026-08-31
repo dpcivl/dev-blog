@@ -13,7 +13,7 @@ draft: false
 featured: false
 ---
 
-Alongside [studying data engineering](/en/posts/de-study-01-dirty-data-and-staging), I'm taking a course on smart ports and maritime logistics. This is what I heard in the first lecture.
+Alongside [studying data engineering](/en/posts/de-study-01-dirty-data-and-staging), I'm taking the **SK Planet Busan Smart Port & Maritime Logistics Data course** (SK플래닛 부산 스마트항만 · 해양물류 데이터 실무 과정, K-New Deal Academy). This is what I heard in the first lecture.
 
 > Even if you know databases or coding, you can't do data analysis without understanding trade.
 
