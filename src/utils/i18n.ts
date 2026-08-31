@@ -39,3 +39,26 @@ export function filterByLang(
 ): CollectionEntry<"blog">[] {
   return posts.filter(post => getLang(post) === lang);
 }
+
+/**
+ * 포스트가 아닌 고정 페이지(홈 · About 등)의 hreflang 대체 링크를 만든다.
+ *
+ * 포스트 상세는 PostDetails.astro 가 KO/EN 짝을 찾아 직접 계산하지만, 고정 페이지는
+ * 짝이 경로로 이미 정해져 있어 그냥 만들어주면 된다. 이게 없으면 구글이 / 와 /en/ 을
+ * 서로의 번역본으로 인식하지 못한다.
+ *
+ * x-default 는 사이트 기본 언어인 한국어를 가리킨다.
+ */
+export function staticHreflang(
+  koPath: string,
+  enPath: string,
+  site: string
+): { lang: string; href: string }[] {
+  const ko = new URL(koPath, site).href;
+  const en = new URL(enPath, site).href;
+  return [
+    { lang: "ko", href: ko },
+    { lang: "en", href: en },
+    { lang: "x-default", href: ko },
+  ];
+}

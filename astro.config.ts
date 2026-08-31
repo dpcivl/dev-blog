@@ -11,6 +11,10 @@ import {
 } from "@shikijs/transformers";
 import { transformerFileName } from "./src/utils/transformers/fileName";
 import { SITE } from "./src/config";
+import { getThinTagSlugs } from "./src/utils/thinTags";
+
+// 글 1편짜리 태그 목록 — 빌드 시작 시 한 번만 계산 (sitemap filter 가 매 URL 마다 호출됨)
+const thinTags = getThinTagSlugs();
 
 // https://astro.build/config
 export default defineConfig({
@@ -25,7 +29,27 @@ export default defineConfig({
       filter: page => {
         // Exclude portfolio (unlisted — accessible only via direct URL)
         if (page.includes("/portfolio")) return false;
-        return SITE.showArchives || !page.endsWith("/archives");
+        if (!SITE.showArchives && page.endsWith("/archives")) return false;
+
+        // 글이 1편뿐인 태그 페이지는 sitemap 에서 제외한다.
+        // sitemap 581개 중 390개가 태그 페이지였고 그중 90여 개가 글 하나짜리라,
+        // 크롤러가 실제 글보다 얇은 목록 페이지를 더 많이 보게 되어 있었다.
+        // 페이지 자체는 계속 생성한다 — 사이트 안에서 탐색에 쓰이므로.
+        const tagMatch = page.match(/\/(en\/)?tags\/([^/]+)\/$/);
+        if (tagMatch) {
+          const lang = tagMatch[1] ? "en" : "ko";
+          // 한글 태그는 sitemap URL 에서 퍼센트 인코딩되어 나온다
+          // (`/tags/하드웨어/` → `/tags/%ED%95%98...`). 디코딩해야 slug 와 대조된다.
+          let slug = tagMatch[2];
+          try {
+            slug = decodeURIComponent(slug);
+          } catch {
+            // 잘못된 인코딩이면 원본 그대로 대조 (걸러지지 않고 남을 뿐 빌드는 계속)
+          }
+          if (thinTags[lang].has(slug)) return false;
+        }
+
+        return true;
       },
     }),
   ],

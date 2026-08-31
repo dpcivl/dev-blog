@@ -8,7 +8,7 @@ import StatGrid from "@/components/StatGrid.astro";
 import PostRow from "@/components/PostRow.astro";
 import getSortedPosts from "@/utils/getSortedPosts";
 import { getPublishActivity } from "@/utils/getPublishActivity";
-import { filterByLang } from "@/utils/i18n";
+import { filterByLang, staticHreflang } from "@/utils/i18n";
 import { SITE } from "@/config";
 
 const enPosts = filterByLang(await getCollection("blog"), "en");
@@ -29,9 +29,21 @@ const stats = [
   { v: `${liveProjects.length}`, k: "Products I ship & run" },
   { v: `${getSortedPosts(koPosts).length}`, k: "Posts in Korean" },
 ];
+
+// KO 홈과 같은 이유. 더해서 이 페이지는 htmlLang 을 넘기지 않아 lang="ko" 로 나가고 있었다.
+const pageTitle = "Park Hyoin — Dev Learning Notes";
+const pageDesc =
+  "Notes by Park Hyoin on what I build and where I get stuck. " +
+  "Series on LLMs, backend, AGV self-driving robots, port logistics, and " +
+  "vibe-coding vocabulary, plus side projects I ship and run.";
 ---
 
-<Layout>
+<Layout
+  title={pageTitle}
+  description={pageDesc}
+  htmlLang="en"
+  hreflangAlternates={staticHreflang("/", "/en/", SITE.website)}
+>
   <Header />
   <div class="page-narrow">
     <main id="main-content" data-layout="index">

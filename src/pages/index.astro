@@ -10,7 +10,7 @@ import ProjectTile from "@/components/ProjectTile.astro";
 import getSortedPosts from "@/utils/getSortedPosts";
 import { getPublishActivity } from "@/utils/getPublishActivity";
 import { getSeriesSummary } from "@/data/series";
-import { filterByLang } from "@/utils/i18n";
+import { filterByLang, staticHreflang } from "@/utils/i18n";
 import { SITE } from "@/config";
 
 const posts = filterByLang(await getCollection("blog"), "ko");
@@ -31,9 +31,22 @@ const stats = [
   { v: `${liveProjects.length}개`, k: "직접 배포 · 운영 중인 제품" },
   { v: `${series.length}개`, k: "학습 시리즈" },
 ];
+
+// 홈 <title> 은 원래 SITE.title("Park Hyoin") 하나뿐이라 한국어 검색어가 전혀 안 잡혔다.
+// 이름(한글·로마자)과 이 블로그가 다루는 주제를 title / description 에 명시한다.
+const pageTitle = "박효인 (Park Hyoin) — 개발 학습 기록";
+const pageDesc =
+  "박효인의 개발 학습 기록. 만든 것과 막힌 것을 그때그때 남깁니다. " +
+  "LLM · 백엔드 · AGV 자율주행 · 항만 도메인 · 바이브코딩 용어 정리 시리즈와, " +
+  "직접 배포해 운영 중인 사이드 프로젝트를 기록합니다.";
 ---
 
-<Layout>
+<Layout
+  title={pageTitle}
+  description={pageDesc}
+  htmlLang="ko"
+  hreflangAlternates={staticHreflang("/", "/en/", SITE.website)}
+>
   <Header />
   <div class="page-narrow">
     <main id="main-content" data-layout="index">

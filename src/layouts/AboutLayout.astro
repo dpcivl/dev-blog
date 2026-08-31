@@ -4,14 +4,24 @@ import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import Breadcrumb from "@/components/Breadcrumb.astro";
 import Layout from "./Layout.astro";
+import { staticHreflang } from "@/utils/i18n";
 import { SITE } from "@/config";
 
 type Props = MarkdownLayoutProps<{ title: string }>;
 
 const { frontmatter } = Astro.props;
+
+// 이 레이아웃은 /about 과 /en/about 이 공유한다. 언어를 넘기지 않아 EN About 이
+// lang="ko" 로 나가고 있었고, hreflang 도 없어 두 페이지가 서로의 번역본으로
+// 인식되지 않았다. 경로로 언어를 판별해 둘 다 채운다.
+const isEnglish = Astro.url.pathname.startsWith("/en/");
 ---
 
-<Layout title={`${frontmatter.title} | ${SITE.title}`}>
+<Layout
+  title={`${frontmatter.title} | ${SITE.title}`}
+  htmlLang={isEnglish ? "en" : "ko"}
+  hreflangAlternates={staticHreflang("/about/", "/en/about/", SITE.website)}
+>
   <Header />
   <Breadcrumb />
   <div class="page-narrow">
