@@ -52,20 +52,83 @@ function detectUnrenderedMermaid(content) {
   return out;
 }
 
+/**
+ * 공인 IP 주소 탐지.
+ *
+ * 실제로 사고가 났다 (2026-09-06): 작성자의 집 공인 IP 가 deploy/README.md 와
+ * 블로그 본문에 그대로 들어간 채 push 됐다. "집 IP 는 공개 저장소에 올리지
+ * 말 것" 이라고 적어둔 문서 자체에 실제 값이 들어 있었다.
+ *
+ * 사설 대역과 문서용 예약 대역은 통과시킨다. 예시를 써야 할 때는 RFC 5737 의
+ * 문서용 주소(192.0.2.x · 198.51.100.x · 203.0.113.x)를 쓰면 이 검사에 안 걸린다.
+ */
+function detectPublicIp(content) {
+  const findings = [];
+  const lines = content.split(/\r?\n/);
+  const RE = /\b(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\b/g;
+
+  const isAllowed = (a, b) =>
+    a === 10 ||                       // 사설
+    a === 127 ||                      // 루프백
+    a === 0 ||
+    (a === 172 && b >= 16 && b <= 31) ||
+    (a === 192 && b === 168) ||
+    (a === 169 && b === 254) ||       // 링크 로컬
+    (a === 192 && b === 0) ||         // RFC 5737 문서용 (192.0.2.x)
+    (a === 198 && b === 51) ||        // RFC 5737 (198.51.100.x)
+    (a === 203 && b === 0) ||         // RFC 5737 (203.0.113.x)
+    a >= 224;                         // 멀티캐스트 · 예약
+
+  lines.forEach((line, i) => {
+    // 버전 번호(1.24.0.1 같은 것)와 혼동되지 않도록 앞뒤 문맥이 버전이면 건너뛴다
+    if (/\b(v|version|버전)\s*\d/i.test(line)) return;
+    for (const m of line.matchAll(RE)) {
+      const [a, b, c, d] = m.slice(1).map(Number);
+      if ([a, b, c, d].some(n => n > 255)) continue;
+      if (isAllowed(a, b)) continue;
+      findings.push({ line: i + 1, ip: m[0], snippet: line.trim().slice(0, 90) });
+    }
+  });
+  return findings;
+}
+
+// 기본 스캔 대상. 블로그 본문뿐 아니라 운영 문서도 본다 —
+// 집 IP 가 새어나간 곳이 deploy/README.md 였다.
+const DEFAULT_TARGETS = [
+  "src/data/blog",
+  "deploy",
+  "docs",
+  "README.md",
+  "CLAUDE.md",
+];
+
 async function main() {
-  const target =
-    process.argv[2] ?? path.join(REPO_ROOT, "src", "data", "blog");
-  const files = await walk(path.resolve(target));
+  const targets = process.argv[2]
+    ? [path.resolve(process.argv[2])]
+    : DEFAULT_TARGETS.map(t => path.join(REPO_ROOT, t));
+
+  const files = [];
+  for (const t of targets) {
+    try {
+      files.push(...(await walk(t)));
+    } catch (e) {
+      if (e.code !== "ENOENT") throw e; // 없는 경로는 조용히 건너뛴다
+    }
+  }
 
   let totalFindings = 0;
   const filesWithIssues = [];
   const filesWithMermaid = [];
+  const filesWithIp = [];
 
   for (const file of files) {
     const content = await fs.readFile(file, "utf8");
 
     const raw = detectUnrenderedMermaid(content);
     if (raw.length > 0) filesWithMermaid.push({ file, raw });
+
+    const ips = detectPublicIp(content);
+    if (ips.length > 0) filesWithIp.push({ file, ips });
 
     const findings = detectAccidentalStrikethrough(content);
     if (findings.length === 0) continue;
@@ -82,11 +145,27 @@ async function main() {
     console.log("  → `pnpm mermaid:render` 를 실행한 뒤 커밋하세요.\n");
   }
 
-  const scannedLabel = `Scanned ${files.length} file(s) in ${relPath(path.resolve(target))}`;
+  if (filesWithIp.length > 0) {
+    const n = filesWithIp.reduce((a, f) => a + f.ips.length, 0);
+    console.log(`\n🔴 공인 IP 로 보이는 값 ${n}개:`);
+    for (const { file, ips } of filesWithIp) {
+      console.log(`  ${relPath(file)}`);
+      for (const f of ips) console.log(`    L${f.line}: ${f.ip}  —  ${f.snippet}`);
+    }
+    console.log(
+      "  → 서버 · 집 IP 는 공개 저장소에 올리지 마세요. 예시가 필요하면"
+    );
+    console.log(
+      "     RFC 5737 문서용 주소(192.0.2.1 · 198.51.100.1 · 203.0.113.1)를 쓰세요.\n"
+    );
+  }
+
+  const hardFail = filesWithMermaid.length > 0 || filesWithIp.length > 0;
+  const scannedLabel = `Scanned ${files.length} file(s) in ${targets.map(t => relPath(t)).join(", ")}`;
 
   if (filesWithIssues.length === 0) {
     console.log(`${scannedLabel} — no accidental-strikethrough patterns found.`);
-    process.exit(filesWithMermaid.length > 0 ? 1 : 0);
+    process.exit(hardFail ? 1 : 0);
   }
 
   console.log(scannedLabel);
