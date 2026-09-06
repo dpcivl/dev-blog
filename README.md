@@ -75,11 +75,17 @@ docs/
 └── analytics-log.md    # 방문 지표 관측 로그
 ```
 
-## 라이센스 · 크레딧
+## 라이선스 · 크레딧
 
-- **테마**: [AstroPaper](https://github.com/satnaing/astro-paper) by Sat Naing (MIT)
-- **콘텐츠 (`src/data/blog/`, `src/data/portfolio/`)**: © 2026 Park Hyoin — All rights reserved
-- **코드 (커스텀 스크립트, 컴포넌트, 설정)**: MIT
+이 저장소는 **두 개의 라이선스**로 나뉜다. 코드는 자유롭게 가져다 쓸 수 있지만, 글은 조건이 붙는다.
+
+| 대상 | 라이선스 | 파일 |
+| --- | --- | --- |
+| 소스 코드 (컴포넌트 · 스크립트 · 배포 설정 등) | MIT | [LICENSE](LICENSE) |
+| 글 · 이미지 (`src/data/blog/`, `src/data/portfolio/`, `public/assets/posts/`, about 페이지) | CC BY-NC 4.0 | [LICENSE-CONTENT](LICENSE-CONTENT) |
+
+- **테마**: [AstroPaper](https://github.com/satnaing/astro-paper) by Sat Naing (MIT) 에서 출발
+- **글**: 출처를 밝히면 공유 · 변형해도 좋지만 **상업적 이용은 불가**. 상업적 이용 문의는 아래 이메일로.
 
 ## 컨택
 
