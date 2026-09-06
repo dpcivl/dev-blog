@@ -6,9 +6,22 @@
 
 ## 스택
 
-- **[Astro 5](https://astro.build/)** + **[Tailwind CSS 4](https://tailwindcss.com/)** ([AstroPaper](https://github.com/satnaing/astro-paper) 테마 기반)
-- **[Vercel](https://vercel.com/)** 배포
+- **[Astro 5](https://astro.build/)** + **[Tailwind CSS 4](https://tailwindcss.com/)** — [AstroPaper](https://github.com/satnaing/astro-paper) 에서 출발
+- **[AWS Lightsail](https://aws.amazon.com/lightsail/)** 자체 운영 (nginx + GitHub Actions 배포) — *2026-09-06 Vercel 에서 이전*
 - **[Claude Sonnet 5](https://claude.com/product/claude-code)** KR → EN 번역 파이프라인 (Anthropic API + 프롬프트 캐싱) — *2026-08-25 부터 자동 실행 중단, 수동 호출만*
+
+### 어디까지가 AstroPaper 인가
+
+템플릿에서 출발했지만 **보이는 것은 대부분 다시 만들었다.** 최초 커밋 대비 코드 기준으로
+56개 파일 · `+4,883 / -438` 줄이 바뀌었고, `src` 파일 수는 94 → 265 개가 됐다.
+
+| | |
+| --- | --- |
+| **물려받아 그대로 쓰는 것** | 콘텐츠 컬렉션 · 정렬 · 태그 집계 · OG 이미지 생성 등 **데이터 계층 유틸**, 포스트 상세의 기본 구조 (`ShareLinks` · `EditPost` · `getSortedPosts` · `getUniqueTags` 등) |
+| **직접 만든 것** | 디자인 시스템 전체 (`global.css` 70 → 364줄, 지운 건 12줄), 홈 (`+234 / -93` — 사이드바를 걷고 한 줄 인덱스 · 잔디 · 지표 격자로 재구성), 컴포넌트 · 페이지 23개, 빌드 · 발행 스크립트 10개, i18n 계층, 배포 파이프라인 |
+
+즉 **AstroPaper 는 데이터 계층으로 남았고 표현 계층은 교체됐다.**
+결정 과정은 [블로그 글](https://parkhyo.in/posts/blog-beyond-astropaper-what-i-added/) 과 `docs/design-log.md` 에 있다.
 
 ## 이 블로그의 커스텀 기능
 
@@ -23,6 +36,7 @@ AstroPaper 기본에서 매일 발행하면서 부딪힌 지점들을 도구로 
 | **자동화** | KR → EN 번역 파이프라인 (검증기 6종 + anchor 재작성), 로컬 mermaid 사전 렌더, 링크 체커 (내부/외부), Markdown 사후 검증기, PNG → WebP 변환 |
 | **워크플로우** | Inbox / Scratch 발행 시스템, 보안 스크러빙 지침, 종료 프로젝트 소프트 숨김 (`_prefix`) |
 | **홈 · 포트폴리오** | 사이드바 없는 단일 컬럼 에디토리얼, 발행 잔디 (방문 시점 기준 최근 90일 롤링), 지표 격자, 성과 우선 포트폴리오 카드 |
+| **운영** | 자체 서버 배포 (원자적 릴리스 교체 · 롤백), nginx 로그 기반 방문 통계 대시보드 (`/stats`, basic auth) |
 | **디자인** | Pretendard 폰트, `word-break: keep-all` 한국어 줄바꿈, `<details>` 접기/펼치기, `docs/design-log.md` 결정 로그 |
 
 ## 로컬 개발
