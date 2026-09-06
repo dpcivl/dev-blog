@@ -11,9 +11,7 @@ const { tag, tagName, size = "lg" } = Astro.props;
 
 const pathname = Astro.url.pathname;
 const isEnglishPage =
-  pathname === "/en" ||
-  pathname === "/en/" ||
-  pathname.startsWith("/en/");
+  pathname === "/en" || pathname === "/en/" || pathname.startsWith("/en/");
 const tagBase = isEnglishPage ? "/en/tags" : "/tags";
 ---
 

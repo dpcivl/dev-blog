@@ -39,7 +39,8 @@ const weeks = Math.ceil(data.length / 7);
 const LEVELS = [0, 2, 3, 4] as const;
 const level = (n: number) => (n === 0 ? 0 : n === 1 ? 2 : n === 2 ? 3 : 4);
 
-const ariaLabel = label ?? `발행 활동 히트맵: ${weeks}주 동안 총 ${total}${unit}`;
+const ariaLabel =
+  label ?? `발행 활동 히트맵: ${weeks}주 동안 총 ${total}${unit}`;
 ---
 
 <div class="grass-wrap">
@@ -151,8 +152,7 @@ const ariaLabel = label ?? `발행 활동 히트맵: ${weeks}주 동안 총 ${to
       const isEn = el.dataset.labelTpl === "en";
 
       // 발행 캘린더는 블로그 기준 시간대(KST)를 따른다 — 서버 집계와 동일
-      const key = (d: Date) =>
-        d.toLocaleDateString("en-CA", { timeZone: tz });
+      const key = (d: Date) => d.toLocaleDateString("en-CA", { timeZone: tz });
 
       // 마지막 칸은 오늘. 아직 오지 않은 날짜는 그리지 않는다.
       const today = new Date(`${key(new Date())}T00:00:00`);
@@ -164,12 +164,11 @@ const ariaLabel = label ?? `발행 활동 히트맵: ${weeks}주 동안 총 ${to
       const cellCount =
         Math.round((today.getTime() - start.getTime()) / DAY) + 1;
 
-      const level = (n: number) => (n === 0 ? 0 : n === 1 ? 2 : n === 2 ? 3 : 4);
+      const level = (n: number) =>
+        n === 0 ? 0 : n === 1 ? 2 : n === 2 ? 3 : 4;
 
       // 서버가 그린 칸 수와 오늘 기준 칸 수가 다를 수 있으므로 개수를 맞춘다
-      const cells = Array.from(
-        el.querySelectorAll<HTMLElement>(".grass-cell")
-      );
+      const cells = Array.from(el.querySelectorAll<HTMLElement>(".grass-cell"));
       const template = cells[0];
       if (!template) return;
       while (cells.length > cellCount) cells.pop()!.remove();

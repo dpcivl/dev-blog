@@ -14,7 +14,8 @@
         type="button"
         class="gallery-close"
         aria-label="갤러리 닫기"
-        data-gallery-close>×</button>
+        data-gallery-close>×</button
+      >
     </header>
 
     <div class="gallery-stage">
@@ -22,13 +23,15 @@
         type="button"
         class="gallery-nav gallery-prev"
         aria-label="이전 이미지"
-        data-gallery-prev>‹</button>
+        data-gallery-prev>‹</button
+      >
       <img id="gallery-image" alt="" />
       <button
         type="button"
         class="gallery-nav gallery-next"
         aria-label="다음 이미지"
-        data-gallery-next>›</button>
+        data-gallery-next>›</button
+      >
     </div>
 
     <footer class="gallery-footer">
@@ -213,7 +216,7 @@
     }
 
     // 카드의 "사진 보기" 버튼 클릭
-    document.addEventListener("click", (e) => {
+    document.addEventListener("click", e => {
       const target = (e.target as HTMLElement)?.closest<HTMLButtonElement>(
         "[data-gallery-trigger]"
       );
@@ -240,12 +243,12 @@
     closeBtn.addEventListener("click", close);
 
     // 백드롭 클릭 시 닫기
-    dialog.addEventListener("click", (e) => {
+    dialog.addEventListener("click", e => {
       if (e.target === dialog) close();
     });
 
     // 키보드 ←/→
-    dialog.addEventListener("keydown", (e) => {
+    dialog.addEventListener("keydown", e => {
       if (e.key === "ArrowLeft" && index > 0) {
         index--;
         render();

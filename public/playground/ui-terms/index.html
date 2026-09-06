@@ -26,8 +26,7 @@
         --code-text: #18181b;
         --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         --shadow-md:
-          0 4px 6px -1px rgba(0, 0, 0, 0.08),
-          0 2px 4px -2px rgba(0, 0, 0, 0.06);
+          0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
       }
 
       * {
@@ -682,7 +681,10 @@
         <!-- ===== Hierarchy ===== -->
         <section class="demo" id="hierarchy">
           <h2>위계 (hierarchy)</h2>
-          <p class="intro">한 화면에 여러 버튼이 있을 때 "뭐가 가장 중요한가" 를 시각적으로 알려준다.</p>
+          <p class="intro">
+            한 화면에 여러 버튼이 있을 때 "뭐가 가장 중요한가" 를 시각적으로
+            알려준다.
+          </p>
           <div class="demo-area">
             <div class="demo-row">
               <button class="btn">primary</button>
@@ -877,11 +879,7 @@
                 <div class="duration-mover d800" data-duration></div>
               </div>
             </div>
-            <button
-              class="btn"
-              style="margin-top: 1rem"
-              id="duration-trigger"
-            >
+            <button class="btn" style="margin-top: 1rem" id="duration-trigger">
               모두 움직이기 / 되돌리기
             </button>
           </div>
@@ -998,8 +996,7 @@
         );
       });
       modalOverlay.addEventListener("click", e => {
-        if (e.target === modalOverlay)
-          modalOverlay.classList.remove("is-open");
+        if (e.target === modalOverlay) modalOverlay.classList.remove("is-open");
       });
 
       // Toast

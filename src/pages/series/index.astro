@@ -40,8 +40,8 @@ function formatDate(d?: Date) {
       <section class="series-hero">
         <h1>시리즈</h1>
         <p>
-          한 주제를 여러 편으로 나눠 정리한 글 묶음. 처음부터 차례로 읽어도 좋고,
-          궁금한 편만 골라 봐도 됩니다.
+          한 주제를 여러 편으로 나눠 정리한 글 묶음. 처음부터 차례로 읽어도
+          좋고, 궁금한 편만 골라 봐도 됩니다.
         </p>
       </section>
 
@@ -54,8 +54,17 @@ function formatDate(d?: Date) {
                 <span class="series-badge">{s.posts.length}편</span>
               </div>
               <span class="series-chevron" aria-hidden="true">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="9 6 15 12 9 18"></polyline>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="9 6 15 12 9 18" />
                 </svg>
               </span>
             </summary>
@@ -71,8 +80,13 @@ function formatDate(d?: Date) {
               <ol class="series-list">
                 {s.posts.map((p, idx) => (
                   <li>
-                    <a href={`${getPath(p.id, p.filePath)}/`} class="series-item group">
-                      <span class="series-idx">{String(idx + 1).padStart(2, "0")}</span>
+                    <a
+                      href={`${getPath(p.id, p.filePath)}/`}
+                      class="series-item group"
+                    >
+                      <span class="series-idx">
+                        {String(idx + 1).padStart(2, "0")}
+                      </span>
                       <div class="series-item-body">
                         <div class="series-item-title group-hover:text-accent">
                           {p.data.title}
@@ -157,7 +171,9 @@ function formatDate(d?: Date) {
     align-items: center;
     justify-content: center;
     color: var(--muted);
-    transition: transform 0.2s ease, color 0.15s ease;
+    transition:
+      transform 0.2s ease,
+      color 0.15s ease;
   }
   .series-block[open] > .series-summary .series-chevron {
     transform: rotate(90deg);

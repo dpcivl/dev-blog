@@ -12,7 +12,14 @@ const PLAYGROUNDS = [
       "버튼 상태(default/hover/active/disabled/loading), 애니메이션 property·duration·easing, 모달/토스트/툴팁을 직접 호버·클릭으로 체험.",
     relatedPost: "ui-vocabulary-for-vibe-coding",
     relatedPostTitle: "바이브코딩을 위한 UI 어휘 정리",
-    sections: ["버튼 상태", "위계", "input/card/modal/toast", "애니메이션", "duration", "easing"],
+    sections: [
+      "버튼 상태",
+      "위계",
+      "input/card/modal/toast",
+      "애니메이션",
+      "duration",
+      "easing",
+    ],
   },
   {
     title: "DB 용어 playground",
@@ -21,7 +28,14 @@ const PLAYGROUNDS = [
       "정규화 Update Anomaly, 1:N·N:M 관계, B-tree 검색 단계, 트랜잭션 rollback, Dirty Read, expand-and-contract 마이그레이션을 시뮬레이션.",
     relatedPost: "db-vocabulary-for-vibe-coding",
     relatedPostTitle: "바이브코딩을 위한 DB · 데이터 모델링 어휘",
-    sections: ["정규화", "관계", "인덱스 B-tree", "트랜잭션", "격리 수준", "마이그레이션"],
+    sections: [
+      "정규화",
+      "관계",
+      "인덱스 B-tree",
+      "트랜잭션",
+      "격리 수준",
+      "마이그레이션",
+    ],
   },
   {
     title: "API 설계 playground",
@@ -30,7 +44,14 @@ const PLAYGROUNDS = [
       "REST 메서드와 URL 매핑, 상태 코드 대역, 멱등성 시뮬레이션(POST 재시도), Offset vs Cursor 페이지네이션, 인증(401) vs 인가(403) 흐름, CORS preflight 를 직접 클릭으로 체험.",
     relatedPost: "api-vocabulary-for-vibe-coding",
     relatedPostTitle: "바이브코딩을 위한 API 설계 어휘",
-    sections: ["REST", "상태 코드", "멱등성", "페이지네이션", "인증/인가", "CORS"],
+    sections: [
+      "REST",
+      "상태 코드",
+      "멱등성",
+      "페이지네이션",
+      "인증/인가",
+      "CORS",
+    ],
   },
   {
     title: "SQL 절 순서 playground",
@@ -38,7 +59,8 @@ const PLAYGROUNDS = [
     description:
       "SELECT · FROM · WHERE 를 직접 배치해 문법 에러를 내보고, 같은 쿼리가 FROM → WHERE → SELECT 순으로 처리되는 과정을 한 단계씩 밟아본다. WHERE 에서 별칭을 못 쓰는 이유까지.",
     relatedPost: "programmers-sql-01-select-from-where-order",
-    relatedPostTitle: "프로그래머스 SQL #1 — SELECT · FROM · WHERE 는 순서가 있다",
+    relatedPostTitle:
+      "프로그래머스 SQL #1 — SELECT · FROM · WHERE 는 순서가 있다",
     sections: ["적는 순서", "실행 순서", "별칭 함정"],
   },
   {
@@ -48,7 +70,12 @@ const PLAYGROUNDS = [
       "Client vs Server state 차이 (새로고침 동작), 장바구니로 derived 상태 자동 계산, 좋아요 버튼으로 optimistic update + 실패 시 롤백, 4가지 캐시 무효화 트리거(이벤트/시간/포커스/수동) 를 직접 클릭으로 체험.",
     relatedPost: "state-management-vocabulary-for-vibe-coding",
     relatedPostTitle: "바이브코딩을 위한 상태 관리 어휘",
-    sections: ["Client/Server", "Derived", "Optimistic Update", "Cache Invalidation"],
+    sections: [
+      "Client/Server",
+      "Derived",
+      "Optimistic Update",
+      "Cache Invalidation",
+    ],
   },
 ];
 ---
@@ -60,8 +87,8 @@ const PLAYGROUNDS = [
       <section class="pg-hero">
         <h1>플레이그라운드</h1>
         <p>
-          용어 정리 글의 부록으로 만든 인터랙티브 데모. 글로만 보면 추상적인 개념을
-          직접 만져보면서 익힐 수 있습니다.
+          용어 정리 글의 부록으로 만든 인터랙티브 데모. 글로만 보면 추상적인
+          개념을 직접 만져보면서 익힐 수 있습니다.
         </p>
       </section>
 

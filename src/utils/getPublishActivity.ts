@@ -57,9 +57,8 @@ export function getPublishActivity(
   start.setDate(start.getDate() - start.getDay());
 
   const cellCount =
-    Math.round(
-      (lastCell.getTime() - start.getTime()) / (24 * 60 * 60 * 1000)
-    ) + 1;
+    Math.round((lastCell.getTime() - start.getTime()) / (24 * 60 * 60 * 1000)) +
+    1;
   const weeks = Math.ceil(cellCount / 7);
 
   const data: number[] = [];

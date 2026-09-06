@@ -9,12 +9,9 @@ const { lang, postTitle } = Astro.props;
 const emailAddress = "dpcivl713@gmail.com";
 
 const subject =
-  lang === "en"
-    ? `Feedback: ${postTitle}`
-    : `[블로그 피드백] ${postTitle}`;
+  lang === "en" ? `Feedback: ${postTitle}` : `[블로그 피드백] ${postTitle}`;
 
-const issueHref =
-  `https://github.com/dpcivl/dev-blog/issues/new?title=${encodeURIComponent(subject)}`;
+const issueHref = `https://github.com/dpcivl/dev-blog/issues/new?title=${encodeURIComponent(subject)}`;
 
 const copy =
   lang === "en"
@@ -61,8 +58,7 @@ const copy =
           stroke-linejoin="round"
         >
           <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-          <path
-            d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
           ></path>
         </svg>
         <svg
@@ -210,14 +206,15 @@ const copy =
 
 <script>
   function initFeedbackCopy() {
-    const pills =
-      document.querySelectorAll<HTMLButtonElement>(".feedback-email-pill");
+    const pills = document.querySelectorAll<HTMLButtonElement>(
+      ".feedback-email-pill"
+    );
     pills.forEach(pill => {
       if (pill.dataset.bound === "1") return;
       pill.dataset.bound = "1";
-      const originalText = pill
-        .querySelector<HTMLElement>(".feedback-email-text")
-        ?.textContent ?? "";
+      const originalText =
+        pill.querySelector<HTMLElement>(".feedback-email-text")?.textContent ??
+        "";
 
       pill.addEventListener("click", async () => {
         const email = pill.dataset.email ?? "";

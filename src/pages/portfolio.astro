@@ -83,11 +83,17 @@ const lastUpdated = new Date().toLocaleDateString("ko-KR", {
         </p>
 
         <div class="mt-7 flex flex-wrap gap-3">
-          {/*
+          {
+            /*
             이력서 PDF 버튼은 넣지 않았다 — public/ 에 PDF 파일이 없다.
             파일을 추가하면 여기에 primary 버튼으로 되살릴 수 있다.
-          */}
-          <a href="mailto:dpcivl713@gmail.com" class="pf-btn pf-btn-primary" data-mail-copy>
+          */
+          }
+          <a
+            href="mailto:dpcivl713@gmail.com"
+            class="pf-btn pf-btn-primary"
+            data-mail-copy
+          >
             이메일 복사
           </a>
           <a href="/about" class="pf-btn">About</a>
@@ -115,9 +121,11 @@ const lastUpdated = new Date().toLocaleDateString("ko-KR", {
         )
       }
 
-      {/* ===== 사이드 프로젝트 =====
+      {
+        /* ===== 사이드 프로젝트 =====
           상태별 3분할은 카드 내부 상태 라벨로 흡수했다.
-          completed / paused 가 늘어나면 아래 배열을 소제목별로 다시 쪼개면 된다. */}
+          completed / paused 가 늘어나면 아래 배열을 소제목별로 다시 쪼개면 된다. */
+      }
       {
         sideProjects.length > 0 && (
           <section class="pt-12">

@@ -60,10 +60,7 @@ const pageList = buildPageList(currentPage, lastPage);
     >
       <a
         href={page.url.prev || "#"}
-        class:list={[
-          "page-nav",
-          { "is-disabled": !page.url.prev },
-        ]}
+        class:list={["page-nav", { "is-disabled": !page.url.prev }]}
         aria-label="이전 페이지"
         aria-disabled={!page.url.prev}
       >
@@ -81,7 +78,11 @@ const pageList = buildPageList(currentPage, lastPage);
             {item}
           </span>
         ) : (
-          <a href={pageHref(item)} class="page-num" aria-label={`${item} 페이지로 이동`}>
+          <a
+            href={pageHref(item)}
+            class="page-num"
+            aria-label={`${item} 페이지로 이동`}
+          >
             {item}
           </a>
         )
@@ -89,10 +90,7 @@ const pageList = buildPageList(currentPage, lastPage);
 
       <a
         href={page.url.next || "#"}
-        class:list={[
-          "page-nav",
-          { "is-disabled": !page.url.next },
-        ]}
+        class:list={["page-nav", { "is-disabled": !page.url.next }]}
         aria-label="다음 페이지"
         aria-disabled={!page.url.next}
       >

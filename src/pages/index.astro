@@ -64,7 +64,7 @@ const pageDesc =
             만든 것과 <span class="hl">막힌 것</span>을 그때그때 기록합니다.
           </h1>
 
-          <p class="mt-5 max-w-[44rem] text-[1.05rem] text-muted text-pretty">
+          <p class="mt-5 max-w-[44rem] text-[1.05rem] text-pretty text-muted">
             {SITE.desc}
           </p>
 
@@ -78,7 +78,11 @@ const pageDesc =
               target="_blank"
               rel="noopener noreferrer">GitHub</a
             >
-            <a href="mailto:dpcivl713@gmail.com" class="hero-btn" data-mail-copy>
+            <a
+              href="mailto:dpcivl713@gmail.com"
+              class="hero-btn"
+              data-mail-copy
+            >
               이메일 복사
             </a>
           </div>
@@ -127,9 +131,9 @@ const pageDesc =
               </a>
             </div>
             <div>
-              {sortedPosts
-                .slice(0, SITE.postPerIndex)
-                .map(post => <PostRow post={post} />)}
+              {sortedPosts.slice(0, SITE.postPerIndex).map(post => (
+                <PostRow post={post} />
+              ))}
             </div>
           </section>
         )
@@ -147,7 +151,10 @@ const pageDesc =
             </div>
             <div class="grid gap-4 sm:grid-cols-3">
               {series.map(s => (
-                <a href={`/series#${s.id}`} class="tile rounded-xl border border-border p-5">
+                <a
+                  href={`/series#${s.id}`}
+                  class="tile rounded-xl border border-border p-5"
+                >
                   <div class="text-[0.92rem] font-semibold">{s.title}</div>
                   <div class="mt-1 font-code text-[0.74rem] text-muted">
                     {s.count}편
@@ -215,7 +222,9 @@ const pageDesc =
     const targets = document.querySelectorAll<HTMLElement>("[data-rise]");
     if (!targets.length) return;
 
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
     if (reduce) {
       targets.forEach(el => el.classList.remove("rise-init"));
       return;

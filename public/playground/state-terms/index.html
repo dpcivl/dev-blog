@@ -27,7 +27,9 @@
         --highlight: #fef3c7;
       }
 
-      * { box-sizing: border-box; }
+      * {
+        box-sizing: border-box;
+      }
 
       body {
         margin: 0;
@@ -85,7 +87,9 @@
         font-size: 0.9rem;
         transition: background 0.15s ease;
       }
-      .sidebar a:hover { background: var(--code-bg); }
+      .sidebar a:hover {
+        background: var(--code-bg);
+      }
       .sidebar .back-link {
         display: block;
         margin-top: 1rem;
@@ -95,8 +99,12 @@
         font-size: 0.875rem;
       }
 
-      .content { min-width: 0; }
-      header.page-header { margin-bottom: 2rem; }
+      .content {
+        min-width: 0;
+      }
+      header.page-header {
+        margin-bottom: 2rem;
+      }
       header.page-header h1 {
         font-size: 2rem;
         margin: 0 0 0.5rem 0;
@@ -146,7 +154,9 @@
         border-radius: 6px;
         overflow-x: auto;
         font-size: 0.85rem;
-        font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+        font-family:
+          ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono",
+          Menlo, monospace;
         line-height: 1.5;
         margin: 0;
       }
@@ -170,18 +180,24 @@
         color: white;
         transition: background 0.15s ease;
       }
-      button.btn:hover { background: var(--primary-dark); }
+      button.btn:hover {
+        background: var(--primary-dark);
+      }
       button.btn.btn-ghost {
         background: var(--surface);
         color: var(--text);
         border-color: var(--border);
       }
-      button.btn.btn-ghost:hover { background: var(--code-bg); }
+      button.btn.btn-ghost:hover {
+        background: var(--code-bg);
+      }
       button.btn.btn-danger {
         background: var(--danger);
         border-color: var(--danger);
       }
-      button.btn.btn-danger:hover { background: var(--danger-dark); }
+      button.btn.btn-danger:hover {
+        background: var(--danger-dark);
+      }
 
       input[type="text"],
       input[type="number"] {
@@ -201,7 +217,9 @@
         gap: 1rem;
       }
       @media (max-width: 700px) {
-        .cs-grid { grid-template-columns: 1fr; }
+        .cs-grid {
+          grid-template-columns: 1fr;
+        }
       }
       .cs-pane {
         background: var(--surface);
@@ -239,8 +257,12 @@
         padding: 0.5rem 0;
         border-bottom: 1px solid var(--border);
       }
-      .cart-row:last-child { border-bottom: none; }
-      .cart-row input { width: 100%; }
+      .cart-row:last-child {
+        border-bottom: none;
+      }
+      .cart-row input {
+        width: 100%;
+      }
       .cart-row button {
         background: transparent;
         border: 1px solid var(--border);
@@ -273,8 +295,12 @@
         padding: 0.5rem;
         transition: transform 0.15s ease;
       }
-      .like-btn:hover { transform: scale(1.1); }
-      .like-btn.is-liked { color: var(--danger); }
+      .like-btn:hover {
+        transform: scale(1.1);
+      }
+      .like-btn.is-liked {
+        color: var(--danger);
+      }
       .like-state {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -305,7 +331,9 @@
         font-size: 0.9rem;
         display: none;
       }
-      .toast.is-show { display: block; }
+      .toast.is-show {
+        display: block;
+      }
       .toast.is-error {
         background: rgba(220, 38, 38, 0.1);
         border-left: 4px solid var(--danger);
@@ -319,7 +347,9 @@
         gap: 1rem;
       }
       @media (max-width: 700px) {
-        .cache-stage { grid-template-columns: 1fr; }
+        .cache-stage {
+          grid-template-columns: 1fr;
+        }
       }
       .cache-pane {
         background: var(--surface);
@@ -331,8 +361,12 @@
         margin: 0 0 0.5rem 0;
         font-size: 0.95rem;
       }
-      .cache-pane.is-stale h3 { color: var(--warning); }
-      .cache-pane.is-fresh h3 { color: var(--success); }
+      .cache-pane.is-stale h3 {
+        color: var(--warning);
+      }
+      .cache-pane.is-fresh h3 {
+        color: var(--success);
+      }
       .cache-state {
         font-family: ui-monospace, monospace;
         font-size: 0.85rem;
@@ -379,7 +413,9 @@
           <a href="#optimistic">Optimistic Update</a>
           <a href="#cache">Cache Invalidation</a>
         </nav>
-        <a class="back-link" href="/posts/state-management-vocabulary-for-vibe-coding"
+        <a
+          class="back-link"
+          href="/posts/state-management-vocabulary-for-vibe-coding"
           >← 원문 글로 돌아가기</a
         >
       </aside>
@@ -397,7 +433,9 @@
         <section class="demo" id="client-server">
           <h2>1. Client State vs Server State</h2>
           <p class="intro">
-            왼쪽은 client state (앱이 주인 — 새로고침 시 사라짐), 오른쪽은 server state (서버가 주인 — 캐시 형태). "페이지 새로고침" 을 눌러서 둘의 차이를 보세요.
+            왼쪽은 client state (앱이 주인 — 새로고침 시 사라짐), 오른쪽은
+            server state (서버가 주인 — 캐시 형태). "페이지 새로고침" 을 눌러서
+            둘의 차이를 보세요.
           </p>
           <div class="demo-area">
             <div class="cs-grid">
@@ -414,57 +452,99 @@
                 <div class="cs-status" id="cs-server">캐시: 비어있음</div>
               </div>
             </div>
-            <div class="controls" style="margin-top: 1rem;">
-              <button class="btn btn-ghost" id="cs-refresh">🔄 페이지 새로고침 시뮬레이션</button>
+            <div class="controls" style="margin-top: 1rem">
+              <button class="btn btn-ghost" id="cs-refresh">
+                🔄 페이지 새로고침 시뮬레이션
+              </button>
             </div>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.5rem 0 0;">
-              새로고침하면 <strong>client state 는 초기값으로 돌아가고</strong>, server state 는 다시 fetch 해야 합니다.
+            <p
+              style="
+                font-size: 0.85rem;
+                color: var(--text-muted);
+                margin: 0.5rem 0 0;
+              "
+            >
+              새로고침하면 <strong>client state 는 초기값으로 돌아가고</strong>,
+              server state 는 다시 fetch 해야 합니다.
             </p>
           </div>
-          <pre>// React 진영의 분리 패턴
+          <pre>
+// React 진영의 분리 패턴
 const [theme, setTheme] = useState('light');       // client
-const { data: user } = useQuery(['user'], fetchUser); // server</pre>
+const { data: user } = useQuery(['user'], fetchUser); // server</pre
+          >
         </section>
 
         <!-- 2. Derived -->
         <section class="demo" id="derived">
           <h2>2. Derived (파생 상태) — 저장하지 말고 계산해서 써라</h2>
           <p class="intro">
-            아래는 장바구니. <strong>물품 가격·수량은 원본 상태</strong> 로 저장, <strong>총액은 derived (계산값)</strong>. 값을 바꿔보세요. 총액이 자동 갱신됩니다.
+            아래는 장바구니. <strong>물품 가격·수량은 원본 상태</strong> 로
+            저장, <strong>총액은 derived (계산값)</strong>. 값을 바꿔보세요.
+            총액이 자동 갱신됩니다.
           </p>
           <div class="demo-area">
             <div id="cart-list"></div>
-            <button class="btn btn-ghost" id="cart-add" style="margin-top: 1rem;">+ 물품 추가</button>
+            <button
+              class="btn btn-ghost"
+              id="cart-add"
+              style="margin-top: 1rem"
+            >
+              + 물품 추가
+            </button>
             <div class="cart-total">
-              <div>물품 수: <strong id="cart-count">0</strong> 종 / <strong id="cart-qty-total">0</strong> 개</div>
+              <div>
+                물품 수: <strong id="cart-count">0</strong> 종 /
+                <strong id="cart-qty-total">0</strong> 개
+              </div>
               <div>총액: <span class="derived" id="cart-total">0 원</span></div>
             </div>
           </div>
-          <pre>// 원본만 저장
+          <pre>
+// 원본만 저장
 const items = [{ name, price, qty }, ...];
 
 // derived — 계산해서 씀 (저장 X)
-const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);</pre>
+const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);</pre
+          >
         </section>
 
         <!-- 3. Optimistic -->
         <section class="demo" id="optimistic">
           <h2>3. Optimistic Update — 즉시 UI 변경 + 실패 시 롤백</h2>
           <p class="intro">
-            하트 버튼을 누르면 <strong>UI 는 즉시</strong> 채워집니다. 백그라운드에서 가짜 서버 요청이 1.5초 후 응답. <strong>실패 확률을 조정</strong>해서 롤백 동작을 확인해보세요.
+            하트 버튼을 누르면 <strong>UI 는 즉시</strong> 채워집니다.
+            백그라운드에서 가짜 서버 요청이 1.5초 후 응답.
+            <strong>실패 확률을 조정</strong>해서 롤백 동작을 확인해보세요.
           </p>
           <div class="demo-area">
             <div class="controls">
-              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 0.5rem;
+                  font-size: 0.85rem;
+                  color: var(--text-muted);
+                "
+              >
                 서버 실패 확률
-                <input id="opt-fail-rate" type="number" value="30" min="0" max="100" step="10" style="width: 70px;" />
+                <input
+                  id="opt-fail-rate"
+                  type="number"
+                  value="30"
+                  min="0"
+                  max="100"
+                  step="10"
+                  style="width: 70px"
+                />
                 %
               </label>
               <button class="btn btn-ghost" id="opt-reset">초기화</button>
             </div>
-            <div style="text-align: center;">
+            <div style="text-align: center">
               <button class="like-btn" id="like-btn">🤍</button>
-              <div style="color: var(--text-muted); font-size: 0.85rem;">
+              <div style="color: var(--text-muted); font-size: 0.85rem">
                 좋아요 <strong id="like-count">0</strong>
               </div>
             </div>
@@ -480,7 +560,8 @@ const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);</pre>
             </div>
             <div class="toast is-error" id="opt-toast"></div>
           </div>
-          <pre>// 1. UI 먼저 바꿈
+          <pre>
+// 1. UI 먼저 바꿈
 setLiked(true);
 
 // 2. 서버 요청
@@ -491,22 +572,26 @@ try {
   // 3b. 실패 → 롤백 + 사용자 알림
   setLiked(false);
   toast.error("좋아요 실패");
-}</pre>
+}</pre
+          >
         </section>
 
         <!-- 4. Cache invalidation -->
         <section class="demo" id="cache">
           <h2>4. Cache Invalidation — 4가지 트리거 패턴</h2>
           <p class="intro">
-            오른쪽이 캐시. "서버 데이터 변경" 으로 캐시가 낡아지면 (stale), 4가지 트리거로 갱신할 수 있습니다.
+            오른쪽이 캐시. "서버 데이터 변경" 으로 캐시가 낡아지면 (stale),
+            4가지 트리거로 갱신할 수 있습니다.
           </p>
           <div class="demo-area">
             <div class="cache-stage">
               <div class="cache-pane">
                 <h3>🗄 서버 (진짜 원본)</h3>
                 <div class="cache-state" id="server-data">{ posts: 3 }</div>
-                <div class="controls" style="margin-top: 0.75rem;">
-                  <button class="btn btn-danger" id="server-mutate">서버 데이터 변경 (글 추가)</button>
+                <div class="controls" style="margin-top: 0.75rem">
+                  <button class="btn btn-danger" id="server-mutate">
+                    서버 데이터 변경 (글 추가)
+                  </button>
                 </div>
               </div>
               <div class="cache-pane is-fresh" id="cache-pane">
@@ -515,16 +600,27 @@ try {
                 <div class="cache-meta" id="cache-meta">마지막 fetch: 방금</div>
               </div>
             </div>
-            <div class="label" style="margin-top: 1rem;">트리거 패턴 — 캐시 무효화 → 재fetch</div>
+            <div class="label" style="margin-top: 1rem">
+              트리거 패턴 — 캐시 무효화 → 재fetch
+            </div>
             <div class="trigger-grid">
-              <button class="btn btn-ghost" id="trig-event">이벤트 기반 (글 POST 시뮬)</button>
-              <button class="btn btn-ghost" id="trig-time">시간 기반 (10초 후 자동)</button>
-              <button class="btn btn-ghost" id="trig-focus">포커스 기반 (탭 재진입)</button>
-              <button class="btn btn-ghost" id="trig-manual">수동 새로고침</button>
+              <button class="btn btn-ghost" id="trig-event">
+                이벤트 기반 (글 POST 시뮬)
+              </button>
+              <button class="btn btn-ghost" id="trig-time">
+                시간 기반 (10초 후 자동)
+              </button>
+              <button class="btn btn-ghost" id="trig-focus">
+                포커스 기반 (탭 재진입)
+              </button>
+              <button class="btn btn-ghost" id="trig-manual">
+                수동 새로고침
+              </button>
             </div>
             <div class="timer-state" id="timer-state"></div>
           </div>
-          <pre>// TanStack Query 예
+          <pre>
+// TanStack Query 예
 // 이벤트: mutation 성공 시 무효화
 mutation.onSuccess(() => qc.invalidateQueries(['posts']));
 
@@ -532,7 +628,8 @@ mutation.onSuccess(() => qc.invalidateQueries(['posts']));
 useQuery(['posts'], fetchPosts, {
   staleTime: 10_000,    // 10초 후 stale
   refetchOnWindowFocus: true,
-});</pre>
+});</pre
+          >
         </section>
       </main>
     </div>
@@ -546,13 +643,17 @@ useQuery(['posts'], fetchPosts, {
         const clientStatus = document.getElementById("cs-client");
         const serverStatus = document.getElementById("cs-server");
 
-        let theme = "light";          // client state
-        let userCache = null;          // server state cache
+        let theme = "light"; // client state
+        let userCache = null; // server state cache
 
         function render() {
           clientStatus.textContent = "현재 값: " + theme;
           serverStatus.textContent = userCache
-            ? "캐시: { name: \"" + userCache.name + "\", since: " + userCache.since + " }"
+            ? '캐시: { name: "' +
+              userCache.name +
+              '", since: ' +
+              userCache.since +
+              " }"
             : "캐시: 비어있음";
         }
         toggleBtn.addEventListener("click", function () {
@@ -568,8 +669,8 @@ useQuery(['posts'], fetchPosts, {
           }, 600);
         });
         refreshBtn.addEventListener("click", function () {
-          theme = "light";      // client state → 초기화
-          userCache = null;     // server state 캐시 → 비움
+          theme = "light"; // client state → 초기화
+          userCache = null; // server state 캐시 → 비움
           fetchBtn.textContent = "서버에서 fetch";
           render();
         });
@@ -595,16 +696,34 @@ useQuery(['posts'], fetchPosts, {
             const row = document.createElement("div");
             row.className = "cart-row";
             row.innerHTML =
-              '<input type="text" value="' + it.name + '" data-i="' + i + '" data-k="name" />' +
-              '<input type="number" value="' + it.price + '" data-i="' + i + '" data-k="price" min="0" />' +
-              '<input type="number" value="' + it.qty + '" data-i="' + i + '" data-k="qty" min="0" />' +
-              '<button data-rm="' + i + '">✕</button>';
+              '<input type="text" value="' +
+              it.name +
+              '" data-i="' +
+              i +
+              '" data-k="name" />' +
+              '<input type="number" value="' +
+              it.price +
+              '" data-i="' +
+              i +
+              '" data-k="price" min="0" />' +
+              '<input type="number" value="' +
+              it.qty +
+              '" data-i="' +
+              i +
+              '" data-k="qty" min="0" />' +
+              '<button data-rm="' +
+              i +
+              '">✕</button>';
             list.appendChild(row);
           });
 
           // derived
-          const total = items.reduce(function (s, i) { return s + i.price * i.qty; }, 0);
-          const qtyTotal = items.reduce(function (s, i) { return s + i.qty; }, 0);
+          const total = items.reduce(function (s, i) {
+            return s + i.price * i.qty;
+          }, 0);
+          const qtyTotal = items.reduce(function (s, i) {
+            return s + i.qty;
+          }, 0);
           countEl.textContent = String(items.length);
           qtyTotalEl.textContent = String(qtyTotal);
           totalEl.textContent = total.toLocaleString() + " 원";
@@ -614,10 +733,14 @@ useQuery(['posts'], fetchPosts, {
           if (!t.dataset || t.dataset.i === undefined) return;
           const i = parseInt(t.dataset.i, 10);
           const k = t.dataset.k;
-          items[i][k] = k === "name" ? t.value : (parseInt(t.value, 10) || 0);
+          items[i][k] = k === "name" ? t.value : parseInt(t.value, 10) || 0;
           // derived 만 재계산 (input value 는 유지)
-          const total = items.reduce(function (s, i) { return s + i.price * i.qty; }, 0);
-          const qtyTotal = items.reduce(function (s, i) { return s + i.qty; }, 0);
+          const total = items.reduce(function (s, i) {
+            return s + i.price * i.qty;
+          }, 0);
+          const qtyTotal = items.reduce(function (s, i) {
+            return s + i.qty;
+          }, 0);
           countEl.textContent = String(items.length);
           qtyTotalEl.textContent = String(qtyTotal);
           totalEl.textContent = total.toLocaleString() + " 원";
@@ -663,7 +786,9 @@ useQuery(['posts'], fetchPosts, {
         function showToast(msg) {
           toast.textContent = msg;
           toast.classList.add("is-show");
-          setTimeout(function () { toast.classList.remove("is-show"); }, 2500);
+          setTimeout(function () {
+            toast.classList.remove("is-show");
+          }, 2500);
         }
         likeBtn.addEventListener("click", function () {
           if (busy) return;
@@ -680,7 +805,7 @@ useQuery(['posts'], fetchPosts, {
             const rate = parseInt(failRate.value, 10) || 0;
             const success = Math.floor(Math.random() * 100) >= rate;
             if (success) {
-              serverLiked = uiLiked;       // 서버도 갱신
+              serverLiked = uiLiked; // 서버도 갱신
             } else {
               // 3b. 실패 → 롤백
               uiLiked = prevServer;
@@ -781,9 +906,12 @@ useQuery(['posts'], fetchPosts, {
               clearInterval(timeBased);
               timeBased = null;
               trigTime.textContent = "시간 기반 (10초 후 자동)";
-              setTimeout(function () { timerState.textContent = ""; }, 2000);
+              setTimeout(function () {
+                timerState.textContent = "";
+              }, 2000);
             } else {
-              timerState.textContent = "⏱ " + timeRemaining + "초 후 재fetch...";
+              timerState.textContent =
+                "⏱ " + timeRemaining + "초 후 재fetch...";
             }
           }, 1000);
         });

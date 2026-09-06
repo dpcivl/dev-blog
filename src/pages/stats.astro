@@ -11,7 +11,11 @@ import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 ---
 
-<Layout title="방문 통계" description="nginx 접근 로그 기반 방문 통계" noIndex={true}>
+<Layout
+  title="방문 통계"
+  description="nginx 접근 로그 기반 방문 통계"
+  noIndex={true}
+>
   <Header />
   <div class="page-narrow">
     <main id="main-content" class="stats">
@@ -22,7 +26,9 @@ import Footer from "@/components/Footer.astro";
         </div>
         <div class="ranges" role="group" aria-label="기간 선택">
           <button type="button" class="pill" data-range="7">최근 7일</button>
-          <button type="button" class="pill is-on" data-range="30">최근 30일</button>
+          <button type="button" class="pill is-on" data-range="30"
+            >최근 30일</button
+          >
           <button type="button" class="pill" data-range="90">최근 90일</button>
         </div>
       </div>
@@ -391,10 +397,18 @@ import Footer from "@/components/Footer.astro";
   // 에러 문구를 띄운다. 서버 리포트는 로그 상태에 따라 패널이 통째로
   // 빠질 수 있으므로 모든 접근을 방어적으로 한다.
 
-  type Row = { data?: string; hits?: { count?: number }; visitors?: { count?: number } };
+  type Row = {
+    data?: string;
+    hits?: { count?: number };
+    visitors?: { count?: number };
+  };
   type Panel = { data?: Row[] };
   type Report = {
-    general?: { total_requests?: number; unique_visitors?: number; date_time?: string };
+    general?: {
+      total_requests?: number;
+      unique_visitors?: number;
+      date_time?: string;
+    };
     visitors?: Panel;
     requests?: Panel;
     referring_sites?: Panel;
@@ -418,9 +432,13 @@ import Footer from "@/components/Footer.astro";
 
   const $ = (sel: string) => document.querySelector(sel) as HTMLElement | null;
   const num = (n: unknown) => (typeof n === "number" && isFinite(n) ? n : 0);
-  const rows = (p?: Panel) => (Array.isArray(p?.data) ? (p!.data as Row[]) : []);
+  const rows = (p?: Panel) =>
+    Array.isArray(p?.data) ? (p!.data as Row[]) : [];
   const esc = (s: string) =>
-    s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+    s.replace(
+      /[&<>"]/g,
+      c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!
+    );
 
   /** GoAccess 의 날짜 키는 설정에 따라 20260906 또는 2026-09-06 로 온다. */
   function parseDay(v: string): Date | null {
@@ -436,15 +454,29 @@ import Footer from "@/components/Footer.astro";
   /** 방문자 패널을 날짜 오름차순 시계열로 정리한다. */
   function series(rep: Report) {
     return rows(rep.visitors)
-      .map(r => ({ d: parseDay(String(r.data ?? "")), v: num(r.visitors?.count), h: num(r.hits?.count) }))
+      .map(r => ({
+        d: parseDay(String(r.data ?? "")),
+        v: num(r.visitors?.count),
+        h: num(r.hits?.count),
+      }))
       .filter((x): x is { d: Date; v: number; h: number } => x.d !== null)
       .sort((a, b) => a.d.getTime() - b.d.getTime());
   }
 
-  function metricCard(label: string, value: string, delta: string, up: boolean, spark: { d: Date; v: number }[], note: string) {
+  function metricCard(
+    label: string,
+    value: string,
+    delta: string,
+    up: boolean,
+    spark: { d: Date; v: number }[],
+    note: string
+  ) {
     const max = Math.max(1, ...spark.map(s => s.v));
     const bars = spark
-      .map(s => `<i style="height:${Math.max(8, (s.v / max) * 100)}%" title="${fmtDay(s.d)} · ${s.v}"></i>`)
+      .map(
+        s =>
+          `<i style="height:${Math.max(8, (s.v / max) * 100)}%" title="${fmtDay(s.d)} · ${s.v}"></i>`
+      )
       .join("");
     return `<div class="metric">
       <div class="metric-top">
@@ -462,14 +494,19 @@ import Footer from "@/components/Footer.astro";
     const cur = all.slice(-days);
     const prev = all.slice(-days * 2, -days);
 
-    const sum = (xs: typeof all, k: "v" | "h") => xs.reduce((a, b) => a + b[k], 0);
+    const sum = (xs: typeof all, k: "v" | "h") =>
+      xs.reduce((a, b) => a + b[k], 0);
     const visitors = sum(cur, "v");
     const views = sum(cur, "h");
     const pVisitors = sum(prev, "v");
     const pViews = sum(prev, "h");
 
     const pct = (now: number, before: number) =>
-      before === 0 ? (now === 0 ? "—" : "신규") : `${now >= before ? "▲" : "▼"} ${Math.abs(Math.round(((now - before) / before) * 100))}%`;
+      before === 0
+        ? now === 0
+          ? "—"
+          : "신규"
+        : `${now >= before ? "▲" : "▼"} ${Math.abs(Math.round(((now - before) / before) * 100))}%`;
 
     const perVisit = visitors ? views / visitors : 0;
     const pPerVisit = pVisitors ? pViews / pVisitors : 0;
@@ -480,10 +517,40 @@ import Footer from "@/components/Footer.astro";
     const sparkH = cur.map(c => ({ d: c.d, v: c.h }));
 
     $("[data-metrics]")!.innerHTML =
-      metricCard("방문자", visitors.toLocaleString(), pct(visitors, pVisitors), visitors >= pVisitors, sparkV, "크롤러 제외 실방문") +
-      metricCard("페이지뷰", views.toLocaleString(), pct(views, pViews), views >= pViews, sparkH, "정적 파일 제외") +
-      metricCard("방문당 페이지", perVisit.toFixed(1), pct(Math.round(perVisit * 10), Math.round(pPerVisit * 10)), perVisit >= pPerVisit, sparkH, "학습 블로그 평균 1.5–2.5") +
-      metricCard("일 평균 방문자", daily.toFixed(1), pDaily ? `${daily >= pDaily ? "▲" : "▼"} ${Math.abs(daily - pDaily).toFixed(1)}명` : "—", daily >= pDaily, sparkV, `${cur.length}일 평균`);
+      metricCard(
+        "방문자",
+        visitors.toLocaleString(),
+        pct(visitors, pVisitors),
+        visitors >= pVisitors,
+        sparkV,
+        "크롤러 제외 실방문"
+      ) +
+      metricCard(
+        "페이지뷰",
+        views.toLocaleString(),
+        pct(views, pViews),
+        views >= pViews,
+        sparkH,
+        "정적 파일 제외"
+      ) +
+      metricCard(
+        "방문당 페이지",
+        perVisit.toFixed(1),
+        pct(Math.round(perVisit * 10), Math.round(pPerVisit * 10)),
+        perVisit >= pPerVisit,
+        sparkH,
+        "학습 블로그 평균 1.5–2.5"
+      ) +
+      metricCard(
+        "일 평균 방문자",
+        daily.toFixed(1),
+        pDaily
+          ? `${daily >= pDaily ? "▲" : "▼"} ${Math.abs(daily - pDaily).toFixed(1)}명`
+          : "—",
+        daily >= pDaily,
+        sparkV,
+        `${cur.length}일 평균`
+      );
 
     // ── 많이 읽힌 글 ──
     const posts = rows(rep.requests)
@@ -508,7 +575,9 @@ import Footer from "@/components/Footer.astro";
     // ── 유입 경로 ──
     const refs = rows(rep.referring_sites)
       .map(r => {
-        const host = String(r.data ?? "").replace(/^https?:\/\//, "").split("/")[0];
+        const host = String(r.data ?? "")
+          .replace(/^https?:\/\//, "")
+          .split("/")[0];
         return { name: REFERRER_NAMES[host] ?? host, hits: num(r.hits?.count) };
       })
       .slice(0, 8);
@@ -526,8 +595,18 @@ import Footer from "@/components/Footer.astro";
       : `<p class="empty">직접 유입만 있습니다</p>`;
 
     // ── 응답 상태 ──
-    const LABEL: Record<string, string> = { "2xx": "정상", "3xx": "캐시 적중", "4xx": "없는 주소", "5xx": "서버 오류" };
-    const buckets: Record<string, number> = { "2xx": 0, "3xx": 0, "4xx": 0, "5xx": 0 };
+    const LABEL: Record<string, string> = {
+      "2xx": "정상",
+      "3xx": "캐시 적중",
+      "4xx": "없는 주소",
+      "5xx": "서버 오류",
+    };
+    const buckets: Record<string, number> = {
+      "2xx": 0,
+      "3xx": 0,
+      "4xx": 0,
+      "5xx": 0,
+    };
     for (const r of rows(rep.status_codes)) {
       const code = String(r.data ?? "").trim();
       const k = `${code[0]}xx`;
@@ -535,7 +614,18 @@ import Footer from "@/components/Footer.astro";
     }
     $("[data-status]")!.innerHTML = Object.entries(buckets)
       .map(([k, v]) => {
-        const cls = k === "5xx" ? (v > 0 ? "bad" : "neutral") : k === "4xx" ? (v > 0 ? "bad" : "neutral") : k === "2xx" ? "ok" : "neutral";
+        const cls =
+          k === "5xx"
+            ? v > 0
+              ? "bad"
+              : "neutral"
+            : k === "4xx"
+              ? v > 0
+                ? "bad"
+                : "neutral"
+              : k === "2xx"
+                ? "ok"
+                : "neutral";
         return `<div class="mini">
           <span class="badge ${cls}">${k}</span>
           <span class="mini-name">${LABEL[k]}</span>
@@ -574,13 +664,19 @@ import Footer from "@/components/Footer.astro";
         </div>
         <div class="bots-nums">${
           byBot.length
-            ? byBot.map(b => `<div class="bot"><b>${b.hits.toLocaleString()}</b><small>${esc(b.name)}</small></div>`).join("")
+            ? byBot
+                .map(
+                  b =>
+                    `<div class="bot"><b>${b.hits.toLocaleString()}</b><small>${esc(b.name)}</small></div>`
+                )
+                .join("")
             : `<div class="bot"><b>${total.toLocaleString()}</b><small>요청</small></div>`
         }</div>`;
     }
 
     const updated = rep.general?.date_time ?? "";
-    $("[data-updated]")!.textContent = `${updated ? updated + " 갱신 · " : ""}nginx 접근 로그 · 크롤러 제외`;
+    $("[data-updated]")!.textContent =
+      `${updated ? updated + " 갱신 · " : ""}nginx 접근 로그 · 크롤러 제외`;
   }
 
   async function load(days: number) {
@@ -607,7 +703,8 @@ import Footer from "@/components/Footer.astro";
   }
 
   function init() {
-    const pills = document.querySelectorAll<HTMLButtonElement>(".pill[data-range]");
+    const pills =
+      document.querySelectorAll<HTMLButtonElement>(".pill[data-range]");
     if (!pills.length) return;
     pills.forEach(p =>
       p.addEventListener("click", () => {

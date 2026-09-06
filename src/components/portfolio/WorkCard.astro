@@ -43,7 +43,11 @@ const titleOf = (slug: string) =>
       {period}
     </div>
     {company && <div class="mt-2 text-[0.86rem] font-semibold">{company}</div>}
-    {role && <div class="mt-1 text-[0.8rem] leading-[1.5] text-muted">{role}</div>}
+    {
+      role && (
+        <div class="mt-1 text-[0.8rem] leading-[1.5] text-muted">{role}</div>
+      )
+    }
   </div>
 
   {/* ===== 우: 본문 ===== */}

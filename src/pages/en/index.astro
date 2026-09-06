@@ -59,10 +59,12 @@ const pageDesc =
           <h1
             class="mt-4 text-[2.9rem] leading-[1.28] font-bold tracking-[-0.02em] text-balance"
           >
-            I write down what I build — and <span class="hl">where I get stuck</span>.
+            I write down what I build — and <span class="hl"
+              >where I get stuck</span
+            >.
           </h1>
 
-          <p class="mt-5 max-w-[44rem] text-[1.05rem] text-muted text-pretty">
+          <p class="mt-5 max-w-[44rem] text-[1.05rem] text-pretty text-muted">
             Notes on what I learn and build.
           </p>
 
@@ -73,7 +75,11 @@ const pageDesc =
               target="_blank"
               rel="noopener noreferrer">GitHub</a
             >
-            <a href="mailto:dpcivl713@gmail.com" class="hero-btn" data-mail-copy>
+            <a
+              href="mailto:dpcivl713@gmail.com"
+              class="hero-btn"
+              data-mail-copy
+            >
               Copy email
             </a>
           </div>
@@ -137,9 +143,12 @@ const pageDesc =
               English translations coming soon
             </h2>
             <p class="mt-3 text-[0.95rem] leading-[1.7] text-muted">
-              I'm translating my Korean posts to English. Meanwhile, feel free to
-              browse the <a class="text-accent" href="/">Korean version</a> — most
-              posts include code, diagrams, and screenshots that are
+              I'm translating my Korean posts to English. Meanwhile, feel free
+              to browse the{" "}
+              <a class="text-accent" href="/">
+                Korean version
+              </a>{" "}
+              — most posts include code, diagrams, and screenshots that are
               language-independent.
             </p>
           </section>
@@ -190,7 +199,9 @@ const pageDesc =
     const targets = document.querySelectorAll<HTMLElement>("[data-rise]");
     if (!targets.length) return;
 
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
     if (reduce) {
       targets.forEach(el => el.classList.remove("rise-init"));
       return;

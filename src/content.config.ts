@@ -49,7 +49,9 @@ const portfolio = defineCollection({
         .optional(),
       // 담당 업무 — { k: 항목명, v: 내용 } 권장. 레거시 문자열도 받는다.
       responsibilities: z
-        .array(z.union([z.string(), z.object({ k: z.string(), v: z.string() })]))
+        .array(
+          z.union([z.string(), z.object({ k: z.string(), v: z.string() })])
+        )
         .default([]),
       // 정량 성과 — { value: 수치, label: 설명 } 권장. 레거시 문자열도 받는다.
       outcomes: z

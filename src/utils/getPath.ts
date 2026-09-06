@@ -29,11 +29,7 @@ export function getPath(
     ?.filter(segment => !LANG_PREFIXES.has(segment)) // strip language prefix
     .map(segment => slugifyStr(segment));
 
-  const basePath = includeBase
-    ? isEnglish
-      ? "/en/posts"
-      : "/posts"
-    : "";
+  const basePath = includeBase ? (isEnglish ? "/en/posts" : "/posts") : "";
 
   // slug = last segment of id
   const blogId = id.split("/");

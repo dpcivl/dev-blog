@@ -28,7 +28,9 @@
         --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
       }
 
-      * { box-sizing: border-box; }
+      * {
+        box-sizing: border-box;
+      }
 
       body {
         margin: 0;
@@ -86,7 +88,9 @@
         font-size: 0.9rem;
         transition: background 0.15s ease;
       }
-      .sidebar a:hover { background: var(--code-bg); }
+      .sidebar a:hover {
+        background: var(--code-bg);
+      }
       .sidebar .back-link {
         display: block;
         margin-top: 1rem;
@@ -96,8 +100,12 @@
         font-size: 0.875rem;
       }
 
-      .content { min-width: 0; }
-      header.page-header { margin-bottom: 2rem; }
+      .content {
+        min-width: 0;
+      }
+      header.page-header {
+        margin-bottom: 2rem;
+      }
       header.page-header h1 {
         font-size: 2rem;
         margin: 0 0 0.5rem 0;
@@ -147,7 +155,9 @@
         border-radius: 6px;
         overflow-x: auto;
         font-size: 0.85rem;
-        font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+        font-family:
+          ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono",
+          Menlo, monospace;
         line-height: 1.5;
         margin: 0;
       }
@@ -192,13 +202,17 @@
         color: white;
         transition: background 0.15s ease;
       }
-      button.btn:hover { background: var(--primary-dark); }
+      button.btn:hover {
+        background: var(--primary-dark);
+      }
       button.btn.btn-ghost {
         background: var(--surface);
         color: var(--text);
         border-color: var(--border);
       }
-      button.btn.btn-ghost:hover { background: var(--code-bg); }
+      button.btn.btn-ghost:hover {
+        background: var(--code-bg);
+      }
 
       /* 1. REST preview */
       .rest-preview {
@@ -239,13 +253,30 @@
         border: 1px solid var(--border);
         background: var(--surface);
         color: var(--text);
-        transition: transform 0.1s ease, background 0.15s ease;
+        transition:
+          transform 0.1s ease,
+          background 0.15s ease;
       }
-      .status-btn:hover { transform: translateY(-1px); }
-      .status-btn.is-2xx { border-color: var(--success); color: var(--success); }
-      .status-btn.is-4xx { border-color: var(--warning); color: var(--warning); }
-      .status-btn.is-5xx { border-color: var(--danger); color: var(--danger); }
-      .status-btn.is-active { background: var(--primary); color: white; border-color: var(--primary); }
+      .status-btn:hover {
+        transform: translateY(-1px);
+      }
+      .status-btn.is-2xx {
+        border-color: var(--success);
+        color: var(--success);
+      }
+      .status-btn.is-4xx {
+        border-color: var(--warning);
+        color: var(--warning);
+      }
+      .status-btn.is-5xx {
+        border-color: var(--danger);
+        color: var(--danger);
+      }
+      .status-btn.is-active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+      }
       .status-detail {
         padding: 1rem;
         background: var(--code-bg);
@@ -280,7 +311,9 @@
         gap: 1rem;
       }
       @media (max-width: 700px) {
-        .pg-compare { grid-template-columns: 1fr; }
+        .pg-compare {
+          grid-template-columns: 1fr;
+        }
       }
       .pg-pane {
         background: var(--surface);
@@ -317,9 +350,15 @@
         font-size: 0.9rem;
         margin-top: 0.5rem;
       }
-      .auth-result.is-200 { border-left: 4px solid var(--success); }
-      .auth-result.is-401 { border-left: 4px solid var(--danger); }
-      .auth-result.is-403 { border-left: 4px solid var(--warning); }
+      .auth-result.is-200 {
+        border-left: 4px solid var(--success);
+      }
+      .auth-result.is-401 {
+        border-left: 4px solid var(--danger);
+      }
+      .auth-result.is-403 {
+        border-left: 4px solid var(--warning);
+      }
 
       /* 6. CORS */
       .cors-result {
@@ -330,8 +369,12 @@
         margin-top: 0.5rem;
         line-height: 1.6;
       }
-      .cors-result.is-ok { border-left: 4px solid var(--success); }
-      .cors-result.is-blocked { border-left: 4px solid var(--danger); }
+      .cors-result.is-ok {
+        border-left: 4px solid var(--success);
+      }
+      .cors-result.is-blocked {
+        border-left: 4px solid var(--danger);
+      }
     </style>
   </head>
   <body>
@@ -355,8 +398,8 @@
         <header class="page-header">
           <h1>API 설계 playground</h1>
           <p>
-            원문 글의 어휘 — REST · 상태 코드 · 멱등성 · 페이지네이션 · 인증/인가
-            · CORS 를 직접 입력하고 클릭하면서 익혀볼 수 있는 페이지.
+            원문 글의 어휘 — REST · 상태 코드 · 멱등성 · 페이지네이션 ·
+            인증/인가 · CORS 를 직접 입력하고 클릭하면서 익혀볼 수 있는 페이지.
           </p>
         </header>
 
@@ -364,7 +407,8 @@
         <section class="demo" id="rest">
           <h2>1. REST — 리소스 + HTTP 메서드</h2>
           <p class="intro">
-            메서드와 URL 조합으로 어떤 행위를 표현하는지 라이브로 확인. URL 의 마지막이 ID(숫자) 인지 아닌지에 따라 의미가 바뀐다.
+            메서드와 URL 조합으로 어떤 행위를 표현하는지 라이브로 확인. URL 의
+            마지막이 ID(숫자) 인지 아닌지에 따라 의미가 바뀐다.
           </p>
           <div class="demo-area">
             <div class="controls">
@@ -378,7 +422,7 @@
                   <option>DELETE</option>
                 </select>
               </label>
-              <label class="field" style="flex: 1; min-width: 200px;">
+              <label class="field" style="flex: 1; min-width: 200px">
                 URL
                 <input id="rest-url" type="text" value="/orders/42" />
               </label>
@@ -388,22 +432,27 @@
                 <span class="method" id="rest-method-out">GET</span>
                 <span id="rest-url-out">/orders/42</span>
               </div>
-              <div class="rest-meaning" id="rest-meaning">→ orders 1개 조회</div>
+              <div class="rest-meaning" id="rest-meaning">
+                → orders 1개 조회
+              </div>
             </div>
           </div>
-          <pre>// REST 의 핵심 — 명사는 URL, 동사는 HTTP 메서드
+          <pre>
+// REST 의 핵심 — 명사는 URL, 동사는 HTTP 메서드
 GET    /orders        // 목록 조회
 GET    /orders/42     // 1개 조회
 POST   /orders        // 생성
 PATCH  /orders/42     // 일부 수정
-DELETE /orders/42     // 삭제</pre>
+DELETE /orders/42     // 삭제</pre
+          >
         </section>
 
         <!-- 2. Status codes -->
         <section class="demo" id="status">
           <h2>2. 상태 코드 — 대역별 의미</h2>
           <p class="intro">
-            코드 버튼을 클릭하면 의미와 대응 방법이 표시됩니다. 색 = 대역 (초록 2xx / 주황 4xx / 빨강 5xx).
+            코드 버튼을 클릭하면 의미와 대응 방법이 표시됩니다. 색 = 대역 (초록
+            2xx / 주황 4xx / 빨강 5xx).
           </p>
           <div class="demo-area">
             <div class="status-grid" id="status-grid"></div>
@@ -417,7 +466,8 @@ DELETE /orders/42     // 삭제</pre>
         <section class="demo" id="idempotency">
           <h2>3. 멱등성 — 같은 요청 N 번 시뮬레이션</h2>
           <p class="intro">
-            메서드를 고른 다음 "재시도 한 번 더" 를 눌러보세요. POST 는 호출마다 새 주문이 쌓이고, 멱등 메서드는 결과가 그대로입니다.
+            메서드를 고른 다음 "재시도 한 번 더" 를 눌러보세요. POST 는 호출마다
+            새 주문이 쌓이고, 멱등 메서드는 결과가 그대로입니다.
           </p>
           <div class="demo-area">
             <div class="controls">
@@ -434,22 +484,30 @@ DELETE /orders/42     // 삭제</pre>
               <button class="btn btn-ghost" id="idem-reset">초기화</button>
             </div>
             <div class="idem-stage">
-              <div class="idem-counter">요청 횟수: <strong id="idem-count">0</strong></div>
-              <div class="idem-state" id="idem-state">서버 상태: orders = []</div>
+              <div class="idem-counter">
+                요청 횟수: <strong id="idem-count">0</strong>
+              </div>
+              <div class="idem-state" id="idem-state">
+                서버 상태: orders = []
+              </div>
             </div>
           </div>
-          <pre>// POST 는 호출마다 새 리소스 생성 → 결제 두 번 사고 위험
+          <pre>
+// POST 는 호출마다 새 리소스 생성 → 결제 두 번 사고 위험
 // 해결: Idempotency-Key 헤더로 같은 요청임을 알려줌
 POST /orders
 Idempotency-Key: a1b2c3-...
-{ "amount": 5000 }</pre>
+{ "amount": 5000 }</pre
+          >
         </section>
 
         <!-- 4. Pagination -->
         <section class="demo" id="pagination">
           <h2>4. 페이지네이션 — Offset vs Cursor</h2>
           <p class="intro">
-            "데이터 1개 추가" 를 누르면 새 주문이 맨 위에 추가됩니다. Offset 은 페이지가 밀려서 중복이 생기고, Cursor 는 기준점이 고정되어 안정적입니다.
+            "데이터 1개 추가" 를 누르면 새 주문이 맨 위에 추가됩니다. Offset 은
+            페이지가 밀려서 중복이 생기고, Cursor 는 기준점이 고정되어
+            안정적입니다.
           </p>
           <div class="demo-area">
             <div class="controls">
@@ -469,11 +527,13 @@ Idempotency-Key: a1b2c3-...
               </div>
             </div>
           </div>
-          <pre>// Offset — 페이지 N = 앞 (N-1)*size 개 건너뜀
+          <pre>
+// Offset — 페이지 N = 앞 (N-1)*size 개 건너뜀
 GET /orders?limit=3&offset=3
 
 // Cursor — 직전 페이지의 마지막 ID 이후로 N 개
-GET /orders?limit=3&cursor=order_42_2026-06-19T12:00:00Z</pre>
+GET /orders?limit=3&cursor=order_42_2026-06-19T12:00:00Z</pre
+          >
         </section>
 
         <!-- 5. Auth -->
@@ -507,39 +567,50 @@ GET /orders?limit=3&cursor=order_42_2026-06-19T12:00:00Z</pre>
                 </select>
               </label>
             </div>
-            <div class="auth-result" id="auth-result">결과: 값을 선택하세요.</div>
+            <div class="auth-result" id="auth-result">
+              결과: 값을 선택하세요.
+            </div>
           </div>
-          <pre>// 인증 (Authentication) — "누구?"
+          <pre>
+// 인증 (Authentication) — "누구?"
 // → 토큰 없거나 잘못됨 → 401 Unauthorized
 
 // 인가 (Authorization) — "뭘 할 수 있어?"
-// → 토큰 유효하지만 권한 없음 → 403 Forbidden</pre>
+// → 토큰 유효하지만 권한 없음 → 403 Forbidden</pre
+          >
         </section>
 
         <!-- 6. CORS -->
         <section class="demo" id="cors">
           <h2>6. CORS — 다른 출처일 때 브라우저의 판단</h2>
           <p class="intro">
-            요청 출처와 서버가 허용한 출처를 비교해서 브라우저가 응답을 통과시킬지 결정합니다. <code>*</code> 면 모든 출처 허용.
+            요청 출처와 서버가 허용한 출처를 비교해서 브라우저가 응답을
+            통과시킬지 결정합니다. <code>*</code> 면 모든 출처 허용.
           </p>
           <div class="demo-area">
             <div class="controls">
-              <label class="field" style="flex: 1; min-width: 200px;">
+              <label class="field" style="flex: 1; min-width: 200px">
                 요청 출처
-                <input id="cors-origin" type="text" value="https://my-app.com" />
+                <input
+                  id="cors-origin"
+                  type="text"
+                  value="https://my-app.com"
+                />
               </label>
-              <label class="field" style="flex: 1; min-width: 200px;">
+              <label class="field" style="flex: 1; min-width: 200px">
                 서버 Allow-Origin
                 <input id="cors-allow" type="text" value="https://my-app.com" />
               </label>
             </div>
             <div class="cors-result" id="cors-result">결과: —</div>
           </div>
-          <pre>// 서버 응답 헤더로 허용 출처 알림
+          <pre>
+// 서버 응답 헤더로 허용 출처 알림
 HTTP/1.1 200 OK
 Access-Control-Allow-Origin: https://my-app.com
 
-// 브라우저: 응답은 도착했지만 출처 안 맞으면 JS 에 전달 X</pre>
+// 브라우저: 응답은 도착했지만 출처 안 맞으면 JS 에 전달 X</pre
+          >
         </section>
       </main>
     </div>
@@ -565,10 +636,14 @@ Access-Control-Allow-Origin: https://my-app.com
           let result = "";
           if (method === "GET" && hasId) result = `→ ${collection} 1개 조회`;
           else if (method === "GET") result = `→ ${collection} 목록 조회`;
-          else if (method === "POST") result = `→ ${collection} 새로 생성 (비멱등)`;
-          else if (method === "PATCH" && hasId) result = `→ ${collection} 일부 수정`;
-          else if (method === "PUT" && hasId) result = `→ ${collection} 전체 교체 (멱등)`;
-          else if (method === "DELETE" && hasId) result = `→ ${collection} 삭제 (멱등)`;
+          else if (method === "POST")
+            result = `→ ${collection} 새로 생성 (비멱등)`;
+          else if (method === "PATCH" && hasId)
+            result = `→ ${collection} 일부 수정`;
+          else if (method === "PUT" && hasId)
+            result = `→ ${collection} 전체 교체 (멱등)`;
+          else if (method === "DELETE" && hasId)
+            result = `→ ${collection} 삭제 (멱등)`;
           else result = `→ ID 없는 ${method} 은 보통 컬렉션 전체 대상`;
           meaning.textContent = result;
         }
@@ -580,16 +655,66 @@ Access-Control-Allow-Origin: https://my-app.com
       // ============ 2. Status codes ============
       (function () {
         const data = [
-          { code: 200, band: "2xx", name: "OK", desc: "성공. 본문에 결과가 들어있음." },
-          { code: 201, band: "2xx", name: "Created", desc: "성공 + 새 리소스가 생성됨. 보통 POST 응답." },
-          { code: 204, band: "2xx", name: "No Content", desc: "성공했지만 본문 없음. DELETE 응답에 자주 쓰임." },
-          { code: 400, band: "4xx", name: "Bad Request", desc: "요청 형식이 잘못됨. 클라이언트의 코드를 고쳐야 함." },
-          { code: 401, band: "4xx", name: "Unauthorized", desc: "인증 실패. 토큰이 없거나 잘못됨." },
-          { code: 403, band: "4xx", name: "Forbidden", desc: "인가 실패. 토큰은 유효하나 권한이 없음." },
-          { code: 404, band: "4xx", name: "Not Found", desc: "리소스가 존재하지 않음." },
-          { code: 409, band: "4xx", name: "Conflict", desc: "충돌. 같은 이메일로 가입 시도 같은 경우." },
-          { code: 500, band: "5xx", name: "Internal Server Error", desc: "서버 잘못. 일시적이면 재시도로 풀림." },
-          { code: 503, band: "5xx", name: "Service Unavailable", desc: "서버가 일시적으로 처리 불가." },
+          {
+            code: 200,
+            band: "2xx",
+            name: "OK",
+            desc: "성공. 본문에 결과가 들어있음.",
+          },
+          {
+            code: 201,
+            band: "2xx",
+            name: "Created",
+            desc: "성공 + 새 리소스가 생성됨. 보통 POST 응답.",
+          },
+          {
+            code: 204,
+            band: "2xx",
+            name: "No Content",
+            desc: "성공했지만 본문 없음. DELETE 응답에 자주 쓰임.",
+          },
+          {
+            code: 400,
+            band: "4xx",
+            name: "Bad Request",
+            desc: "요청 형식이 잘못됨. 클라이언트의 코드를 고쳐야 함.",
+          },
+          {
+            code: 401,
+            band: "4xx",
+            name: "Unauthorized",
+            desc: "인증 실패. 토큰이 없거나 잘못됨.",
+          },
+          {
+            code: 403,
+            band: "4xx",
+            name: "Forbidden",
+            desc: "인가 실패. 토큰은 유효하나 권한이 없음.",
+          },
+          {
+            code: 404,
+            band: "4xx",
+            name: "Not Found",
+            desc: "리소스가 존재하지 않음.",
+          },
+          {
+            code: 409,
+            band: "4xx",
+            name: "Conflict",
+            desc: "충돌. 같은 이메일로 가입 시도 같은 경우.",
+          },
+          {
+            code: 500,
+            band: "5xx",
+            name: "Internal Server Error",
+            desc: "서버 잘못. 일시적이면 재시도로 풀림.",
+          },
+          {
+            code: 503,
+            band: "5xx",
+            name: "Service Unavailable",
+            desc: "서버가 일시적으로 처리 불가.",
+          },
         ];
         const grid = document.getElementById("status-grid");
         const detail = document.getElementById("status-detail");
@@ -603,7 +728,8 @@ Access-Control-Allow-Origin: https://my-app.com
               x.classList.remove("is-active");
             });
             b.classList.add("is-active");
-            detail.innerHTML = "<strong>" + s.code + " " + s.name + "</strong><br/>" + s.desc;
+            detail.innerHTML =
+              "<strong>" + s.code + " " + s.name + "</strong><br/>" + s.desc;
           });
           grid.appendChild(b);
         });
@@ -665,17 +791,34 @@ Access-Control-Allow-Origin: https://my-app.com
         function render() {
           const offsetPage2 = items.slice(3, 6);
           off.textContent =
-            "현재 데이터:\n  [" + items.join(", ") + "]\n\n" +
-            "2페이지 결과 (offset=3, limit=3):\n  [" + offsetPage2.join(", ") + "]";
+            "현재 데이터:\n  [" +
+            items.join(", ") +
+            "]\n\n" +
+            "2페이지 결과 (offset=3, limit=3):\n  [" +
+            offsetPage2.join(", ") +
+            "]";
 
-          const cursorNext = items.filter(function (id) { return id < cursorAfterId; }).slice(0, 3);
+          const cursorNext = items
+            .filter(function (id) {
+              return id < cursorAfterId;
+            })
+            .slice(0, 3);
           cur.textContent =
-            "현재 데이터:\n  [" + items.join(", ") + "]\n\n" +
-            "cursor=" + cursorAfterId + " 이후 3개:\n  [" + cursorNext.join(", ") + "]";
+            "현재 데이터:\n  [" +
+            items.join(", ") +
+            "]\n\n" +
+            "cursor=" +
+            cursorAfterId +
+            " 이후 3개:\n  [" +
+            cursorNext.join(", ") +
+            "]";
 
-          const overlap = offsetPage2.filter(function (id) { return firstPageSnapshot.indexOf(id) !== -1; });
+          const overlap = offsetPage2.filter(function (id) {
+            return firstPageSnapshot.indexOf(id) !== -1;
+          });
           if (overlap.length > 0) {
-            offNote.textContent = "⚠ 중복: " + overlap.join(", ") + " (1페이지에서 본 것과 겹침)";
+            offNote.textContent =
+              "⚠ 중복: " + overlap.join(", ") + " (1페이지에서 본 것과 겹침)";
             offNote.classList.add("is-warn");
           } else {
             offNote.textContent = "정상";
@@ -710,7 +853,8 @@ Access-Control-Allow-Origin: https://my-app.com
             result.classList.add("is-401");
             result.innerHTML =
               "<strong>401 Unauthorized</strong> — 인증 실패 (토큰 " +
-              (token.value === "none" ? "없음" : "잘못됨") + ")";
+              (token.value === "none" ? "없음" : "잘못됨") +
+              ")";
             return;
           }
           if (owner.value === "other" && role.value !== "admin") {
@@ -747,17 +891,21 @@ Access-Control-Allow-Origin: https://my-app.com
           }
           if (a === "*") {
             result.classList.add("is-ok");
-            result.innerHTML = "✅ <strong>통과</strong> — 서버가 모든 출처 허용 (<code>Allow-Origin: *</code>)";
+            result.innerHTML =
+              "✅ <strong>통과</strong> — 서버가 모든 출처 허용 (<code>Allow-Origin: *</code>)";
             return;
           }
           if (o === a) {
             result.classList.add("is-ok");
-            result.innerHTML = "✅ <strong>통과</strong> — 출처가 허용 목록과 일치";
+            result.innerHTML =
+              "✅ <strong>통과</strong> — 출처가 허용 목록과 일치";
           } else {
             result.classList.add("is-blocked");
             result.innerHTML =
-              "❌ <strong>브라우저 차단</strong> — 요청 출처(<code>" + o +
-              "</code>)가 Allow-Origin(<code>" + a +
+              "❌ <strong>브라우저 차단</strong> — 요청 출처(<code>" +
+              o +
+              "</code>)가 Allow-Origin(<code>" +
+              a +
               "</code>)과 다름. 응답 본문은 도착했지만 브라우저가 자바스크립트에 전달하지 않습니다.";
           }
         }

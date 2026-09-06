@@ -122,7 +122,9 @@ const NAV_ITEMS = [
                 href={item.href}
                 class:list={[
                   "nav-l",
-                  isActive(item.href) ? "active-nav text-foreground" : "text-muted",
+                  isActive(item.href)
+                    ? "active-nav text-foreground"
+                    : "text-muted",
                 ]}
               >
                 {item.label}
