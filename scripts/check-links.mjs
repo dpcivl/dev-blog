@@ -7,7 +7,7 @@
 //   - route links  (/about, /portfolio, /series, /playground, ...)
 // External links (http/https) are skipped — see check-links-external.mjs.
 
-import { readdir, readFile, stat } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";

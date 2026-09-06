@@ -3,7 +3,11 @@ name: CI
 permissions:
   contents: read
 
+# main 에 직접 푸시하는 흐름이라 pull_request 만으로는 한 번도 돌지 않았다.
+# 실제로 lint 가 91개 오류로 깨진 채 몇 달을 갔다. push 에서도 돌린다.
 on:
+  push:
+    branches: [main]
   pull_request:
     types:
       - opened

@@ -26,7 +26,8 @@ const blog = defineCollection({
 
 const portfolio = defineCollection({
   loader: glob({ pattern: "**/[^_]*.md", base: `./${PORTFOLIO_PATH}` }),
-  schema: ({ image }) =>
+  // 이 스키마는 image() 헬퍼를 쓰지 않는다 (썸네일 경로를 문자열로 받는다)
+  schema: () =>
     z.object({
       title: z.string(),
       type: z.enum(["side", "work"]),

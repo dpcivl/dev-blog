@@ -102,7 +102,9 @@ async function main() {
   const totalOld = conversions.reduce((s, c) => s + c.srcSize, 0);
   const totalNew = conversions.reduce((s, c) => s + c.dstSize, 0);
   console.log(`\n== Conversion summary ==`);
-  console.log(`  Converted: ${conversions.length}, Failed: ${failed}`);
+  console.log(
+    `  Converted: ${conversions.length}, Skipped: ${skipped}, Failed: ${failed}`
+  );
   console.log(`  Total: ${bytes(totalOld)} → ${bytes(totalNew)} (-${((1 - totalNew / totalOld) * 100).toFixed(0)}%)`);
 
   if (dry) {
