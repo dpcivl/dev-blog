@@ -178,9 +178,18 @@ human.log    사람 요청만 — 방문 통계
 > 셌기 때문에 JS 를 실행하지 않는 봇이 자연히 빠졌다. 광고 차단기에 안 막히는
 > 장점의 이면이다.
 
-**본인 IP 를 빼려면** 서버에서 직접 추가한다 (공개 저장소에 집 IP 를 넣지 말 것).
-`map $remote_addr $ip_human { default 1; 1.2.3.4 0; }` 를 추가하고
-`$log_human` 판정에 끼워넣는 식이다.
+**본인 IP 제외** — 설정은 저장소에 있지만 주소 목록은 서버에만 둔다
+(집 IP 는 개인정보라 공개 저장소에 올리지 않는다).
+
+```bash
+# 이 파일이 없으면 nginx 가 뜨지 않는다. 설정을 받기 전에 먼저 만들 것.
+sudo tee /etc/nginx/conf.d/stats-exclude-ips.map <<'EOF'
+# <IP> 0;   ← 통계에서 제외할 주소
+EOF
+```
+
+주소를 추가할 때는 같은 파일에 `<작성자 집 IP> 0;` 형식으로 한 줄씩 넣고
+`sudo nginx -t && sudo systemctl reload nginx`. 집 IP 는 바뀌므로 완벽하진 않다.
 
 ### 알아둘 것
 
