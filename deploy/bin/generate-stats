@@ -3,7 +3,8 @@
 #   설치: sudo install -m 755 generate-stats /usr/local/bin/generate-stats
 #
 # 리포트를 둘로 나눈다.
-#   /stats/       사람 방문 — 볼 패널만 남기고 나머지는 숨긴다. 누적 DB 사용.
+#   /stats/       사람 방문 — 블로그 톤의 대시보드(Astro)가 report.json 을 읽어 그린다.
+#   /stats/raw/   GoAccess 원본 리포트 (디버깅용)
 #   /stats/bots/  크롤러 활동 — 구글봇 · 네이버 Yeti 등이 오고 있는지 확인용.
 #
 # 크롤러 리포트는 누적하지 않는다. stdin 으로 넘기면 GoAccess 의 증분 추적이
@@ -17,7 +18,7 @@ DB=/var/lib/goaccess
 
 command -v goaccess >/dev/null || { echo "goaccess 미설치" >&2; exit 1; }
 [ -r "$LOG" ] || { echo "로그를 읽을 수 없다: $LOG" >&2; exit 1; }
-mkdir -p "$OUT_DIR/bots" "$DB"
+mkdir -p "$OUT_DIR/raw" "$OUT_DIR/bots" "$DB"
 
 COMMON=(
   --log-format=COMBINED
@@ -50,8 +51,10 @@ HIDE=(
 goaccess "$LOG" "${COMMON[@]}" "${HIDE[@]}" \
   --ignore-crawlers \
   --persist --restore --db-path="$DB" \
-  --html-report-title="parkhyo.in — 방문" \
-  -o "$OUT_DIR/index.html"
+  --html-report-title="parkhyo.in — 방문 (원본)" \
+  --date-spec=date \
+  -o "$OUT_DIR/raw/index.html" \
+  -o "$OUT_DIR/report.json"
 
 # ── 2. 크롤러 활동 (검색엔진 봇만, 최근 이틀) ──
 # zcat -f 는 압축·비압축 둘 다 처리한다. 회전 직후에도 어제치가 남는다.
@@ -65,7 +68,11 @@ goaccess "$LOG" "${COMMON[@]}" "${HIDE[@]}" \
       --ignore-panel=CACHE_STATUS --ignore-panel=ASN \
       --ignore-panel=MIME_TYPE --ignore-panel=TLS_TYPE \
       --html-report-title="parkhyo.in — 크롤러 (최근 2일)" \
+      --date-spec=date \
       -o "$OUT_DIR/bots/index.html" \
+      -o "$OUT_DIR/bots/report.json" \
   || echo "크롤러 로그 없음 — 리포트 건너뜀" >&2
 
-chmod 644 "$OUT_DIR/index.html" "$OUT_DIR/bots/index.html" 2>/dev/null || true
+# nginx(www-data)가 읽을 수 있게
+find "$OUT_DIR" -type f -exec chmod 644 {} + 2>/dev/null || true
+find "$OUT_DIR" -type d -exec chmod 755 {} + 2>/dev/null || true

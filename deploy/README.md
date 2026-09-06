@@ -111,12 +111,24 @@ sudo chmod 644 /etc/cron.d/goaccess-stats
 
 확인: `https://parkhyo.in/stats/` — 아이디·비밀번호를 물어본다.
 
-### 두 개의 리포트
+### 화면 구성
 
-| 주소 | 내용 | 누적 |
+| 주소 | 내용 | 만드는 주체 |
 | --- | --- | --- |
-| `/stats/` | 사람 방문 — 추세 · 인기 글 · 유입 경로 · 404 · 상태 코드 | 예 |
-| `/stats/bots/` | 검색엔진 크롤러 활동 (최근 2일) | 아니오 |
+| `/stats/` | 블로그 톤의 대시보드 | Astro (`src/pages/stats.astro`) |
+| `/stats/report.json` | 방문 데이터 | GoAccess, 시간마다 |
+| `/stats/bots/report.json` | 크롤러 데이터 | GoAccess, 시간마다 |
+| `/stats/raw/` | GoAccess 원본 리포트 (디버깅용) | GoAccess |
+| `/stats/bots/` | 크롤러 원본 리포트 | GoAccess |
+
+대시보드 HTML 은 **릴리스에 들어 있고**(정적 빌드), 데이터는 브라우저가
+`/stats/report.json` 을 받아 그린다. 통계는 서버에서 시간마다 갱신되므로
+빌드 시점에 넣을 수 없다.
+
+**전부 같은 basic auth 아래 있다.** 그래서 헤더 네비게이션에는 넣지 않았다 —
+방문자가 링크를 누르면 비밀번호 창이 뜨게 된다. 주소를 직접 치고 들어간다.
+
+`noindex` + `robots.txt` 차단 + sitemap 제외까지 걸어뒀다.
 
 기본 GoAccess 리포트는 패널이 15개쯤 되는데, **보고 나서 할 일이 없는 것**은
 숨겼다 — 브라우저 · OS · 방문 시간대 · 접속 IP · 지역 · 검색어 · 정적 파일.

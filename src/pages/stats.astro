@@ -1,0 +1,623 @@
+---
+// 방문 통계 대시보드 — GoAccess 가 만든 JSON 을 읽어 블로그 톤으로 그린다.
+//
+// 이 페이지는 정적으로 빌드되고, 데이터는 브라우저에서 /stats/report.json 을
+// 받아온다. 통계는 서버에서 시간마다 갱신되므로 빌드 시점에 넣을 수 없다.
+//
+// nginx 가 /stats/ 전체를 basic auth 로 막고 있어 방문자에게 노출되지 않는다.
+// 그래서 헤더 네비게이션에는 넣지 않았다 — 링크를 눌러도 비밀번호를 물어보게 된다.
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+---
+
+<Layout title="방문 통계" description="nginx 접근 로그 기반 방문 통계" noIndex={true}>
+  <Header />
+  <div class="page-narrow">
+    <main id="main-content" class="stats">
+      <div class="head">
+        <div>
+          <h1>방문 통계</h1>
+          <p class="sub" data-updated>불러오는 중…</p>
+        </div>
+        <div class="ranges" role="group" aria-label="기간 선택">
+          <button type="button" class="pill" data-range="7">최근 7일</button>
+          <button type="button" class="pill is-on" data-range="30">최근 30일</button>
+          <button type="button" class="pill" data-range="90">최근 90일</button>
+        </div>
+      </div>
+
+      <p class="empty" data-error hidden></p>
+
+      <section class="cards" data-metrics></section>
+
+      <section class="cols">
+        <div class="card">
+          <div class="card-head">
+            <h2>많이 읽힌 글</h2>
+            <span class="hint">정적 파일 제외</span>
+          </div>
+          <div data-posts></div>
+        </div>
+
+        <div class="stack">
+          <div class="card">
+            <div class="card-head"><h2>유입 경로</h2></div>
+            <div data-referrers></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h2>응답 상태</h2></div>
+            <div data-status></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>고쳐야 할 것 · 404</h2>
+          <span class="hint">깨진 링크</span>
+        </div>
+        <div data-notfound></div>
+      </section>
+
+      <section class="banner" data-bots hidden></section>
+
+      <p class="foot-note">
+        nginx 접근 로그 · 크롤러 제외 · <a href="/stats/raw/">GoAccess 원본</a>
+      </p>
+    </main>
+  </div>
+  <Footer />
+</Layout>
+
+<style>
+  .stats {
+    width: 100%;
+    padding-bottom: 4rem;
+  }
+
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    padding: 2rem 0 1.4rem;
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin: 0;
+  }
+  .sub {
+    font-size: 14px;
+    color: var(--muted);
+    margin: 0.35rem 0 0;
+  }
+
+  .ranges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .pill {
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--foreground);
+    font-size: 13px;
+    font-family: inherit;
+  }
+  .pill.is-on {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--background);
+    font-weight: 600;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: 16px;
+  }
+
+  .cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .card,
+  :global(.stats .metric) {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  section.card {
+    margin-top: 16px;
+  }
+
+  .card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .card-head h2 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0;
+  }
+  .hint {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .banner {
+    margin-top: 16px;
+    background: var(--accent-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .empty {
+    font-size: 13px;
+    color: var(--muted);
+    padding: 1rem 0;
+    margin: 0;
+  }
+
+  .foot-note {
+    margin-top: 1.5rem;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .foot-note a {
+    color: var(--accent);
+  }
+
+  /* ── 스크립트가 만들어 넣는 것들 ─────────────────────────── */
+
+  :global(.stats .metric-top) {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+  }
+  :global(.stats .metric-label) {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  :global(.stats .metric-delta) {
+    font-size: 12px;
+    font-weight: 700;
+    font-family: var(--font-code);
+    color: var(--muted);
+  }
+  :global(.stats .metric-delta.up) {
+    color: #3f7d58;
+  }
+  :global(html[data-theme="dark"] .stats .metric-delta.up) {
+    color: #7fbf9a;
+  }
+  :global(.stats .metric-value) {
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    margin: 6px 0 10px;
+  }
+  :global(.stats .spark) {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 40px;
+  }
+  :global(.stats .spark i) {
+    flex: 1;
+    border-radius: 2px 2px 0 0;
+    background: color-mix(in oklab, var(--accent) 22%, var(--background));
+    min-height: 3px;
+  }
+  :global(.stats .metric-note) {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 10px 0 0;
+  }
+
+  :global(.stats .row) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 56px;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  :global(.stats .row:last-child) {
+    border-bottom: 0;
+  }
+  :global(.stats .row-title) {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  :global(.stats .row-title a) {
+    color: inherit;
+    text-decoration: none;
+  }
+  :global(.stats .row-title a:hover) {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+  :global(.stats .bar) {
+    height: 5px;
+    border-radius: 3px;
+    background: color-mix(in oklab, var(--border) 70%, var(--background));
+    margin-top: 6px;
+    overflow: hidden;
+  }
+  :global(.stats .bar span) {
+    display: block;
+    height: 100%;
+    border-radius: 3px;
+    background: var(--accent);
+  }
+  :global(.stats .row-num) {
+    font-family: var(--font-code);
+    font-size: 14px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  :global(.stats .mini) {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    font-size: 13px;
+  }
+  :global(.stats .mini-name) {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  :global(.stats .mini-track) {
+    width: 56px;
+    height: 5px;
+    border-radius: 3px;
+    background: color-mix(in oklab, var(--border) 70%, var(--background));
+    overflow: hidden;
+    flex: none;
+  }
+  :global(.stats .mini-track span) {
+    display: block;
+    height: 100%;
+    background: color-mix(in oklab, var(--accent) 62%, var(--background));
+  }
+  :global(.stats .mini-num) {
+    width: 34px;
+    text-align: right;
+    font-family: var(--font-code);
+    font-variant-numeric: tabular-nums;
+    flex: none;
+  }
+
+  :global(.stats .badge) {
+    font-family: var(--font-code);
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    flex: none;
+  }
+  :global(.stats .badge.ok) {
+    background: var(--accent-bg);
+    color: color-mix(in oklab, var(--accent) 70%, black);
+  }
+  :global(html[data-theme="dark"] .stats .badge.ok) {
+    color: var(--accent);
+  }
+  :global(.stats .badge.neutral) {
+    background: color-mix(in oklab, var(--border) 70%, var(--background));
+    color: var(--muted);
+  }
+  :global(.stats .badge.bad) {
+    background: #f0e3e3;
+    color: #8a3a3a;
+  }
+  :global(html[data-theme="dark"] .stats .badge.bad) {
+    background: rgba(217, 123, 110, 0.16);
+    color: #d97b6e;
+  }
+
+  :global(.stats .path) {
+    font-family: var(--font-code);
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  :global(.stats .bot) {
+    text-align: right;
+  }
+  :global(.stats .bot b) {
+    display: block;
+    font-family: var(--font-code);
+    font-size: 18px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  :global(.stats .bot small) {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  :global(.stats .bots-nums) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pill {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  // GoAccess JSON → 화면. 데이터가 없거나 모양이 다르면 조용히 비우고
+  // 에러 문구를 띄운다. 서버 리포트는 로그 상태에 따라 패널이 통째로
+  // 빠질 수 있으므로 모든 접근을 방어적으로 한다.
+
+  type Row = { data?: string; hits?: { count?: number }; visitors?: { count?: number } };
+  type Panel = { data?: Row[] };
+  type Report = {
+    general?: { total_requests?: number; unique_visitors?: number; date_time?: string };
+    visitors?: Panel;
+    requests?: Panel;
+    referring_sites?: Panel;
+    not_found?: Panel;
+    status_codes?: Panel;
+    browsers?: Panel;
+  };
+
+  const REFERRER_NAMES: Record<string, string> = {
+    "google.com": "구글",
+    "www.google.com": "구글",
+    "search.naver.com": "네이버",
+    "m.search.naver.com": "네이버",
+    "naver.com": "네이버",
+    "bing.com": "빙",
+    "duckduckgo.com": "덕덕고",
+    "search.daum.net": "다음",
+    "t.co": "X",
+    "github.com": "GitHub",
+  };
+
+  const $ = (sel: string) => document.querySelector(sel) as HTMLElement | null;
+  const num = (n: unknown) => (typeof n === "number" && isFinite(n) ? n : 0);
+  const rows = (p?: Panel) => (Array.isArray(p?.data) ? (p!.data as Row[]) : []);
+  const esc = (s: string) =>
+    s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+
+  /** GoAccess 의 날짜 키는 설정에 따라 20260906 또는 2026-09-06 로 온다. */
+  function parseDay(v: string): Date | null {
+    const m = /^(\d{4})-?(\d{2})-?(\d{2})$/.exec(v.trim());
+    if (!m) return null;
+    return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  }
+
+  function fmtDay(d: Date) {
+    return `${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }
+
+  /** 방문자 패널을 날짜 오름차순 시계열로 정리한다. */
+  function series(rep: Report) {
+    return rows(rep.visitors)
+      .map(r => ({ d: parseDay(String(r.data ?? "")), v: num(r.visitors?.count), h: num(r.hits?.count) }))
+      .filter((x): x is { d: Date; v: number; h: number } => x.d !== null)
+      .sort((a, b) => a.d.getTime() - b.d.getTime());
+  }
+
+  function metricCard(label: string, value: string, delta: string, up: boolean, spark: { d: Date; v: number }[], note: string) {
+    const max = Math.max(1, ...spark.map(s => s.v));
+    const bars = spark
+      .map(s => `<i style="height:${Math.max(8, (s.v / max) * 100)}%" title="${fmtDay(s.d)} · ${s.v}"></i>`)
+      .join("");
+    return `<div class="metric">
+      <div class="metric-top">
+        <span class="metric-label">${esc(label)}</span>
+        <span class="metric-delta${up ? " up" : ""}">${esc(delta)}</span>
+      </div>
+      <div class="metric-value">${esc(value)}</div>
+      <div class="spark" aria-hidden="true">${bars}</div>
+      <p class="metric-note">${esc(note)}</p>
+    </div>`;
+  }
+
+  function render(rep: Report, bots: Report | null, days: number) {
+    const all = series(rep);
+    const cur = all.slice(-days);
+    const prev = all.slice(-days * 2, -days);
+
+    const sum = (xs: typeof all, k: "v" | "h") => xs.reduce((a, b) => a + b[k], 0);
+    const visitors = sum(cur, "v");
+    const views = sum(cur, "h");
+    const pVisitors = sum(prev, "v");
+    const pViews = sum(prev, "h");
+
+    const pct = (now: number, before: number) =>
+      before === 0 ? (now === 0 ? "—" : "신규") : `${now >= before ? "▲" : "▼"} ${Math.abs(Math.round(((now - before) / before) * 100))}%`;
+
+    const perVisit = visitors ? views / visitors : 0;
+    const pPerVisit = pVisitors ? pViews / pVisitors : 0;
+    const daily = cur.length ? visitors / cur.length : 0;
+    const pDaily = prev.length ? pVisitors / prev.length : 0;
+
+    const sparkV = cur.map(c => ({ d: c.d, v: c.v }));
+    const sparkH = cur.map(c => ({ d: c.d, v: c.h }));
+
+    $("[data-metrics]")!.innerHTML =
+      metricCard("방문자", visitors.toLocaleString(), pct(visitors, pVisitors), visitors >= pVisitors, sparkV, "크롤러 제외 실방문") +
+      metricCard("페이지뷰", views.toLocaleString(), pct(views, pViews), views >= pViews, sparkH, "정적 파일 제외") +
+      metricCard("방문당 페이지", perVisit.toFixed(1), pct(Math.round(perVisit * 10), Math.round(pPerVisit * 10)), perVisit >= pPerVisit, sparkH, "학습 블로그 평균 1.5–2.5") +
+      metricCard("일 평균 방문자", daily.toFixed(1), pDaily ? `${daily >= pDaily ? "▲" : "▼"} ${Math.abs(daily - pDaily).toFixed(1)}명` : "—", daily >= pDaily, sparkV, `${cur.length}일 평균`);
+
+    // ── 많이 읽힌 글 ──
+    const posts = rows(rep.requests)
+      .map(r => ({ path: String(r.data ?? ""), hits: num(r.hits?.count) }))
+      .filter(p => p.path.startsWith("/") && !p.path.startsWith("/stats"))
+      .slice(0, 12);
+    const maxHits = Math.max(1, ...posts.map(p => p.hits));
+    $("[data-posts]")!.innerHTML = posts.length
+      ? posts
+          .map(
+            p => `<div class="row">
+              <div>
+                <div class="row-title"><a href="${esc(p.path)}">${esc(decodeURIComponent(p.path))}</a></div>
+                <div class="bar"><span style="width:${(p.hits / maxHits) * 100}%"></span></div>
+              </div>
+              <div class="row-num">${p.hits.toLocaleString()}</div>
+            </div>`
+          )
+          .join("")
+      : `<p class="empty">아직 기록이 없습니다</p>`;
+
+    // ── 유입 경로 ──
+    const refs = rows(rep.referring_sites)
+      .map(r => {
+        const host = String(r.data ?? "").replace(/^https?:\/\//, "").split("/")[0];
+        return { name: REFERRER_NAMES[host] ?? host, hits: num(r.hits?.count) };
+      })
+      .slice(0, 8);
+    const maxRef = Math.max(1, ...refs.map(r => r.hits));
+    $("[data-referrers]")!.innerHTML = refs.length
+      ? refs
+          .map(
+            r => `<div class="mini">
+              <span class="mini-name">${esc(r.name)}</span>
+              <span class="mini-track"><span style="width:${(r.hits / maxRef) * 100}%"></span></span>
+              <span class="mini-num">${r.hits}</span>
+            </div>`
+          )
+          .join("")
+      : `<p class="empty">직접 유입만 있습니다</p>`;
+
+    // ── 응답 상태 ──
+    const LABEL: Record<string, string> = { "2xx": "정상", "3xx": "캐시 적중", "4xx": "없는 주소", "5xx": "서버 오류" };
+    const buckets: Record<string, number> = { "2xx": 0, "3xx": 0, "4xx": 0, "5xx": 0 };
+    for (const r of rows(rep.status_codes)) {
+      const code = String(r.data ?? "").trim();
+      const k = `${code[0]}xx`;
+      if (k in buckets) buckets[k] += num(r.hits?.count);
+    }
+    $("[data-status]")!.innerHTML = Object.entries(buckets)
+      .map(([k, v]) => {
+        const cls = k === "5xx" ? (v > 0 ? "bad" : "neutral") : k === "4xx" ? (v > 0 ? "bad" : "neutral") : k === "2xx" ? "ok" : "neutral";
+        return `<div class="mini">
+          <span class="badge ${cls}">${k}</span>
+          <span class="mini-name">${LABEL[k]}</span>
+          <span class="mini-num">${v.toLocaleString()}</span>
+        </div>`;
+      })
+      .join("");
+
+    // ── 404 ──
+    const nf = rows(rep.not_found)
+      .map(r => ({ path: String(r.data ?? ""), hits: num(r.hits?.count) }))
+      .slice(0, 10);
+    $("[data-notfound]")!.innerHTML = nf.length
+      ? nf
+          .map(
+            n => `<div class="mini">
+              <span class="path mini-name">${esc(decodeURIComponent(n.path))}</span>
+              <span class="mini-num">${n.hits}</span>
+            </div>`
+          )
+          .join("")
+      : `<p class="empty">깨진 링크 없음</p>`;
+
+    // ── 크롤러 ──
+    const banner = $("[data-bots]")!;
+    if (bots) {
+      const total = num(bots.general?.total_requests);
+      const byBot = rows(bots.browsers)
+        .map(r => ({ name: String(r.data ?? ""), hits: num(r.hits?.count) }))
+        .filter(b => b.hits > 0)
+        .slice(0, 4);
+      banner.hidden = false;
+      banner.innerHTML = `<div>
+          <div style="font-size:14px;font-weight:600">${total > 0 ? "크롤러는 계속 오고 있습니다" : "최근 2일 크롤러 방문이 없습니다"}</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:2px">최근 2일 · 사람 통계에서는 제외된 수치</div>
+        </div>
+        <div class="bots-nums">${
+          byBot.length
+            ? byBot.map(b => `<div class="bot"><b>${b.hits.toLocaleString()}</b><small>${esc(b.name)}</small></div>`).join("")
+            : `<div class="bot"><b>${total.toLocaleString()}</b><small>요청</small></div>`
+        }</div>`;
+    }
+
+    const updated = rep.general?.date_time ?? "";
+    $("[data-updated]")!.textContent = `${updated ? updated + " 갱신 · " : ""}nginx 접근 로그 · 크롤러 제외`;
+  }
+
+  async function load(days: number) {
+    const err = $("[data-error]")!;
+    try {
+      const res = await fetch("/stats/report.json", { cache: "no-store" });
+      if (!res.ok) throw new Error(`report.json ${res.status}`);
+      const rep: Report = await res.json();
+
+      let bots: Report | null = null;
+      try {
+        const b = await fetch("/stats/bots/report.json", { cache: "no-store" });
+        if (b.ok) bots = await b.json();
+      } catch {
+        /* 크롤러 리포트는 없을 수 있다 — 무시 */
+      }
+
+      err.hidden = true;
+      render(rep, bots, days);
+    } catch (e) {
+      err.hidden = false;
+      err.textContent = `통계를 불러오지 못했습니다 (${e instanceof Error ? e.message : "알 수 없는 오류"}). 서버에서 generate-stats 가 돌았는지 확인하세요.`;
+    }
+  }
+
+  function init() {
+    const pills = document.querySelectorAll<HTMLButtonElement>(".pill[data-range]");
+    if (!pills.length) return;
+    pills.forEach(p =>
+      p.addEventListener("click", () => {
+        pills.forEach(q => q.classList.toggle("is-on", q === p));
+        load(Number(p.dataset.range));
+      })
+    );
+    load(30);
+  }
+
+  init();
+  document.addEventListener("astro:page-load", init);
+</script>

@@ -29,6 +29,9 @@ export default defineConfig({
       filter: page => {
         // Exclude portfolio (unlisted — accessible only via direct URL)
         if (page.includes("/portfolio")) return false;
+        // 방문 통계는 basic auth 로 막혀 있고 noindex 다. sitemap 에 넣으면
+        // "색인해라" 와 "하지 마라" 를 동시에 말하는 셈이 된다.
+        if (page.includes("/stats")) return false;
         if (!SITE.showArchives && page.endsWith("/archives")) return false;
 
         // 글이 1편뿐인 태그 페이지는 sitemap 에서 제외한다.
