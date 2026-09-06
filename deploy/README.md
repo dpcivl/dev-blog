@@ -10,7 +10,8 @@ Vercel → Lightsail 이전을 위한 서버 설정. 전체 계획과 전환 절
 
 | 파일 | 놓일 곳 |
 | --- | --- |
-| `nginx/parkhyo.in.conf` | `/etc/nginx/sites-available/` → `sites-enabled/` 링크 |
+| `nginx/parkhyo.in.bootstrap.conf` | 인증서 받기 전 임시 (HTTP 전용) |
+| `nginx/parkhyo.in.conf` | 인증서 받은 뒤 교체 (HTTPS · 308 · 캐시) |
 | `bin/activate-release` | `/usr/local/bin/` (실행 권한 755) |
 
 ## 서버 준비 (Phase 1a)
@@ -51,8 +52,9 @@ sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
-인증서가 아직 없으면 443 블록 때문에 `nginx -t` 가 실패한다.
-80 블록만 먼저 올려 certbot 을 돌리고, 발급된 뒤 전체 설정을 넣는다.
+**순서가 있다.** 본 설정은 443 블록에서 인증서 파일을 참조하므로,
+인증서가 없는 상태로 올리면 `nginx -t` 가 실패하고 nginx 가 뜨지 않는다.
+부트스트랩 설정으로 먼저 올려 IP 검증까지 마치고, 인증서를 받은 뒤 교체한다.
 
 ### 4. TLS
 
