@@ -8,7 +8,9 @@ techStack:
   - Astro 5
   - Tailwind CSS 4
   - TypeScript
-  - Vercel
+  - AWS Lightsail
+  - nginx
+  - GitHub Actions
   - Pagefind
   - Pretendard
   - Satori (OG 이미지 동적 생성)
