@@ -1,8 +1,8 @@
 @import "tailwindcss";
 @import "./typography.css";
 
-/* Pretendard 는 Layout.astro <head> 의 <link> 로 로드 (CDN @import 가 Vite 빌드에서
-   누락되는 이슈 회피). src/layouts/Layout.astro 참고. */
+/* Pretendard 는 Layout.astro <head> 의 <link> 로 로드한다.
+   public/fonts/pretendard-1.3.9/ 에 자체 호스팅 (2026-09-06 jsdelivr 에서 이관). */
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
