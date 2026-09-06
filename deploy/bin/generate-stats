@@ -1,31 +1,71 @@
 #!/usr/bin/env bash
-# nginx 접근 로그로 방문 통계 HTML 을 만든다. cron 이 시간마다 호출.
+# nginx 접근 로그로 방문 통계를 만든다. cron 이 시간마다 호출.
 #   설치: sudo install -m 755 generate-stats /usr/local/bin/generate-stats
 #
-# --persist/--restore 로 누적 DB 를 쓴다. 이게 없으면 logrotate 가 로그를
-# 지울 때 과거 통계도 같이 사라진다 (Ubuntu 기본: 매일 회전, 14개 보관).
+# 리포트를 둘로 나눈다.
+#   /stats/       사람 방문 — 볼 패널만 남기고 나머지는 숨긴다. 누적 DB 사용.
+#   /stats/bots/  크롤러 활동 — 구글봇 · 네이버 Yeti 등이 오고 있는지 확인용.
+#
+# 크롤러 리포트는 누적하지 않는다. stdin 으로 넘기면 GoAccess 의 증분 추적이
+# 안 먹어 매 실행마다 중복 집계되기 때문이다. "지금 크롤러가 오는가" 를 보는
+# 용도라 최근 이틀치면 충분하다.
 set -euo pipefail
 
 LOG=/var/log/nginx/access.log
-OUT=/var/www/stats/index.html
+OUT_DIR=/var/www/stats
 DB=/var/lib/goaccess
 
 command -v goaccess >/dev/null || { echo "goaccess 미설치" >&2; exit 1; }
 [ -r "$LOG" ] || { echo "로그를 읽을 수 없다: $LOG" >&2; exit 1; }
-mkdir -p "$(dirname "$OUT")" "$DB"
+mkdir -p "$OUT_DIR/bots" "$DB"
 
-goaccess "$LOG" \
-  --log-format=COMBINED \
-  --persist --restore --db-path="$DB" \
+COMMON=(
+  --log-format=COMBINED
+  --real-os
+  --tz=Asia/Seoul
+  --static-file=.webp --static-file=.avif
+  --static-file=.woff2 --static-file=.mp4
+)
+
+# 보고 나서 할 일이 없는 패널은 숨긴다
+HIDE=(
+  --ignore-panel=REQUESTS_STATIC
+  --ignore-panel=HOSTS
+  --ignore-panel=OS
+  --ignore-panel=BROWSERS
+  --ignore-panel=VISIT_TIMES
+  --ignore-panel=VIRTUAL_HOSTS
+  --ignore-panel=REFERRERS
+  --ignore-panel=KEYPHRASES
+  --ignore-panel=REMOTE_USER
+  --ignore-panel=CACHE_STATUS
+  --ignore-panel=GEO_LOCATION
+  --ignore-panel=ASN
+  --ignore-panel=MIME_TYPE
+  --ignore-panel=TLS_TYPE
+)
+# 남는 것: VISITORS(추세) · REQUESTS(인기 글) · NOT_FOUND(404) · REFERRING_SITES(유입) · STATUS_CODES
+
+# ── 1. 사람 방문 (크롤러 제외, 누적) ──
+goaccess "$LOG" "${COMMON[@]}" "${HIDE[@]}" \
   --ignore-crawlers \
-  --real-os \
-  --html-report-title="parkhyo.in" \
-  --tz=Asia/Seoul \
-  --static-file=.webp \
-  --static-file=.avif \
-  --static-file=.woff2 \
-  --static-file=.mp4 \
-  -o "$OUT"
+  --persist --restore --db-path="$DB" \
+  --html-report-title="parkhyo.in — 방문" \
+  -o "$OUT_DIR/index.html"
 
-# nginx 가 읽을 수 있게
-chmod 644 "$OUT"
+# ── 2. 크롤러 활동 (검색엔진 봇만, 최근 이틀) ──
+# zcat -f 는 압축·비압축 둘 다 처리한다. 회전 직후에도 어제치가 남는다.
+{ zcat -f /var/log/nginx/access.log.1 2>/dev/null || true; cat "$LOG"; } \
+  | grep -aiE 'Googlebot|Yeti|bingbot|Daum|Applebot|DuckDuckBot|PetalBot' \
+  | goaccess - "${COMMON[@]}" \
+      --ignore-panel=REQUESTS_STATIC \
+      --ignore-panel=OS --ignore-panel=VISIT_TIMES \
+      --ignore-panel=VIRTUAL_HOSTS --ignore-panel=REFERRERS \
+      --ignore-panel=KEYPHRASES --ignore-panel=REMOTE_USER \
+      --ignore-panel=CACHE_STATUS --ignore-panel=ASN \
+      --ignore-panel=MIME_TYPE --ignore-panel=TLS_TYPE \
+      --html-report-title="parkhyo.in — 크롤러 (최근 2일)" \
+      -o "$OUT_DIR/bots/index.html" \
+  || echo "크롤러 로그 없음 — 리포트 건너뜀" >&2
+
+chmod 644 "$OUT_DIR/index.html" "$OUT_DIR/bots/index.html" 2>/dev/null || true
