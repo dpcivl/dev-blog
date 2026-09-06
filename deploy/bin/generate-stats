@@ -21,12 +21,16 @@ command -v goaccess >/dev/null || { echo "goaccess 미설치" >&2; exit 1; }
 [ -r "$LOG" ] || { echo "로그를 읽을 수 없다: $LOG" >&2; exit 1; }
 
 # human.log 는 nginx 설정을 반영한 뒤 첫 요청이 와야 생긴다.
-# 없으면 전체 로그로 대신하되, 그 수치는 봇이 섞인 값임을 알린다.
-SRC="$HUMAN"
+#
+# 없을 때 access.log 로 폴백하면 안 된다. 누적 DB(--persist)에 봇 데이터가
+# 영구히 들어가서, 나중에 human.log 가 생겨도 그 오염이 계속 남는다.
+# 실제로 한 번 그렇게 됐다. 사람 리포트는 건너뛰고 크롤러 리포트만 만든다.
+HUMAN_OK=1
 if [ ! -s "$HUMAN" ]; then
-  echo "경고: $HUMAN 이 없거나 비었다. access.log 로 대체한다 —" >&2
-  echo "      nginx 설정을 반영했는지 확인할 것. 이 수치에는 봇이 섞인다." >&2
-  SRC="$LOG"
+  echo "$HUMAN 이 없거나 비었다 — 방문 통계는 건너뛴다." >&2
+  echo "  nginx 설정이 반영됐는지, 반영 후 사람 요청이 한 번이라도 왔는지 확인할 것." >&2
+  echo "  (로그를 지웠다면 sudo nginx -s reopen 이 필요하다)" >&2
+  HUMAN_OK=0
 fi
 mkdir -p "$OUT_DIR/raw" "$OUT_DIR/bots" "$DB"
 
@@ -59,13 +63,15 @@ HIDE=(
 
 # ── 1. 사람 방문 (누적) ──
 # 1차 필터는 nginx 가 이미 했다(human.log). --ignore-crawlers 는 2차 방어선.
-goaccess "$SRC" "${COMMON[@]}" "${HIDE[@]}" \
+if [ "$HUMAN_OK" = 1 ]; then
+goaccess "$HUMAN" "${COMMON[@]}" "${HIDE[@]}" \
   --ignore-crawlers \
   --persist --restore --db-path="$DB" \
   --html-report-title="parkhyo.in — 방문 (원본)" \
   --date-spec=date \
   -o "$OUT_DIR/raw/index.html" \
   -o "$OUT_DIR/report.json"
+fi
 
 # ── 2. 크롤러 활동 (검색엔진 봇만, 최근 이틀) ──
 # zcat -f 는 압축·비압축 둘 다 처리한다. 회전 직후에도 어제치가 남는다.
