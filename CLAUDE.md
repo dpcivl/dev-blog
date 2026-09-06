@@ -68,7 +68,7 @@ git -C src/scratch pull --rebase
      - `title`, `description`, `pubDatetime` (ISO 8601, 예: `2026-05-05T13:00:00Z`)
      - `tags`: 한국어 태그 OK (예: `트러블슈팅`, `astro`)
      - `draft: false`, `featured: true/false` 적절히
-   - ⚠️ **`pubDatetime` 은 반드시 현재 UTC 시각 또는 과거**로 설정. 미래 시각이면 [src/utils/postFilter.ts](src/utils/postFilter.ts)의 `isPublishTimePassed` 필터에 걸려 production(Vercel) 빌드에서 제외됨 (dev 서버에서는 보이므로 dev 화면만 보고 발행됐다고 착각하기 쉬움). 작성 직전에 `date -u` 로 현재 시각 확인 후 그보다 이전 시각으로 설정.
+   - ⚠️ **`pubDatetime` 은 반드시 현재 UTC 시각 또는 과거**로 설정. 미래 시각이면 [src/utils/postFilter.ts](src/utils/postFilter.ts)의 `isPublishTimePassed` 필터에 걸려 production 빌드에서 제외됨 (dev 서버에서는 보이므로 dev 화면만 보고 발행됐다고 착각하기 쉬움). 작성 직전에 `date -u` 로 현재 시각 확인 후 그보다 이전 시각으로 설정.
    - 사용자가 거칠게 적은 메모를 다음 형태로 정돈한다:
      - **상황** → **시도/검증** → **원인/해결** → **회고** 흐름
      - 구어체 한국어, 1인칭("나"), `~다` 어미
@@ -147,7 +147,7 @@ grep -nE '^\s*[+?]|^\s*![^[]' <메모파일>
 
 ### 🔴 보안 스크러빙 (반드시 발행 직전 수행)
 
-이 블로그는 GitHub public 저장소 + Vercel 공개 배포다. **포스트에 들어가는 모든 텍스트는 인터넷에 영구 공개된다고 간주한다.** 한 번 push되면 git history / GitHub 검색 / 외부 스크래퍼에서 회수 불가능.
+이 블로그는 GitHub public 저장소 + AWS Lightsail 공개 배포다. **포스트에 들어가는 모든 텍스트는 인터넷에 영구 공개된다고 간주한다.** 한 번 push되면 git history / GitHub 검색 / 외부 스크래퍼에서 회수 불가능.
 
 **절대 본문·코드 블록·에러 로그·스크린샷·frontmatter 어디에도 포함하면 안 되는 것:**
 
@@ -409,7 +409,23 @@ CLAUDE.md 이관 규칙 (2026-07-14). 이전에는 `~/.claude/projects/*/memory/
   - `.gitattributes` 로 LF 통일 (Windows autocrlf 자동 처리)
   - Node/pnpm 버전은 `.nvmrc` (Node 24) + `packageManager` (pnpm@11.1.2) 로 pin
   - **매 세션 시작 시 `git pull` · 종료 시 반드시 `git push`** — 안 하면 다른 기기에서 갈라짐
-- 빌드 스크립트의 `cp -r dist/pagefind public/`는 Unix 명령이라 Windows 로컬 빌드 시 마지막 단계가 실패. Vercel (Linux) 에서는 정상.
+- 빌드 스크립트의 `cp -r dist/pagefind public/`는 Unix 명령이라 Windows 로컬 빌드 시 마지막 단계가 실패. 배포 빌드는 GitHub Actions (Linux) 에서 돌아 정상.
+
+## 배포 (2026-09-06~ AWS Lightsail)
+
+Vercel 에서 **AWS Lightsail 자체 운영**으로 이전했다. 글 쓰는 절차는 바뀌지 않았다 — `main` 에 푸시하면 끝이다.
+
+```
+main 푸시 → GitHub Actions 빌드 → rsync → releases/<시각>-<sha>/ → current 심볼릭 링크 교체
+```
+
+- 워크플로: [.github/workflows/deploy.yml](.github/workflows/deploy.yml) · 서버 설정: [deploy/](deploy/)
+- 빌드는 **CI 에서** 한다. 서버(512MB)는 정적 파일만 서빙한다 — 빌드 중 OG 이미지 150여 장을 resvg 로 렌더하고 Pagefind 색인을 만들어서 작은 인스턴스로는 감당이 안 된다
+- 배포 실패해도 **직전 릴리스가 그대로 서빙**된다 (심볼릭 링크를 안 바꾸므로). 롤백은 서버에서 `activate-release <이전-id>`
+- 인증서는 Let's Encrypt · webroot 방식 자동 갱신. `certbot renew --dry-run` 으로 확인
+- **방문 통계 없음** — `@vercel/analytics` 를 제거했고 대체는 아직 안 정했다. Postgres 를 올릴 때 Umami 를 같이 얹는 안이 있다
+- 서버 nginx 는 **1.24** 다. `http2 on;` 같은 1.25+ 문법을 쓰면 안 된다
+- 서버가 저장소 파일을 `raw.githubusercontent.com` 에서 받을 때 **5분 캐시**에 걸린다. 급하면 URL 에 커밋 해시를 박는다
 
 ## 이미지 최적화 워크플로우
 
@@ -417,7 +433,7 @@ CLAUDE.md 이관 규칙 (2026-07-14). 이전에는 `~/.claude/projects/*/memory/
 
 ## Mermaid 다이어그램 워크플로우
 
-Vercel 빌드 환경에서 Chromium 실행이 불안정해 remark-mermaidjs 를 파이프라인에 넣으면 본문 유실 사고가 남 (2026-07-10 실제 발생). 그래서 **로컬에서 사전 렌더 → static asset 커밋** 방식으로 고정.
+당시 배포처였던 Vercel 의 빌드 환경에서 Chromium 실행이 불안정해 remark-mermaidjs 를 파이프라인에 넣으면 본문 유실 사고가 남 (2026-07-10 실제 발생). 그래서 **로컬에서 사전 렌더 → static asset 커밋** 방식으로 고정. 배포처가 Lightsail 로 바뀐 뒤에도 이 방식을 유지한다 — 방문자 렌더 지연 0 · 클라이언트 JS 0 이라는 이점은 그대로다.
 
 1. 포스트 MD 에 ` ```mermaid ` 코드 블록으로 자유롭게 작성
 2. 첫 줄에 `%% alt: 다이어그램 설명` (접근성용, mermaid 는 `%%` 를 주석 처리)
@@ -427,7 +443,7 @@ Vercel 빌드 환경에서 Chromium 실행이 불안정해 remark-mermaidjs 를 
 4. `git commit` — SVG + 재작성된 MD 함께
 5. 필요 시 `pnpm mermaid:gc` 로 참조 없는 hash 파일 정리 (legacy 명명 SVG 는 안 건드림)
 
-**Astro 파이프라인엔 mermaid 플러그인 없음** — 재추가하지 말 것. Vercel 은 이미지만 서빙.
+**Astro 파이프라인엔 mermaid 플러그인 없음** — 재추가하지 말 것. 서버는 이미지만 서빙.
 
 ### 언제 쓰는가 (이게 오래 비어 있었다)
 
