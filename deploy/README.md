@@ -71,6 +71,55 @@ sudo certbot renew --dry-run   # 갱신이 실제로 되는지 한 번은 확인
 > 방문자 브라우저에 HSTS 가 캐시되어 있다. **전환 시점에 유효한 인증서가 없으면
 > 브라우저가 경고를 건너뛰고 접속 자체를 거부한다.** 인증서를 먼저 확보할 것.
 
+## 방문 통계 (GoAccess)
+
+Vercel Analytics 를 걷어낸 자리를 nginx 로그 분석으로 대신한다.
+클라이언트 JS 를 쓰지 않아 광고 차단기에 막히지 않고, 상주 프로세스가 없어
+512 MB 인스턴스에서도 부담이 없다. 대신 크롤러가 같이 잡히므로 필터가 필요하다.
+
+```bash
+sudo apt install -y goaccess apache2-utils
+
+sudo install -m 755 deploy/bin/generate-stats /usr/local/bin/generate-stats
+sudo mkdir -p /var/www/stats /var/lib/goaccess
+
+# 대시보드 접근용 비밀번호 (사용자 이름은 원하는 대로)
+sudo htpasswd -c /etc/nginx/.htpasswd-stats admin
+sudo chown root:www-data /etc/nginx/.htpasswd-stats
+sudo chmod 640 /etc/nginx/.htpasswd-stats
+
+# 첫 리포트 생성
+sudo /usr/local/bin/generate-stats
+```
+
+nginx 설정을 갱신하고 반영한다 (`/stats/` 블록이 추가돼 있다).
+
+```bash
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+시간마다 갱신되도록 cron 을 건다.
+
+```bash
+echo '30 * * * * root /usr/local/bin/generate-stats >/dev/null 2>&1' \
+  | sudo tee /etc/cron.d/goaccess-stats
+sudo chmod 644 /etc/cron.d/goaccess-stats
+```
+
+> **:30 에 도는 이유** — logrotate 가 자정 무렵 로그를 회전시킨다.
+> 정각에 겹치면 회전 중인 로그를 읽을 수 있어 30분 비켜 둔다.
+
+확인: `https://parkhyo.in/stats/` — 아이디·비밀번호를 물어본다.
+
+### 알아둘 것
+
+- **누적 DB** (`/var/lib/goaccess`) 를 쓰므로 logrotate 가 로그를 지워도 통계는 남는다.
+  이걸 안 켜면 Ubuntu 기본 설정(매일 회전 · 14개 보관) 때문에 2주 뒤 과거가 사라진다.
+- 정적 파일(`.webp` · `.woff2` 등)은 GoAccess 가 별도 패널로 분리하므로
+  페이지뷰가 부풀지 않는다.
+- `--ignore-crawlers` 로 알려진 봇은 제외되지만 전부는 아니다.
+  숫자가 이상하면 대시보드의 User Agent 패널을 먼저 본다.
+
 ## GitHub Secrets
 
 | 이름 | 값 |
