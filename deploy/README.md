@@ -154,7 +154,7 @@ sudo chmod 644 /etc/cron.d/goaccess-stats
 첫날 "실방문 60명" 으로 나온 것의 실체는 이랬다.
 
 ```
-<작성자 집 IP>  123회   작성자 본인
+<작성자 집 IP>   123회   작성자 본인
 curl/8.7.1        60회   검증하며 돌린 것
 TikTokSpider      27회
 Let's Encrypt     10회
@@ -188,7 +188,7 @@ sudo tee /etc/nginx/conf.d/stats-exclude-ips.map <<'EOF'
 EOF
 ```
 
-주소를 추가할 때는 같은 파일에 `<작성자 집 IP> 0;` 형식으로 한 줄씩 넣고
+주소를 추가할 때는 같은 파일에 `<제외할 IP> 0;` 형식으로 한 줄씩 넣고
 `sudo nginx -t && sudo systemctl reload nginx`. 집 IP 는 바뀌므로 완벽하진 않다.
 
 ### 알아둘 것
