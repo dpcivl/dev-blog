@@ -1,0 +1,90 @@
+# Lightsail 배포 — 빌드는 여기서, 서버는 정적 파일만 받는다.
+#
+# 서버에서 pnpm build 를 돌리지 않는 이유: 빌드 중 OG 이미지 152장을 resvg 로
+# 렌더하고 Pagefind 색인을 만든다. 작은 인스턴스에서는 메모리로 넘어지고,
+# 그러면 사이트가 아니라 배포가 멈춘다.
+#
+# 필요한 Secrets:
+#   LIGHTSAIL_HOST         고정 IP 또는 호스트명
+#   LIGHTSAIL_SSH_KEY      deploy 사용자의 개인키 (전체 내용)
+#   LIGHTSAIL_KNOWN_HOSTS  ssh-keyscan -H <IP> 출력
+#   PUBLIC_GOOGLE_SITE_VERIFICATION / PUBLIC_NAVER_SITE_VERIFICATION (선택)
+
+name: Deploy to Lightsail
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build & deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: "☁️ Checkout"
+        uses: actions/checkout@v4
+
+      - name: "📦 pnpm"
+        # 버전은 package.json 의 packageManager 필드를 따른다
+        uses: pnpm/action-setup@v4
+
+      - name: "📦 Node"
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: "pnpm"
+
+      - name: "📦 Install"
+        run: pnpm install --frozen-lockfile
+
+      - name: "🚀 Build"
+        env:
+          PUBLIC_GOOGLE_SITE_VERIFICATION: ${{ secrets.PUBLIC_GOOGLE_SITE_VERIFICATION }}
+          PUBLIC_NAVER_SITE_VERIFICATION: ${{ secrets.PUBLIC_NAVER_SITE_VERIFICATION }}
+        run: pnpm build
+
+      - name: "🔎 산출물 확인"
+        run: |
+          test -s dist/index.html
+          test -s dist/sitemap-index.xml
+          test -d dist/pagefind
+          echo "파일 $(find dist -type f | wc -l)개 · $(du -sh dist | cut -f1)"
+
+      - name: "🔑 SSH 준비"
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.LIGHTSAIL_SSH_KEY }}" > ~/.ssh/deploy
+          chmod 600 ~/.ssh/deploy
+          printf '%s\n' "${{ secrets.LIGHTSAIL_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: "📤 릴리스 전송 후 활성화"
+        env:
+          HOST: ${{ secrets.LIGHTSAIL_HOST }}
+        run: |
+          RELEASE="$(date -u +%Y%m%d-%H%M%S)-${GITHUB_SHA::7}"
+          echo "릴리스: $RELEASE"
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/deploy -o StrictHostKeyChecking=yes" \
+            dist/ "deploy@$HOST:/var/www/parkhyo.in/releases/$RELEASE/"
+          ssh -i ~/.ssh/deploy "deploy@$HOST" \
+            "/usr/local/bin/activate-release '$RELEASE'"
+
+      - name: "✅ 응답 확인"
+        env:
+          HOST: ${{ secrets.LIGHTSAIL_HOST }}
+        run: |
+          # DNS 전환 전에는 Host 헤더를 직접 붙여 IP 로 확인한다
+          code=$(curl -s -o /dev/null -w '%{http_code}' \
+            --resolve "parkhyo.in:443:$HOST" https://parkhyo.in/ || true)
+          echo "HTTP $code"

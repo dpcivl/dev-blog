@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# 새 릴리스를 원자적으로 활성화한다. CI 가 rsync 를 마친 뒤 SSH 로 호출.
+#   설치: sudo install -m 755 activate-release /usr/local/bin/activate-release
+#   사용: activate-release 20260906-102233-a1b2c3d
+set -euo pipefail
+
+ROOT=/var/www/parkhyo.in
+KEEP=5
+
+[ $# -eq 1 ] || { echo "usage: activate-release <release-id>" >&2; exit 2; }
+REL="$ROOT/releases/$1"
+
+# 전송이 중간에 끊긴 릴리스를 활성화하지 않도록 최소한만 확인한다
+[ -d "$REL" ]                  || { echo "릴리스 없음: $REL" >&2; exit 1; }
+[ -s "$REL/index.html" ]       || { echo "index.html 이 없거나 비었다 — 중단" >&2; exit 1; }
+[ -s "$REL/sitemap-index.xml" ]|| { echo "sitemap-index.xml 이 없다 — 중단" >&2; exit 1; }
+
+# 심볼릭 링크 교체는 원자적이라 방문자가 반쪽짜리 사이트를 보지 않는다
+ln -sfn "$REL" "$ROOT/current.tmp"
+mv -Tf "$ROOT/current.tmp" "$ROOT/current"
+
+# 오래된 릴리스 정리 (롤백용으로 최근 몇 개는 남긴다)
+ls -1dt "$ROOT"/releases/*/ 2>/dev/null | tail -n +$((KEEP + 1)) | xargs -r rm -rf
+
+echo "활성화됨: $1"
