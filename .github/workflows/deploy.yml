@@ -84,7 +84,14 @@ jobs:
         env:
           HOST: ${{ secrets.LIGHTSAIL_HOST }}
         run: |
-          # DNS 전환 전에는 Host 헤더를 직접 붙여 IP 로 확인한다
-          code=$(curl -s -o /dev/null -w '%{http_code}' \
-            --resolve "parkhyo.in:443:$HOST" https://parkhyo.in/ || true)
-          echo "HTTP $code"
+          # DNS 전환 전에는 Host 헤더를 직접 붙여 IP 로 확인한다.
+          # 인증서가 생기기 전에는 80 만 열려 있으므로 둘 다 찍어보고 하나라도 200 이면 통과.
+          http=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 \
+            --resolve "parkhyo.in:80:$HOST" http://parkhyo.in/ || echo 000)
+          https=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 \
+            --resolve "parkhyo.in:443:$HOST" https://parkhyo.in/ || echo 000)
+          echo "http=$http  https=$https"
+          if [ "$http" != "200" ] && [ "$https" != "200" ]; then
+            echo "::error::어느 쪽에서도 200 이 오지 않았다"
+            exit 1
+          fi
