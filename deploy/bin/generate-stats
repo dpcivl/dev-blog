@@ -12,12 +12,22 @@
 # 용도라 최근 이틀치면 충분하다.
 set -euo pipefail
 
-LOG=/var/log/nginx/access.log
+LOG=/var/log/nginx/access.log        # 전체 — 크롤러 리포트용
+HUMAN=/var/log/nginx/human.log       # 사람 요청만 — nginx 가 분리해 기록
 OUT_DIR=/var/www/stats
 DB=/var/lib/goaccess
 
 command -v goaccess >/dev/null || { echo "goaccess 미설치" >&2; exit 1; }
 [ -r "$LOG" ] || { echo "로그를 읽을 수 없다: $LOG" >&2; exit 1; }
+
+# human.log 는 nginx 설정을 반영한 뒤 첫 요청이 와야 생긴다.
+# 없으면 전체 로그로 대신하되, 그 수치는 봇이 섞인 값임을 알린다.
+SRC="$HUMAN"
+if [ ! -s "$HUMAN" ]; then
+  echo "경고: $HUMAN 이 없거나 비었다. access.log 로 대체한다 —" >&2
+  echo "      nginx 설정을 반영했는지 확인할 것. 이 수치에는 봇이 섞인다." >&2
+  SRC="$LOG"
+fi
 mkdir -p "$OUT_DIR/raw" "$OUT_DIR/bots" "$DB"
 
 COMMON=(
@@ -47,8 +57,9 @@ HIDE=(
 )
 # 남는 것: VISITORS(추세) · REQUESTS(인기 글) · NOT_FOUND(404) · REFERRING_SITES(유입) · STATUS_CODES
 
-# ── 1. 사람 방문 (크롤러 제외, 누적) ──
-goaccess "$LOG" "${COMMON[@]}" "${HIDE[@]}" \
+# ── 1. 사람 방문 (누적) ──
+# 1차 필터는 nginx 가 이미 했다(human.log). --ignore-crawlers 는 2차 방어선.
+goaccess "$SRC" "${COMMON[@]}" "${HIDE[@]}" \
   --ignore-crawlers \
   --persist --restore --db-path="$DB" \
   --html-report-title="parkhyo.in — 방문 (원본)" \

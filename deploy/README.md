@@ -148,6 +148,40 @@ sudo chmod 644 /etc/cron.d/goaccess-stats
 크롤러 리포트는 누적하지 않는다. 파이프로 넘기면 GoAccess 의 증분 추적이
 안 먹어 매번 중복 집계된다. 이건 추세가 아니라 생존 확인용이라 최근 이틀이면 된다.
 
+### 봇을 거르는 방식 — nginx 단계에서 로그를 나눈다
+
+처음에는 전체 로그를 GoAccess 의 `--ignore-crawlers` 로 걸렀는데 **샜다.**
+첫날 "실방문 60명" 으로 나온 것의 실체는 이랬다.
+
+```
+<작성자 집 IP>  123회   작성자 본인
+curl/8.7.1        60회   검증하며 돌린 것
+TikTokSpider      27회
+Let's Encrypt     10회
+Applebot 7 · Amazonbot 6 · Bytespider 6
+404: /.env · /.git/HEAD · /hudson   취약점 스캐너
+```
+
+`--ignore-crawlers` 는 **알려진 이름 목록** 방식이라 TikTokSpider · Bytespider ·
+curl 을 놓친다. 그래서 사후 필터 대신 **nginx 가 기록 단계에서 나누게** 했다.
+
+```
+access.log   전체 — 크롤러 리포트 · 디버깅
+human.log    사람 요청만 — 방문 통계
+```
+
+`map` 세 개로 판정한다 — UA 가 봇 · 자동화 도구 · 빈 값이면 제외,
+정적 파일과 `/stats/` 자체도 제외. 사후 grep 과 달리 **GoAccess 가 파일을 직접
+읽으므로 증분 처리(`--persist`)가 그대로 작동한다.**
+
+> 서버 로그 분석의 구조적 한계이기도 하다. Vercel Analytics 는 클라이언트 JS 로
+> 셌기 때문에 JS 를 실행하지 않는 봇이 자연히 빠졌다. 광고 차단기에 안 막히는
+> 장점의 이면이다.
+
+**본인 IP 를 빼려면** 서버에서 직접 추가한다 (공개 저장소에 집 IP 를 넣지 말 것).
+`map $remote_addr $ip_human { default 1; 1.2.3.4 0; }` 를 추가하고
+`$log_human` 판정에 끼워넣는 식이다.
+
 ### 알아둘 것
 
 - **누적 DB** (`/var/lib/goaccess`) 를 쓰므로 logrotate 가 로그를 지워도 통계는 남는다.
