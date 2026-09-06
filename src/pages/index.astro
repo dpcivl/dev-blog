@@ -6,7 +6,6 @@ import Footer from "@/components/Footer.astro";
 import Grass from "@/components/Grass.astro";
 import StatGrid from "@/components/StatGrid.astro";
 import PostRow from "@/components/PostRow.astro";
-import ProjectTile from "@/components/ProjectTile.astro";
 import getSortedPosts from "@/utils/getSortedPosts";
 import { getPublishActivity } from "@/utils/getPublishActivity";
 import { getSeriesSummary } from "@/data/series";
@@ -116,25 +115,6 @@ const pageDesc =
           days={90}
         />
       </section>
-
-      {/* ===== 지금 만들고 있는 것 ===== */}
-      {
-        liveProjects.length > 0 && (
-          <section class="rise-init pt-12" data-rise>
-            <div class="mb-4 flex items-baseline justify-between gap-4">
-              <h2 class="text-[0.95rem] font-semibold">지금 만들고 있는 것</h2>
-              <a href="/portfolio" class="arw-link text-[0.8rem]">
-                전체 프로젝트 <span class="arw">→</span>
-              </a>
-            </div>
-            <div class="grid gap-5 sm:grid-cols-2">
-              {liveProjects.map(project => (
-                <ProjectTile project={project} />
-              ))}
-            </div>
-          </section>
-        )
-      }
 
       {/* ===== 최근 기록 ===== */}
       {
