@@ -18,27 +18,23 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 3
 
-    strategy:
-      matrix:
-        node-version: [20]
-
     steps:
       - name: "☁️ Checkout repository"
         uses: actions/checkout@v4
 
+      # 버전은 저장소 핀을 따른다 — package.json 의 packageManager 와 .nvmrc.
+      # 배포(deploy.yml)와 같은 런타임이어야 CI 통과가 배포 성공을 보장한다.
       - name: "📦 Install pnpm"
         uses: pnpm/action-setup@v4
-        with:
-          version: 10.11.1
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: "📦 Node"
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version-file: .nvmrc
           cache: "pnpm"
 
       - name: "📦 Install dependencies"
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: "🔎 Lint code"
         run: pnpm run lint
