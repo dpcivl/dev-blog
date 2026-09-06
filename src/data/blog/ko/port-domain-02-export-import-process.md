@@ -56,7 +56,7 @@ featured: false
 
 선사는 컨테이너 내용물까지는 잘 모른다. 혼적이면 여러 회사가 엮여 있으므로, 대표 하나만 B/L 을 발행하게 하고 그것으로 보험을 든다.
 
-<img src="/assets/mermaid/a57ffe04fc5f2fd6.svg" alt="수출 업무 8단계 흐름 — 운송예약에서 부킹 번호, 컨테이너 확보에서 컨테이너 번호, 적입에서 봉인 번호와 VGM, 수출신고에서 HS Code, 선적 준비에서 베이 플랜, 출항 후 B/L 이 발급된다" style="max-width:100%;height:auto;" />
+<img src="/assets/mermaid/a57ffe04fc5f2fd6.svg" alt="수출 업무 8단계 흐름 — 운송예약에서 부킹 번호, 컨테이너 확보에서 컨테이너 번호, 적입에서 봉인 번호와 VGM, 수출신고에서 HS Code, 선적 준비에서 베이 플랜, 출항 후 B/L 이 발급된다" width="230" height="942" style="max-width:min(100%, 230px);height:auto;" />
 
 > 정리: 운송예약 → 컨테이너 확보 → 적입 → 수출신고 → 터미널 반입 → 선적 준비 → 선적 → 출항 및 서류 완성
 
@@ -76,7 +76,7 @@ featured: false
 
 **6. 컨테이너 반납** — 컨테이너는 선사의 자산이다. 다 쓰면 포워더가 가져가 선사에 반납한다.
 
-<img src="/assets/mermaid/7dc36d7febc6c823.svg" alt="수입 업무 6단계 흐름 — 입항 24시간 전 문서 제출로 MRN 이 발급되고, 입항과 양하 후 보세구역에 장치되며, 수입신고와 운임 정산으로 D/O 를 받아야 반출할 수 있고 마지막에 컨테이너를 반납한다" style="max-width:100%;height:auto;" />
+<img src="/assets/mermaid/7dc36d7febc6c823.svg" alt="수입 업무 6단계 흐름 — 입항 24시간 전 문서 제출로 MRN 이 발급되고, 입항과 양하 후 보세구역에 장치되며, 수입신고와 운임 정산으로 D/O 를 받아야 반출할 수 있고 마지막에 컨테이너를 반납한다" width="243" height="710" style="max-width:min(100%, 243px);height:auto;" />
 
 > 정리: 문서 제출 → 입항 및 양하 → 수입신고 → 운임 정산 → 반출 → 컨테이너 반납
 

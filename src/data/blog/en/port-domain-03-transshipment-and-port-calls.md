@@ -37,7 +37,7 @@ Sometimes transshipment happens because cargo loaded on several small ships gets
 3. It goes to a storage yard. **It isn't even inspected.** It sits in a bonded area waiting
 4. Once the transshipment vessel arrives, the cargo is loaded and the ship departs
 
-<img src="/assets/mermaid/f64a812cbf4dff28.svg" alt="환적 화물 처리 흐름 — 피더선이 입항해 양하한 컨테이너는 관세선을 통과하지 않고 보세구역에서 대기하다 메인라인 선박에 선적되어 출항한다. 관세선을 넘지 않으므로 수입통계가 아니라 항만 처리량으로만 잡힌다" style="max-width:100%;height:auto;" />
+<img src="/assets/mermaid/f64a812cbf4dff28.svg" alt="환적 화물 처리 흐름 — 피더선이 입항해 양하한 컨테이너는 관세선을 통과하지 않고 보세구역에서 대기하다 메인라인 선박에 선적되어 출항한다. 관세선을 넘지 않으므로 수입통계가 아니라 항만 처리량으로만 잡힌다" width="1018" height="222" style="max-width:min(100%, 1018px);height:auto;" />
 
 Step 2 was the most interesting part to me.
 

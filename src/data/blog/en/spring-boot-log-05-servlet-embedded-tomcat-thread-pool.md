@@ -83,7 +83,7 @@ Both are Apache Foundation projects, so the names just happen to overlap — the
 
 Roughly speaking, the backend operates through this flow.
 
-<img src="/assets/mermaid/f697e5047f1b729c.svg" alt="사용자에서 웹 서버, WAS, DB 로 이어지는 백엔드 요청 흐름도" style="max-width:100%;height:auto;" />
+<img src="/assets/mermaid/f697e5047f1b729c.svg" alt="사용자에서 웹 서버, WAS, DB 로 이어지는 백엔드 요청 흐름도" width="663" height="118" style="max-width:min(100%, 663px);height:auto;" />
 
 And apparently, **Nginx** is widely used as a web server these days. It's **lighter and better suited for handling concurrent connections** than Apache HTTP Server.
 

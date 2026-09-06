@@ -73,7 +73,7 @@ dtype: int64
 
 그래서 결과의 길이로 기억하는 게 편하다. `axis=0` 이면 결과가 **컬럼 개수만큼**, `axis=1` 이면 **행 개수만큼** 나온다.
 
-<img src="/assets/mermaid/3a279ef66400f6da.svg" alt="axis 값에 따라 계산 방향과 결과의 길이가 어떻게 달라지는지 비교한 다이어그램" style="max-width:100%;height:auto;" />
+<img src="/assets/mermaid/3a279ef66400f6da.svg" alt="axis 값에 따라 계산 방향과 결과의 길이가 어떻게 달라지는지 비교한 다이어그램" width="871" height="222" style="max-width:min(100%, 871px);height:auto;" />
 
 실제로 이걸 제일 많이 쓰게 되는 자리는 새 열을 파생시킬 때다.
 
@@ -228,7 +228,7 @@ orders[
 
 강의 마지막에 데이터프레임을 처음 받았을 때 훑는 순서를 정리해줬다.
 
-<img src="/assets/mermaid/bac79fcbaee78a67.svg" alt="데이터프레임을 처음 받았을 때 확인하는 9단계 탐색 순서" style="max-width:100%;height:auto;" />
+<img src="/assets/mermaid/bac79fcbaee78a67.svg" alt="데이터프레임을 처음 받았을 때 확인하는 9단계 탐색 순서" width="271" height="1118" style="max-width:min(100%, 271px);height:auto;" />
 
 **1. 데이터가 정상적으로 불러와졌는지 확인**
 

@@ -55,7 +55,7 @@ import numpy as np
 
 그리고 **Series** 는 그 표를 이루는 구성요소 하나다. Series 가 여러 개 모이면 표가 되고 DataFrame 이 된다.
 
-<img src="/assets/mermaid/87ca33b248f8d79e.svg" alt="표와 Series 와 DataFrame 의 관계. 파일로 있는 정형 데이터(표)를 pandas 가 파이썬 객체인 DataFrame 으로 바꾸고, DataFrame 은 열 하나에 해당하는 1차원 배열인 Series 여러 개가 모여 이루어진다. 각 Series 는 인덱스를 공유한다" style="max-width:100%;height:auto;" />
+<img src="/assets/mermaid/87ca33b248f8d79e.svg" alt="표와 Series 와 DataFrame 의 관계. 파일로 있는 정형 데이터(표)를 pandas 가 파이썬 객체인 DataFrame 으로 바꾸고, DataFrame 은 열 하나에 해당하는 1차원 배열인 Series 여러 개가 모여 이루어진다. 각 Series 는 인덱스를 공유한다" width="1028" height="222" style="max-width:min(100%, 1028px);height:auto;" />
 
 그래서 Series 를 다룰 줄 알면 열의 특성을 뽑거나 필요한 열만 골라내는 작업을 할 수 있다.
 

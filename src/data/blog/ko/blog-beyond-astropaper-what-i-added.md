@@ -252,7 +252,7 @@ featured: true
 
 "검색이 잘 되고 있나" 를 확인해보려다 **몇 달째 신호가 두 호스트로 갈려 있던 것**을 발견했다. Vercel 은 `www.parkhyo.in` 을 Production 으로 두고 `parkhyo.in` 을 307 로 www 에 넘기고 있었는데, 코드의 `SITE.website` 는 non-www 였다. 여기서 canonical · sitemap 581개 · hreflang · robots.txt 가 전부 파생되니 이런 모양이 된다.
 
-<img src="/assets/mermaid/d07bab8bf5d5cabd.svg" alt="도메인 통합 전 크롤러가 겪던 순환. sitemap 과 robots.txt 는 parkhyo.in 을 가리키고, parkhyo.in 은 307 임시 리디렉트로 www 에 넘기고, 실제 본문을 서빙하는 www 가 내보내는 canonical 은 다시 parkhyo.in 을 가리켜 제자리로 돌아온다" style="max-width:100%;height:auto;" />
+<img src="/assets/mermaid/d07bab8bf5d5cabd.svg" alt="도메인 통합 전 크롤러가 겪던 순환. sitemap 과 robots.txt 는 parkhyo.in 을 가리키고, parkhyo.in 은 307 임시 리디렉트로 www 에 넘기고, 실제 본문을 서빙하는 www 가 내보내는 canonical 은 다시 parkhyo.in 을 가리켜 제자리로 돌아온다" width="699" height="94" style="max-width:min(100%, 699px);height:auto;" />
 
 - **문제**: **실제로 본문을 서빙하는 www 페이지가 "원본은 내가 아니라 non-www 다" 라고 선언하고, 거기 가면 다시 www 로 튕겨 돌아온다.** 구글은 **리디렉트되는 canonical 을 무시하고** 자기가 알아서 정한다. 즉 내가 지정한 대표 주소가 하나도 안 먹히고 있었다. 게다가 307 은 "임시" 라 두 호스트의 신뢰도가 합쳐지지도 않는다. 이걸 몰랐던 건 **양쪽이 각각은 정상으로 보였기 때문**이다 — Vercel 대시보드는 "Valid Configuration" 초록불, 사이트는 잘 열리고, 빌드도 통과한다. `curl -I` 로 응답 헤더를 직접 봐야 드러났다.
 - **곁다리로 나온 것 셋**:
@@ -274,7 +274,7 @@ featured: true
 - **먼저 바로잡은 오해**: 이전을 결심하기 전에 "Lightsail 로 가면 댓글도 되고 DB 도 되나" 를 물었는데, **막고 있던 건 Vercel 이 아니라 백엔드가 없다는 사실**이었다. Vercel 에서도 어댑터를 붙이면 다 된다. 실제로 갈리는 건 기능이 아니라 **운영 책임**이다. 그걸 알고 나서도 가기로 한 이유는 통제권과 학습이었다.
 - **해법**: **빌드는 CI, 서버는 서빙만.**
 
-<img src="/assets/mermaid/86e7d1daab343aeb.svg" alt="배포 흐름. main 브랜치에 푸시하면 GitHub Actions 가 빌드하고 dist 를 서버의 새 릴리스 디렉토리로 rsync 한 뒤, current 심볼릭 링크를 그 릴리스로 원자적으로 바꾼다. nginx 는 current 만 바라보므로 교체가 순간에 끝나고, 배포가 실패하면 링크가 그대로 남아 직전 릴리스가 계속 서빙된다" style="max-width:100%;height:auto;" />
+<img src="/assets/mermaid/86e7d1daab343aeb.svg" alt="배포 흐름. main 브랜치에 푸시하면 GitHub Actions 가 빌드하고 dist 를 서버의 새 릴리스 디렉토리로 rsync 한 뒤, current 심볼릭 링크를 그 릴리스로 원자적으로 바꾼다. nginx 는 current 만 바라보므로 교체가 순간에 끝나고, 배포가 실패하면 링크가 그대로 남아 직전 릴리스가 계속 서빙된다" width="1168" height="222" style="max-width:min(100%, 1168px);height:auto;" />
 
   서버에서 `pnpm build` 를 돌리지 않는 이유가 있다. 빌드 중에 **OG 이미지 152장을 resvg 로 렌더**하고 Pagefind 색인을 만든다. 512MB 인스턴스에서는 메모리로 넘어지고, 넘어지면 사이트가 아니라 배포가 멈춘다. GitHub Actions 가 빌드하고 `dist/` 만 rsync 로 보내면 인스턴스를 작게 유지할 수 있다.
 - **덤으로 얻은 것**: 릴리스를 옆에 받아두고 **심볼릭 링크만 바꾸는** 방식이라, 배포가 실패하면 **직전 릴리스가 그대로 서빙된다.** Vercel 때는 빌드가 깨지면 그 상태가 반영됐는데 지금은 실패한 배포가 사이트를 건드리지 못한다. 롤백도 링크를 되돌리면 끝이다.

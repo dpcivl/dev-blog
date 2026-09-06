@@ -90,7 +90,7 @@ Ports are broadly divided into basic facilities, functional facilities, support 
 - **Port access transportation facilities**
 - **Mooring facilities** — piers, quay walls, berthing areas, and the bollards that tie ships down
 
-<img src="/assets/mermaid/d726d815488bba5e.svg" alt="항만 구성 계층도 — 항만은 기본시설·기능시설·지원시설·항만친수시설로 나뉘고, 기본시설 아래에 입항 허가를 기다리는 수역시설, 외곽시설, 임항교통시설, 부두와 안벽과 계선주로 이루어진 계류시설이 있다" style="max-width:100%;height:auto;" />
+<img src="/assets/mermaid/d726d815488bba5e.svg" alt="항만 구성 계층도 — 항만은 기본시설·기능시설·지원시설·항만친수시설로 나뉘고, 기본시설 아래에 입항 허가를 기다리는 수역시설, 외곽시설, 임항교통시설, 부두와 안벽과 계선주로 이루어진 계류시설이 있다" width="909" height="326" style="max-width:min(100%, 909px);height:auto;" />
 
 I also picked up a few on-site terms.
 

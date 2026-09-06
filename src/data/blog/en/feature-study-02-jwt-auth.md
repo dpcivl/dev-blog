@@ -28,7 +28,7 @@ Since the server doesn't need to remember anything, [the session weaknesses cove
 - **Memory burden** — Gone, since the server isn't holding onto sessions.
 - **Multiple servers** — No matter which server the request lands on, it just needs to **verify the token**, so there's no problem.
 
-<img src="/assets/mermaid/3d959c5df7b86ae2.svg" alt="세션과 JWT 의 차이 — 세션은 서버가 세션 저장소에 사용자 정보를 기억하고 사용자는 번호표만 들고 다니지만, JWT 는 토큰 자체에 정보를 담아 서버는 아무것도 저장하지 않고 서명 검증만 한다" style="max-width:100%;height:auto;" />
+<img src="/assets/mermaid/3d959c5df7b86ae2.svg" alt="세션과 JWT 의 차이 — 세션은 서버가 세션 저장소에 사용자 정보를 기억하고 사용자는 번호표만 들고 다니지만, JWT 는 토큰 자체에 정보를 담아 서버는 아무것도 저장하지 않고 서명 검증만 한다" width="1690" height="214" style="max-width:min(100%, 1690px);height:auto;" />
 
 ## JWT Structure — Header · Payload · Signature
 

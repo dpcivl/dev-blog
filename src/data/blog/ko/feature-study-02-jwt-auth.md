@@ -28,7 +28,7 @@ featured: false
 - **메모리 부담** — 서버가 세션을 안 들고 있으니 없다.
 - **서버 여러 대** — 어느 서버로 요청이 가든 **토큰만 검증**하면 되니 문제가 안 생긴다.
 
-<img src="/assets/mermaid/3d959c5df7b86ae2.svg" alt="세션과 JWT 의 차이 — 세션은 서버가 세션 저장소에 사용자 정보를 기억하고 사용자는 번호표만 들고 다니지만, JWT 는 토큰 자체에 정보를 담아 서버는 아무것도 저장하지 않고 서명 검증만 한다" style="max-width:100%;height:auto;" />
+<img src="/assets/mermaid/3d959c5df7b86ae2.svg" alt="세션과 JWT 의 차이 — 세션은 서버가 세션 저장소에 사용자 정보를 기억하고 사용자는 번호표만 들고 다니지만, JWT 는 토큰 자체에 정보를 담아 서버는 아무것도 저장하지 않고 서명 검증만 한다" width="1690" height="214" style="max-width:min(100%, 1690px);height:auto;" />
 
 ## JWT 구조 — 헤더 · 페이로드 · 서명
 

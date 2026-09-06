@@ -27,7 +27,7 @@ This is what the log showed.
 
 This means that out of 400 stocks, zero had data for the target date. I had built in a gate so that if coverage falls short, the pipeline stops instead of showing half-complete data on screen. That gate is what triggered.
 
-<img src="/assets/mermaid/d1c0d3e23595e49f.svg" alt="presearch 수집 파이프라인 — Cloud Scheduler 가 매일 08시 Cloud Run Job 을 깨우고, 네이버 검색량과 주가를 모아 BigQuery 에 적재한다. 커버리지 게이트가 목표일 데이터 확보율을 검사해 부족하면 발행을 멈춘다" style="max-width:100%;height:auto;" />
+<img src="/assets/mermaid/d1c0d3e23595e49f.svg" alt="presearch 수집 파이프라인 — Cloud Scheduler 가 매일 08시 Cloud Run Job 을 깨우고, 네이버 검색량과 주가를 모아 BigQuery 에 적재한다. 커버리지 게이트가 목표일 데이터 확보율을 검사해 부족하면 발행을 멈춘다" width="489" height="826" style="max-width:min(100%, 489px);height:auto;" />
 
 ## What I Tried — I suspected the infrastructure first
 

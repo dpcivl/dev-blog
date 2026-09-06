@@ -120,7 +120,7 @@ stable["합계"].pct_change().dropna()
 
 처음에 보려던 건 연간 물동량 처리로 부산항의 효율을 보는 것이었는데, 이 데이터가 거기에 적합하지 않다는 결론이 나왔다.
 
-<img src="/assets/mermaid/6483802d7c85c1af.svg" alt="처음 세운 분석 질문이 데이터와 맞지 않아 다른 질문으로 바꾸는 과정" style="max-width:100%;height:auto;" />
+<img src="/assets/mermaid/6483802d7c85c1af.svg" alt="처음 세운 분석 질문이 데이터와 맞지 않아 다른 질문으로 바꾸는 과정" width="247" height="765" style="max-width:min(100%, 247px);height:auto;" />
 
 어느 항구가 가장 많은 빈도를 나타내는지를 보는 게 낫겠다고 판단했다. 전체 부두 합계를 내고 신항 부두 합계를 낸 다음, 어느 쪽이 더 많이 쓰이는지 보면 컨테이너 수송 효율을 내려면 어떤 항만을 이용해야 하는지 알 수 있다.
 
@@ -202,7 +202,7 @@ pd.read_csv(FILE_PATH, encoding="cp949")
 
 결측치 처리는 뒤로 미루고 쉬운 것부터 했다. 계류시간, 즉 배가 항구에 머무는 시간이다.
 
-<img src="/assets/mermaid/d0ef2b6c4b5104c7.svg" alt="문자열 일시 컬럼에서 시간 단위 계류시간을 만들어내는 변환 순서" style="max-width:100%;height:auto;" />
+<img src="/assets/mermaid/d0ef2b6c4b5104c7.svg" alt="문자열 일시 컬럼에서 시간 단위 계류시간을 만들어내는 변환 순서" width="208" height="606" style="max-width:min(100%, 208px);height:auto;" />
 
 문자열을 시간 데이터로 바꾸는 건 `to_datetime()` 이 해준다.
 

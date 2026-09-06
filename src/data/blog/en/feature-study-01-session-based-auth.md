@@ -46,7 +46,7 @@ The key point is that **the server remembers the session information**. The sess
 
 What's important here is that **the browser automatically attaches the cookie to every request**. So after login, the session ID automatically tags along on every request, and the server can identify the sender each time.
 
-<img src="/assets/mermaid/b9af3f0a63d5b337.svg" alt="세션 기반 인증 시퀀스 — 사용자가 id/pw 로 로그인하면 서버가 세션을 만들어 저장소에 보관하고 세션ID 를 쿠키로 내려준다. 이후 요청마다 브라우저가 쿠키를 자동으로 실어 보내고, 서버는 세션ID 로 저장소를 조회해 사용자를 알아본다" style="max-width:100%;height:auto;" />
+<img src="/assets/mermaid/b9af3f0a63d5b337.svg" alt="세션 기반 인증 시퀀스 — 사용자가 id/pw 로 로그인하면 서버가 세션을 만들어 저장소에 보관하고 세션ID 를 쿠키로 내려준다. 이후 요청마다 브라우저가 쿠키를 자동으로 실어 보내고, 서버는 세션ID 로 저장소를 조회해 사용자를 알아본다" width="785" height="617" style="max-width:min(100%, 785px);height:auto;" />
 
 ## In Spring — Spring Security
 

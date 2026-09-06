@@ -64,7 +64,7 @@ featured: false
 
 **FCL 이냐 LCL 이냐에 따라 코드 체계가 달라진다.** 같은 화물이라도 어떻게 실렸느냐가 식별 구조를 바꾼다는 뜻이다.
 
-<img src="/assets/mermaid/5bb3ea8e8ac7a766.svg" alt="화물 식별자 계층 — 적하목록에 MRN 이 붙고 그 아래 마스터 B/L 일련번호인 MSN 이, 혼재화물의 경우 다시 하우스 B/L 일련번호인 HSN 이 붙는다. FCL 은 마스터 B/L, LCL 은 하우스 B/L 로 이어진다" style="max-width:100%;height:auto;" />
+<img src="/assets/mermaid/5bb3ea8e8ac7a766.svg" alt="화물 식별자 계층 — 적하목록에 MRN 이 붙고 그 아래 마스터 B/L 일련번호인 MSN 이, 혼재화물의 경우 다시 하우스 B/L 일련번호인 HSN 이 붙는다. FCL 은 마스터 B/L, LCL 은 하우스 B/L 로 이어진다" width="480" height="350" style="max-width:min(100%, 480px);height:auto;" />
 
 **항구 식별 코드** — 화물이 어디서 어디까지 가는지 나타낸다. 항공의 IATA 코드처럼 항구에도 식별 코드가 있다.
 

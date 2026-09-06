@@ -83,7 +83,7 @@ server.tomcat.threads.min-spare=10     # 놀고 있어도 최소 몇 명은 대�
 
 백엔드는 대략 이 흐름으로 동작한다.
 
-<img src="/assets/mermaid/f697e5047f1b729c.svg" alt="사용자에서 웹 서버, WAS, DB 로 이어지는 백엔드 요청 흐름도" style="max-width:100%;height:auto;" />
+<img src="/assets/mermaid/f697e5047f1b729c.svg" alt="사용자에서 웹 서버, WAS, DB 로 이어지는 백엔드 요청 흐름도" width="663" height="118" style="max-width:min(100%, 663px);height:auto;" />
 
 그리고 요즘 웹 서버는 **Nginx** 를 많이 쓴다고 한다. Apache HTTP Server 보다 **더 가볍고 동시 접속에 유리**하기 때문이다.
 

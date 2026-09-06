@@ -8,7 +8,11 @@
 //      - Hashes each block's content (first 16 hex chars of SHA256)
 //      - Renders any missing SVGs to public/assets/mermaid/<hash>.svg (via Playwright)
 //      - Rewrites the original MD in-place, replacing the ```mermaid``` block with
-//        <img src="/assets/mermaid/<hash>.svg" alt="..." style="max-width:100%;height:auto;" />
+//        <img src="/assets/mermaid/<hash>.svg" alt="..." width="W" height="H"
+//             style="max-width:min(100%, Wpx);height:auto;" />
+//        (W/H come from the SVG viewBox — see svgSize() for why they're required)
+//      - Re-syncs those width/height attributes on every run, so a sizing change
+//        propagates to already-published posts
 //   4. Author commits SVGs + rewritten MD together
 //
 // Why: Vercel's build environment can't reliably run Chromium, so remark-mermaidjs
@@ -46,10 +50,61 @@ const MERMAID_BLOCK = /```mermaid\r?\n([\s\S]*?)\r?\n```/g;
 const IMG_REF = /\/assets\/mermaid\/([0-9a-f]{16})\.svg/g;
 // Only touch hash-shaped filenames on orphan cleanup; leave legacy named SVGs alone.
 const HASH_FILE = /^[0-9a-f]{16}\.svg$/;
+// 이미 박혀 있는 mermaid <img> 태그 전체. 크기 속성을 다시 계산해 덮어쓰는 데 쓴다.
+const IMG_TAG = /<img\s+src="\/assets\/mermaid\/([0-9a-f]{16})\.svg"[^>]*\/?>/g;
 
 const args = process.argv.slice(2);
 const dryRun = args.includes("--dry");
 const gc = args.includes("--gc");
+
+// mermaid 는 루트 <svg> 에 width="100%" 를 박아 내보낸다. 그 SVG 를 <img> 로
+// 불러오면 브라우저가 "고유 너비 없음" 으로 판정해서 width:auto 를 컨테이너 폭으로
+// 채운다. 세로로 긴 순서도가 본문 폭(816px)까지 늘어나 2500px 높이로 렌더되던 원인.
+// viewBox 에서 실제 크기를 읽어 <img> 에 못박는다. 가로세로를 함께 주므로
+// 이미지가 늦게 와도 자리가 밀리지 않는다(CLS).
+function svgSize(svg) {
+  const vb = svg.match(/viewBox="([\d.\s-]+)"/);
+  if (!vb) return null;
+  const [, , w, h] = vb[1].trim().split(/\s+/).map(Number);
+  if (!Number.isFinite(w) || !Number.isFinite(h) || w <= 0 || h <= 0) return null;
+  return { w: Math.round(w), h: Math.round(h) };
+}
+
+// altEscaped 는 이미 속성용으로 이스케이프된 문자열이어야 한다(이중 이스케이프 방지).
+function buildImgTag(hash, altEscaped, size) {
+  const dims = size ? ` width="${size.w}" height="${size.h}"` : "";
+  const cap = size ? `min(100%, ${size.w}px)` : "100%";
+  return `<img src="/assets/mermaid/${hash}.svg" alt="${altEscaped}"${dims} style="max-width:${cap};height:auto;" />`;
+}
+
+// 이미 발행된 글에 박혀 있는 <img> 태그의 크기 속성을 SVG 실제 크기로 맞춘다.
+// 크기 규칙이 바뀌어도 다음 실행 때 전체 글이 따라오도록 매번 돌린다.
+async function syncExistingImgTags(files) {
+  let touched = 0;
+  for (const file of files) {
+    const before = await readFile(file, "utf8");
+    const tags = [...before.matchAll(new RegExp(IMG_TAG.source, IMG_TAG.flags))];
+    if (tags.length === 0) continue;
+    let after = before;
+    for (const t of tags.reverse()) {
+      const alt = t[0].match(/alt="([^"]*)"/)?.[1] ?? "mermaid diagram";
+      const rebuilt = buildImgTag(t[1], alt, await sizeOf(t[1]));
+      if (rebuilt === t[0]) continue;
+      after = after.slice(0, t.index) + rebuilt + after.slice(t.index + t[0].length);
+    }
+    if (after === before) continue;
+    await writeFile(file, after, "utf8");
+    touched++;
+    console.log(`  ↻ Resized ${path.relative(ROOT, file)}`);
+  }
+  return touched;
+}
+
+async function sizeOf(hash) {
+  const p = path.join(ASSET_DIR, `${hash}.svg`);
+  if (!existsSync(p)) return null;
+  return svgSize(await readFile(p, "utf8"));
+}
 
 function contentHash(source) {
   // Ignore `%% alt: ...` comment lines when hashing so alt-only edits don't
@@ -116,6 +171,7 @@ async function main() {
 
   if (jobs.length === 0) {
     console.log("No ```mermaid``` blocks found in src/data/blog/**/*.md.");
+    if (!dryRun) await syncExistingImgTags(files);
     await runGc(referenced);
     return;
   }
@@ -181,8 +237,7 @@ async function main() {
     let content = await readFile(file, "utf8");
     list.sort((a, b) => b.index - a.index);
     for (const job of list) {
-      const altText = job.alt || "mermaid diagram";
-      const imgTag = `<img src="/assets/mermaid/${job.hash}.svg" alt="${escapeHtmlAttr(altText)}" style="max-width:100%;height:auto;" />`;
+      const imgTag = buildImgTag(job.hash, escapeHtmlAttr(job.alt || "mermaid diagram"), await sizeOf(job.hash));
       content = content.slice(0, job.index) + imgTag + content.slice(job.index + job.matchLen);
       replaced++;
     }
@@ -190,10 +245,13 @@ async function main() {
     console.log(`  → Rewrote ${list.length} block(s) in ${path.relative(ROOT, file)}`);
   }
 
+  const resized = await syncExistingImgTags(files);
+
   console.log(`\n== Summary ==`);
   console.log(`  Rendered new: ${toRender.length}`);
   console.log(`  Cache hits:   ${seenHashes.size - toRender.length}`);
   console.log(`  MD blocks →   <img>: ${replaced}`);
+  console.log(`  Resized files: ${resized}`);
 
   await runGc(new Set([...seenHashes, ...referenced]));
 }
