@@ -1,0 +1,446 @@
+# 프로젝트 컨텍스트
+
+이 저장소는 Astro + AstroPaper 테마 기반 개인 학습 블로그입니다. 작성자는 박효인(@dpcivl)이고, 임베디드 SW · AI Agent · Vibe coding에 관심이 있습니다.
+
+블로그 글은 마크다운 파일 기반이며, [src/data/blog/](src/data/blog/)에 `.md` 파일을 추가하면 자동으로 발행됩니다. (`draft: true` 면 비공개)
+
+## 🔄 세션 시작 루틴 (Codex 자동 수행)
+
+작성자가 Windows + macOS 두 기기를 사용하므로 세션 시작 시 두 repo (main dev-blog + nested `src/scratch/`) 를 동기하는 것이 필수. **첫 사용자 요청에 응답하기 전** 아래를 자동 실행하고 결과를 한 줄로 보고한다.
+
+**실행 순서 (Bash 하나로 배치):**
+
+```bash
+# 1. main repo pull (dirty 면 stash push -u → pull → stash pop)
+git status --short
+git pull --rebase
+# 2. scratch repo pull
+git -C src/scratch pull --rebase
+```
+
+**한 줄 보고 형식 (사용자 응답 앞에 붙임):**
+
+- ✓ 정상: `루틴 ✓ (main: up-to-date / scratch: up-to-date)`
+- ✓ 새 커밋 가져옴: `루틴 ✓ (main: +N커밋 pull / scratch: +M커밋 pull)`
+- ⚠ 실패: `루틴 ⚠ (main pull 실패 — <원인>, 사용자 개입 필요)`
+- skip: `루틴 skip (사용자 요청)`
+
+**Skip 조건:**
+
+- 사용자가 "루틴 스킵" · "오프라인이야" · "pull 안 해도 됨" 명시
+- 이미 이 세션에서 한 번 실행함 (동일 세션에서 반복 금지)
+- 사용자 첫 요청이 명백히 다른 저장소/디렉토리 대상 (예: `~/other-project` 경로 언급)
+
+**예외 처리:**
+
+- Main 에 uncommitted 변경 있으면 `git stash push -u -m "session-start"` → pull → `git stash pop`
+- Stash pop 시 conflict → 다른 작업 중단하고 사용자에게 알림 · 지시 요청
+- Scratch 에 uncommitted 변경 있고 pull 필요하면 우선 사용자에게 "scratch 에 미커밋 파일 있음, 커밋 후 계속할까요?" 확인
+- 네트워크 오프라인이면 한 줄 오프라인 보고 후 진행 (조용히 넘어가지 말 것)
+- `src/000-inbox.md` 는 사용자 개인 메모라 pull 이 안전할 것 (거의 상충 안 남), 상충 시 stash pop 실패 → 사용자에게 알림
+
+**루틴 이후:** 그 다음이 Inbox 워크플로우 (아래) → 실제 사용자 요청 처리 순.
+
+## Inbox 워크플로우 — 매 세션 시작 시 수행
+
+작성자는 [src/000-inbox.md](src/000-inbox.md)에 그날그날 알게 된 내용을 자유로운 형식으로 적어둡니다. Codex의 책임은 이 메모를 정식 블로그 포스트로 다듬어 발행하는 것입니다.
+
+### 트리거
+세션을 시작할 때 `src/000-inbox.md`의 **"처리 대기"** 섹션만 확인합니다. 새 항목이 있으면 사용자가 별도 지시하지 않아도 아래 절차를 수행합니다. (이 워크플로우 자체에 대한 사용자 지시 — 예: "오늘은 글 쓰지 말고 코드만" — 가 있으면 그게 우선)
+
+**"메모 / 계획" 섹션은 자동 발행 대상이 아님.** 거기에는 작성자의 계획·아이디어·진행 중인 실험이 들어가며, Codex는 절대로 자동으로 처리하지 않는다. 작성자가 명시적으로 "메모/계획에 있는 X 정리해서 글로 올려줘"라고 지시할 때만 다룬다. 작성자가 결과/배움이 나오면 직접 "처리 대기"로 항목을 옮긴다.
+
+### 절차
+
+1. **이미지 / 영상 자산 정리**
+   - inbox 나 scratch 에 첨부된 이미지(보통 `image*.png`) / 영상(`*.mp4`) 을 찾는다.
+   - 포스트 슬러그(slug) 폴더로 이동: `public/assets/posts/<slug>/`
+   - 파일명을 내용을 알 수 있게 변경: 예) `01-screenshot-before.png`, `05-demo.mp4`
+   - 마크다운에서는 절대 경로로 참조: `/assets/posts/<slug>/<filename>.png`
+   - **영상 임베드는 반드시 한 줄로** (마크다운 파서가 multi-line HTML 태그를 텍스트로 escape 함):
+     ```html
+     <video src="/assets/posts/<slug>/<file>.mp4" autoplay muted loop playsinline width="100%"></video>
+     ```
+   - 영상 placeholder 컨벤션: 작성자가 `<여기에 <파일명> 영상>` 형태로 위치 지정하면 자동 인식 + 치환
+
+2. **포스트 작성** ([src/data/blog/ko/<slug>.md](src/data/blog/ko/))
+   - frontmatter 필수 필드 ([src/content.config.ts](src/content.config.ts) 참고):
+     - `title`, `description`, `pubDatetime` (ISO 8601, 예: `2026-05-05T13:00:00Z`)
+     - `tags`: 한국어 태그 OK (예: `트러블슈팅`, `astro`)
+     - `draft: false`, `featured: true/false` 적절히
+   - ⚠️ **`pubDatetime` 은 반드시 현재 UTC 시각 또는 과거**로 설정. 미래 시각이면 [src/utils/postFilter.ts](src/utils/postFilter.ts)의 `isPublishTimePassed` 필터에 걸려 production(Vercel) 빌드에서 제외됨 (dev 서버에서는 보이므로 dev 화면만 보고 발행됐다고 착각하기 쉬움). 작성 직전에 `date -u` 로 현재 시각 확인 후 그보다 이전 시각으로 설정.
+   - 사용자가 거칠게 적은 메모를 다음 형태로 정돈한다:
+     - **상황** → **시도/검증** → **원인/해결** → **회고** 흐름
+     - 구어체 한국어, 1인칭("나"), `~다` 어미
+     - 코드 블록 / 스크린샷 적극 활용
+     - 긴 글이면 `## Table of contents` 자동 생성 (remark-toc가 처리)
+
+3. **"공부할 것" 섹션 추가**
+   - 글 마지막에 `## 더 공부해볼 것` (또는 비슷한 제목) 추가
+   - 글에서 다룬 주제와 연관된 학습 거리를 작성자가 따라가볼 수 있게 정리
+   - 가능하면 공식 문서 링크 동반
+   - 작성자가 명시적으로 알고 싶다고 한 의문점은 반드시 포함
+   - 목적: 작성자가 자기 글을 다시 읽으며 학습할 수 있도록
+
+4. **inbox 정리** ([src/000-inbox.md](src/000-inbox.md))
+   - 처리한 항목을 "처리 대기"에서 "처리 완료" 섹션으로 이동
+   - 처리 완료 항목은 취소선(`~~ ~~`)으로 표시하고, 발행된 포스트 파일을 링크
+   - 날짜별로 그룹핑 유지
+
+5. **임시/실험용 포스트 정리**
+   - 디버깅이나 빌드 트리거용으로 만든 임시 포스트(`hello-world.md`, `test-*.md` 등)는 처리 후 삭제
+   - 단, 사용자가 "남겨둬"라고 한 건 유지
+
+6. **EN 번역** — `pnpm translate one <slug>` 실행. 자세한 규칙은 아래 [## 번역 워크플로우 (KO → EN)](#번역-워크플로우-ko--en) 섹션. **KO 만 발행하고 EN 을 안 만들면 언어 스위치가 홈으로 fallback 됨.** 사용자가 명시적으로 "번역은 나중에" 라고 하지 않는 이상 매번 수행.
+
+7. **Commit & Push**
+   - 한 번에 commit: **KO + EN 두 파일 함께** + 이미지 + inbox 업데이트 + 임시 파일 삭제 묶어서
+   - 메시지 예: `Publish post: <제목>`
+   - push까지 완료
+
+### 어조와 분량 가이드
+
+- 사용자의 거친 메모 한 줄도 충분히 풀어쓰되, **억지로 부풀리지 않는다.** 한 줄짜리 발견은 짧은 글로 OK.
+- 코드/명령/로그는 그대로 인용 (사용자가 실제로 본 화면을 그대로 재현)
+- 추측은 추측이라고 명시 ("~인 것 같다", "확인 필요")
+- 사용자가 "왜 그런지 모르겠다"고 한 부분은 **"공부할 것"** 섹션으로 옮겨서 학습 가능 형태로 만든다 (포스트 본문에서 거짓말로 메우지 않기)
+
+### 주의
+
+- **fact-check**: 사용자 메모의 사실관계가 의심스러우면 git 로그 / 빌드 결과 / 코드를 직접 확인 후 정정
+- **이미 발행된 글 재발행 금지**: inbox "처리 완료"에 이미 있는 항목은 다시 발행하지 않음
+
+### 🔴 보안 스크러빙 (반드시 발행 직전 수행)
+
+이 블로그는 GitHub public 저장소 + Vercel 공개 배포다. **포스트에 들어가는 모든 텍스트는 인터넷에 영구 공개된다고 간주한다.** 한 번 push되면 git history / GitHub 검색 / 외부 스크래퍼에서 회수 불가능.
+
+**절대 본문·코드 블록·에러 로그·스크린샷·frontmatter 어디에도 포함하면 안 되는 것:**
+
+- API 키 / 토큰 / 시크릿 (모든 종류 — Kakao/Google/Supabase/OpenAI/Anthropic/AWS/GitHub PAT/JWT 등)
+- OAuth `client_secret`, refresh token, id_token, access_token 본문
+- 비밀번호 / DB 접속 문자열
+- private URL (예: 회사 내부 도메인, 미공개 staging URL, 본인의 개인 supabase 프로젝트 URL `*.supabase.co`)
+- 작성자가 명시한 게 아닌 한 본인/제3자의 이메일 / 전화번호 / 실명·식별자
+- 결제 카드 정보, 사업자번호 등
+
+**의심 패턴 (발행 전에 grep 한 번 돌릴 것):**
+
+- 32자리 이상 hex 문자열 (`[0-9a-f]{32,}`)
+- `eyJ` 로 시작하는 JWT
+- `sk-`, `sk_live_`, `sk_test_`, `ghp_`, `gho_`, `github_pat_` 등 알려진 prefix
+- 20+자리 base64-like 문자열 (특히 `=` padding 포함 시)
+- `*.supabase.co/auth/v1/...`, `*.vercel.app` 등 고유 인스턴스 식별 가능한 도메인
+- `password`, `secret`, `token`, `api_key`, `Bearer ` 키워드 주변
+
+**조치:**
+
+1. 위 항목 발견 시 즉시 마스킹 (`REDACTED_*`, `<your_key_here>`, `0b52...4805` 같은 일부 숨김)
+2. 메모에 키 일부가 섞여있으면 **발행 보류하고 사용자에게 확인**. 자동 마스킹으로 진행하지 말고 명시적으로 알릴 것
+3. 사용자가 이미 push된 시크릿을 발견했다면 **마스킹보다 키 재발급(rotate)을 우선 권고** — 마스킹만으로는 git history / 캐시 / 외부 스크래퍼에서 회수 불가능
+
+**작성자 메모를 인용할 때의 원칙**:
+
+> 메모를 글에 그대로 옮겨붙이지 말 것. 한 줄씩 읽으면서 "이게 외부에 노출돼도 되는가" 를 명시적으로 체크 후 옮긴다. 특히 에러 로그 / 스크린샷 / 명령어 출력은 시크릿이 섞여있을 확률이 높음.
+
+## 캡처 습관 가이드 — 작성자가 메모를 잘 못 잡고 있을 때
+
+작성자가 "기록할 게 없다", "집중하다 보면 놓친다" 같은 고민을 표현하면, 다음 가이드를 짧게 안내한다 (강요 X, 한 번에 다 던지지 말 것).
+
+**신호 3종 — 마주친 순간 한 줄로 inbox에 적기:**
+
+1. **"이거 왜 안 되지" 5분 이상 막힘** → 디버깅 시드
+2. **"오 이거 신기하네 / 처음 안다"** → 학습 시드
+3. **"내일 또 까먹을 듯한 결정"** → 의사결정 기록
+
+**기준은 "한 줄"** — 문장 완성도, 맥락 설명, 코드 예시 다 필요 없음. 신호만 잡으면 풀어쓰는 건 Codex의 책임.
+
+**기존 행동에 캡처 얹기 (새 루틴 만들지 말 것):**
+
+- git commit 직전 → "오늘 뭐 배웠지" 한 줄
+- 에러 검색 직후 → 검색 쿼리 자체가 신호. 복사 → inbox
+- Codex 세션 종료 직전 → "오늘 새로 알게 된 거 한 줄?"
+
+**짧은 신호가 들어오면 Codex의 태도:**
+
+- "이거 너무 짧은데 더 적어주세요" 라고 되묻지 말 것. 한 줄도 충분히 풀어쓸 수 있다.
+- 작성자가 "오늘은 짧습니다" 라고 말하면 글도 짧게 — 억지로 부풀리지 않는다.
+- 메모가 너무 거칠어 사실관계가 불분명하면, 추측을 본문에 넣지 말고 "공부할 것"으로 빼서 정직하게 표현.
+
+## 스크래치 파일에서 포스트 생성
+
+작성자가 작업 중 자유 형식으로 적는 마크다운 파일을 inbox 외에 [src/scratch/](src/scratch/) 폴더에서 별도로 관리한다. (해당 폴더 내용은 .gitignored — 로컬에만 존재)
+
+**트리거:** 자동 발행 대상 아님. 작성자가 **명시적으로** 지시할 때만 처리.
+- 예) "scratch/flutter-routing.md 정리해서 올려줘"
+- 예) "scratch/대회-인사이트.md 글로 만들어줘"
+
+**처리 절차:** inbox 워크플로우와 동일하게 진행.
+1. 해당 파일을 읽어 메모 내용 파악
+2. 첨부 이미지가 있으면 `public/assets/posts/<slug>/`로 이동·이름 변경
+3. 포스트 작성 (frontmatter, "공부할 것" 섹션 포함)
+4. **🔴 보안 스크럽 필수** — inbox 메모와 동일하게 grep 검사
+5. commit & push
+
+**처리 후 스크래치 파일 처리:**
+1. 최상단에 발행 완료 코멘트 한 줄 추가:
+   ```
+   <!-- 📤 발행됨: ./data/blog/<slug>.md (YYYY-MM-DD) -->
+   ```
+2. **파일을 `src/scratch/published/` 로 이동.** (`git mv` 가 아니라 `mv` — scratch 는 .gitignored 라 git 처리 불필요.)
+3. 루트(`src/scratch/`) 에는 작성 중 메모만 남게 됨 → `ls` 한 번으로 "뭐가 발행됐고 뭐가 진행 중인지" 파악 가능.
+
+> 컨벤션 이유: 발행 완료 메모가 누적되면 루트에서 작성 중인 메모를 찾기 어려워짐. published/ 로 격리해서 작성자의 현재 진행 상태를 명확히 한다.
+
+**동기 · 백업 (2026-07-15~):** `src/scratch/` 는 main repo 에서는 계속 `.gitignore` 되지만, **별도 private repo (`dpcivl/dev-blog-scratch`) 로 백업 · 두 기기 (Windows + Mac) 간 동기**됨. 폴더 안에 nested `.git/` 존재.
+
+**Codex 가 scratch 파일 다룰 때:**
+
+- **읽기 · 신규 작성**: 그냥 `src/scratch/<file>` 접근 (nested repo 는 투명)
+- **발행 후 처리** (published/ 로 mv 등) 후에는 **scratch repo 에도 커밋 · 푸시** 하도록 사용자에게 안내:
+  ```bash
+  git -C src/scratch add . && git -C src/scratch commit -m "..." && git -C src/scratch push
+  ```
+- 사용자가 두 기기 사용 중이라 다른 기기 시작 시 `git -C src/scratch pull` 필요함을 종종 상기
+- Main repo commit 은 scratch 변경과 무관 (scratch 는 여전히 `.gitignore` 대상, `!src/scratch/README.md` 예외 하나만 추적)
+
+## 🖋 발행 어투 · 컨벤션 (반드시 준수)
+
+AGENTS.md 이관 규칙 (2026-07-14). 이전에는 `~/.Codex/projects/*/memory/` 에 있어서 기기별로 갈라졌음. 이제 프로젝트 공통.
+
+### 1. 문장 어미는 `~다` 로 통일
+
+작성자가 인박스/스크래치에 남기는 축약형 어미 (`~봄, ~함, ~됨, ~했음, ~있음, ~였음, ~해봤음`) 를 **발행본에 그대로 옮기지 말 것.** 완결된 `~다` 어미로 변환:
+
+| 메모 스타일 (X) | 발행 스타일 (O) |
+|---|---|
+| 확인함, 확인했음 | 확인했다, 확인된다 |
+| 봤음, 봄 | 봤다, 본다 |
+| 였음 | 였다, 이다 |
+| 있었음, 없었음 | 있었다, 없었다 |
+| 했음, 했었음 | 했다, 했었다 |
+| 됨 (문장 끝) | 된다 |
+| 나옴 (문장 끝) | 나온다 |
+| 잡음, 잡힘 | 잡는다, 잡힌다 |
+| 만듦 | 만든다, 만들었다 |
+| 넘어감 | 넘어간다 |
+| 생김, 드러남 | 생긴다, 드러난다 |
+| 좋을 듯 | 좋을 것 같다 / 좋겠다 |
+
+**예외 — 유지해도 되는 곳:**
+- 명사형 어미 자체 (`될 것`, `할 필요`) → 자연스러우니 유지
+- "~는 것" 이 자연스러운 자리
+- 강조 인용문 안 ("~함" 이라는 표현 자체를 인용할 때)
+- 표 안의 짧은 명사구
+
+**발행 전 grep 체크 (권장):** `함\.$`, `함\s`, `봄\.`, `됨\.` (문장 끝 축약형) · `~함,`, `~봄,` (콤마 앞)
+
+### 2. AI 초안 스크러빙 (반드시)
+
+작성자는 AI (ChatGPT/Codex) 가 대신 써준 초안을 그대로 발행하는 것에 강하게 반응한다. `AI가 초안을 써줬어요` 컨텍스트에서는 아래 패턴 스캔 필수.
+
+#### 2-1. AI 티 나는 한국어 패턴
+
+**시적/철학적 아사이드** — 문장 끝에 명상적 코멘트:
+- ❌ "그게 더 남는다", "그게 더 오래 남을 것 같다"
+- ❌ "이 글에서 제일 하고 싶은 말이기도 하다"
+- ❌ "말없이 멈춰 있었다" (사물 감정 부여)
+- ✅ 직접적으로: "그래서 이 글을 남긴다"
+
+**자기지시 메타코멘트** — 글이 스스로에 대해 이야기:
+- ❌ "이게 이 글의 요지다", "이 글에서 하고 싶은 말"
+- ✅ 요지는 실행으로 보여준다. 예외: "여기가 이 글을 쓰는 진짜 이유다" 같은 섹션 도입부는 OK.
+
+**영어 비즈니스 용어 음역** — 자연스러운 한국어 대체어 있음:
+
+| ❌ AI 음역 | ✅ 자연스러운 한국어 |
+|---|---|
+| 큰 레버 / 가장 큰 레버 | 큰 개선 / 제일 큰 병목 |
+| 파킹했다 (parked) | 미뤘다 / 숙제로 넘겼다 |
+| 배선했다 (wired up) | 걸어뒀다 / 설정해뒀다 / 연결해뒀다 |
+| 캡쳐했다 (captured) | 잡았다 / 담았다 |
+| 얼라인했다 (aligned) | 맞췄다 / 정렬했다 |
+| 스코프했다 (scoped) | 범위를 정했다 |
+
+**영어 어순 · 관용구 직역:**
+- ❌ "하루가 헤매지 않은 이유" (The reason today didn't wander) → ✅ "덕분에 하루가 삽질로 흐르지 않았다"
+- ❌ "이게 빠졌던 마지막 카드였다" → 대개 삭제 or "이게 마지막 남은 시도였다"
+- ❌ "~를 위한 것이었다" → ✅ "~하려고 한 것이었다"
+
+**어색한 명사 종결** — 문장을 명사로 끝내는 습관:
+- ❌ "느낌이 아니라 숫자가 어디를 고칠지 알려줬다. 하루가 헤매지 않은 이유." → ✅ 완전 문장으로.
+
+**과도한 형용사:**
+- ❌ "디스플레이용으로 예쁜 한글 폰트" → ✅ "랜딩 제목용으로 한글 디스플레이 폰트"
+
+**부자연스러운 title/heading:**
+- ❌ "출시 전 하루, 성능을 갈아엎고 —" (동사 연결형이 dash 앞에서 끊김)
+- ✅ "출시 하루 전, 성능을 뜯어고쳤다 —" (완전한 문장)
+
+#### 2-2. 스크러빙 체크리스트 (AI 초안 받았을 때)
+
+1. **제목 재작성** — AI 제목은 대개 부자연스럽거나 문장 종결이 어색
+2. **문장 끝 시적 코멘트 제거** — 위 패턴 스캔
+3. **영어 음역 대체** — 위 표 대조
+4. **자기지시 메타 제거** — "이 글에서 ~" 형태 회의
+5. **한국어 리듬 확인** — 소리내어 읽어봤을 때 어색한 구간
+6. **낭송 대비** — 완성 후 다른 발행 포스트 (예: `debugging-tab-switch-freeze-postmortem`, `julgot-launched-day-1-retrospective`) 톤과 나란히 놓고 어색한지 확인
+
+### 3. "다음 글에서 X" 류 미래 약속 금지
+
+본문에 `"다음 글에서…"`, `"다음은 X 로…"`, `"곧 ~ 구현 예정"` 같은 다음 글 예고 · 약속을 적지 않는다.
+
+**Why:** 작성자는 학습 우선순위가 유동적. 본문에 next-post commitment 를 박아두면 (1) 그 글이 안 나오면 오래된 약속이 박제됨 (2) 다음 글이 다른 주제면 본문과 충돌.
+
+**How to apply:**
+- 글 마무리는 **현재까지 정리한 내용** + **떠오른 의문** 정도로만
+- 호기심 · 다음 단계는 **"더 공부해볼 것"** 섹션 항목으로만 (시점 commitment 없이)
+- 시리즈 글이라도 "이 시리즈의 다음 편" 같이 적지 말고, 본 글 안에서 완결되게
+- 예외: 일반적 방향성 ("앞으로 X 쪽도 같이 보고 싶다") 정도는 OK — 약속 아닌 호기심 톤
+
+### 4. 방어적 disclaimer 회피 (자기소개 · 포트폴리오)
+
+자기소개 · 포트폴리오 · About 페이지 같은 공개 글에서:
+
+- ✅ **적극적 신호** (강점 어필) → 명시 OK
+  - 예: portfolio role 에 "AI 페어 프로그래밍" 표기
+- ❌ **방어적 disclaimer** (사전 해명) → 금지
+  - 예: About 에 "AI 활용 깊이를 조절합니다 / 코드 책임은 본인이 집니다" 같은 변명조
+
+**Why:** 사전 변호는 읽지 않으면 생기지 않을 의문을 먼저 심는다. "이 약은 안전합니다" 라고 쓰면 부작용 의심이 유발되는 것과 같음.
+
+**How to apply:**
+- 강점 · 정체성 어필은 메인에 명시
+- 약점 · 우려 해명은 본문에 안 적고, 면접에서 질문 받았을 때만 답변
+- 변호 톤 (방어적) 보다 confident 톤 ("2026년에 AI 안 쓰는 개발자가 더 드물지 않나요?")
+- About / 포트폴리오 다듬을 때 "이 줄이 적극적 신호인가, 방어적 해명인가" 자문
+
+### 5. 종료 프로젝트는 `_prefix` 소프트 숨김
+
+포트폴리오의 어떤 프로젝트가 종료됐거나 "포트폴리오에 올릴 수준 아님" 으로 빼야 할 때 — **파일 자체를 삭제하지 말고** 다음 3단계로 처리:
+
+1. `period` 종료일로 마감 (예: `"2026-06-08 ~"` → `"2026-06-08 ~ 2026-06-19"`)
+2. `status` 를 종료 상태로 (`paused` 가 보통 맞음 — `completed` 는 성공 완료 뉘앙스 강함)
+3. **파일명 앞에 `_` 추가** (`edgebook.md` → `_edgebook.md`)
+
+**Why:** [src/content.config.ts](src/content.config.ts) 의 portfolio loader 가 `glob({ pattern: "**/[^_]*.md" })` 라 `_` 시작 파일은 컬렉션에서 자동 제외 → 페이지에선 숨겨지지만 파일은 보존. 종료된 프로젝트라도 시작일 · 종료일 · 당시 기술스택은 회고용으로 가치 있음.
+
+**How to apply:**
+- "포트폴리오에서 빼주세요" / "이 프로젝트 종료됐어요" → 기본 이 3단계
+- "완전히 삭제해주세요" 라고 명시할 때만 `git rm`
+- 블로그 포스트도 비슷한 규칙 (blog loader 도 `[^_]*.md` 패턴) — 다만 blog 는 `draft: true` 가 더 자연스러움
+
+### 6. blog-beyond-astropaper 는 살아있는 문서
+
+블로그 커스텀 기능 총정리 포스트: [src/data/blog/ko/blog-beyond-astropaper-what-i-added.md](src/data/blog/ko/blog-beyond-astropaper-what-i-added.md) (featured).
+
+**Why:** 기능은 계속 늘어나는데 왜 만들었는지가 커밋 메시지에 흩어져있음. 이 포스트가 컨텍스트 로그. 기획적 어필 (portfolio-adjacent) 목적도.
+
+**How to apply — 새 기능이 추가되거나 크게 바뀔 때:**
+
+1. KR 포스트 "얹은 것들" 섹션에 새 소절 추가 or 기존 소절 갱신 (**문제 → 해법 → 결과** 3단 구조 유지)
+2. 하단 "갱신 기록" 섹션에 날짜 + 한 줄 요약 추가
+3. EN 번역 재실행: `pnpm translate one blog-beyond-astropaper-what-i-added` (프롬프트 캐시 hit 이라 저렴)
+4. "앞으로" 섹션에서 방금 추가한 항목 지움 (완료)
+
+**자동 발동 신호:**
+- 새로운 `scripts/*.mjs` 추가
+- 새 라우트 (`src/pages/**/*.astro`) 추가
+- `astro.config.ts` 플러그인 변경
+- content collection 스키마 변경
+- 새 컨벤션 (파일명 규칙, frontmatter 필드) 도입
+
+**주의:**
+- 사소한 버그 픽스 · 스타일 조정은 대상 아님
+- 사용자가 "이건 저 문서에 반영하지 마" 하면 존중
+- 애매하면 물어보기
+
+## 기타 규칙
+
+- 한국어 응답 기본
+- **크로스 플랫폼 환경**: 이 저장소는 Windows (PowerShell/Bash) + macOS (bash/zsh) 두 기기에서 개발.
+  - 경로 표기 주의: Windows `c:\dev\dev-blog\` ↔ Bash `/c/dev/dev-blog/`, Mac `~/dev-blog`
+  - `.gitattributes` 로 LF 통일 (Windows autocrlf 자동 처리)
+  - Node/pnpm 버전은 `.nvmrc` (Node 24) + `packageManager` (pnpm@11.1.2) 로 pin
+  - **매 세션 시작 시 `git pull` · 종료 시 반드시 `git push`** — 안 하면 다른 기기에서 갈라짐
+- 빌드 스크립트의 `cp -r dist/pagefind public/`는 Unix 명령이라 Windows 로컬 빌드 시 마지막 단계가 실패. Vercel (Linux) 에서는 정상.
+
+## 이미지 최적화 워크플로우
+
+새 포스트에 스크린샷/사진을 추가할 때 PNG/JPG 로 첨부해도 되지만, **발행 전 `pnpm images:webp` 를 한 번 돌리면 자동으로 WebP 변환 + MD 참조 갱신 + 원본 삭제**. WebP 가 원본보다 크면 스킵 (일부 소형 이미지). 지연 로드는 rehype 플러그인이 빌드 시 자동 처리 (첫 이미지는 eager, 나머지는 lazy).
+
+## Mermaid 다이어그램 워크플로우
+
+Vercel 빌드 환경에서 Chromium 실행이 불안정해 remark-mermaidjs 를 파이프라인에 넣으면 본문 유실 사고가 남 (2026-07-10 실제 발생). 그래서 **로컬에서 사전 렌더 → static asset 커밋** 방식으로 고정.
+
+1. 포스트 MD 에 ` ```mermaid ` 코드 블록으로 자유롭게 작성
+2. 첫 줄에 `%% alt: 다이어그램 설명` (접근성용, mermaid 는 `%%` 를 주석 처리)
+3. `pnpm mermaid:render` 실행 — 신규 블록만 로컬 Playwright 로 SVG 생성 (해시 캐싱)
+   - `public/assets/mermaid/<hash>.svg` 로 저장
+   - MD 의 mermaid 블록을 `<img src="/assets/mermaid/<hash>.svg" alt="..." style="max-width:100%;height:auto;" />` 로 자동 재작성
+4. `git commit` — SVG + 재작성된 MD 함께
+5. 필요 시 `pnpm mermaid:gc` 로 참조 없는 hash 파일 정리 (legacy 명명 SVG 는 안 건드림)
+
+**Astro 파이프라인엔 mermaid 플러그인 없음** — 재추가하지 말 것. Vercel 은 이미지만 서빙.
+
+## 번역 워크플로우 (KO → EN)
+
+이 블로그는 KO/EN 이중 언어 (`hreflang` 로 SEO · 사용자 언어 스위치 UI). **KO 발행 시 자동으로 EN 도 번역**하는 게 원칙 (draft 제외).
+
+### 폴더 구조
+
+- `src/data/blog/ko/<slug>.md` — 원본 (한국어). 사용자가 직접 작성 or Codex 가 스크래치/인박스에서 정돈
+- `src/data/blog/en/<slug>.md` — 번역 (`pnpm translate` 파이프라인이 생성)
+- 같은 slug 로 짝. 짝이 안 맞으면 언어 스위치가 홈으로 fallback → 방문자 이탈
+
+### 실행 명령
+
+```bash
+pnpm translate one <slug>       # 단일 포스트 번역 (신규 or 재번역). 가장 자주 씀.
+pnpm translate batch            # 아직 EN 없는 KO 포스트 일괄 번역
+pnpm translate sample           # 지정된 샘플 3편 (스모크 테스트)
+pnpm translate dry <slug>       # 번역 + validate 만, 파일 쓰기 X (검증용)
+```
+
+- **모델**: 기본 `Codex-sonnet-5`. `.env` 의 `ANTHROPIC_MODEL` 로 override 가능
+- **비용**: 포스트 1개당 대략 $0.04–0.08 (프롬프트 캐시 hit 시 저렴)
+- **소요**: 30–60초 per post
+
+### 세팅 요구사항
+
+- `.env` 파일에 `ANTHROPIC_API_KEY=sk-ant-xxx` 필수 (`.env.example` 참조)
+- `.env` 는 `.gitignore` 대상 → **두 기기 각각 수동 세팅**. Mac 초기 세팅 시 Windows 쪽 값을 안전한 채널 (1Password · USB · AirDrop) 로 옮기고 `cp .env.example .env` 후 값 채우기
+- API 키 없으면 `translate` 명령이 즉시 실패 → 안내 에러 메시지 출력
+
+### 자동 검증 ([validate.mjs](scripts/translate/validate.mjs))
+
+번역 직후 자동 실행 — KR/EN 페어 대조:
+
+- 코드 블록 개수 · 내용 일치 (주석은 번역 허용)
+- 링크 URL 개수 · 매핑 (`/posts/` ↔ `/en/posts/` 등)
+- 이미지 경로 일치
+- 헤딩 개수 · 깊이 일치
+- HTML 태그 일치
+- 본문 길이 비율 (0.5× ~ 2.0×)
+- **우발적 strikethrough** (`~1.5~2주` 같은 tilde 오파싱) — KO/EN 각각
+
+이슈 발견 시 결과 요약에 `! [validator] <issue>` 로 표시. 실패한 번역은 재실행 or 수동 수정.
+
+### 앵커 자동 재작성 ([anchor-rewrite.mjs](scripts/translate/anchor-rewrite.mjs))
+
+포스트 안의 다른 KO 헤딩 anchor 링크는 EN 번역 시 자동으로 EN 헤딩 slug 로 재작성. 예: `[#인터페이스-감각의-자동화](/posts/spring-boot-log-01-...)` → `[#the-automation-of-interface-sense](/en/posts/spring-boot-log-01-...)`. 사용자 개입 불필요.
+
+### 권장 워크플로우
+
+1. `src/data/blog/ko/<slug>.md` 작성 (인박스 · 스크래치 · 사용자 요청 등에서)
+2. `pnpm translate one <slug>` — EN 생성
+3. `pnpm check:md` — 전체 tilde strikethrough 검사 (translate 도 페어 검증하지만 다른 KO 포스트 문제도 함께 잡음)
+4. `git add src/data/blog/{ko,en}/<slug>.md` — **KO + EN 함께 스테이지**
+5. `git commit -m "Publish post: <제목>"` + push
+
+### 자주 하는 실수
+
+- ❌ **KO 만 커밋** → EN 없어서 언어 스위치가 홈으로 fallback. 반드시 EN 도 함께 커밋.
+- ❌ **KO 대폭 수정 후 EN 안 갱신** → 두 버전 diverge. 수정하면 `pnpm translate one <slug>` 다시 실행 후 함께 커밋.
+- ❌ **frontmatter tags 를 영어로 번역** → 파이프라인은 tags 를 verbatim 유지 (한국어 태그는 그대로). 태그별 유입 통계 유지 목적.
+- ✅ **Draft (`draft: true`)** — 번역 skip. draft 벗을 때 함께 번역.
+- ✅ **사용자가 "번역은 나중에"** — 그 세션 skip. 다음에 처리하도록 알림.

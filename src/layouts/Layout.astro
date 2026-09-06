@@ -5,7 +5,6 @@ import {
   PUBLIC_GOOGLE_SITE_VERIFICATION,
   PUBLIC_NAVER_SITE_VERIFICATION,
 } from "astro:env/client";
-import Analytics from "@vercel/analytics/astro";
 import { SITE } from "@/config";
 import "@/styles/global.css";
 
@@ -247,8 +246,5 @@ const structuredData = pubDatetime
 
     <!-- Load full theme logic -->
     <script src="../scripts/theme.ts"></script>
-
-    <!-- Vercel Web Analytics -->
-    <Analytics />
   </body>
 </html>
