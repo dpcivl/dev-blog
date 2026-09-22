@@ -59,8 +59,7 @@ export const SERIES: SeriesDef[] = [
   {
     id: "in-sight",
     title: "in-sight",
-    description:
-      "주인장 박효인의 시선으로, 정답이 정해져 있지 않은 것들에 대한 생각을 담는다.",
+    description: "정답이 정해져 있지 않은 것들에 대한 생각을 담는다.",
     tag: "in-sight",
   },
 ];
