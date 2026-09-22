@@ -56,6 +56,13 @@ export const SERIES: SeriesDef[] = [
       "SQL 을 실제로 쓰면서 배우려고 프로그래머스 문제를 하나씩 푼 기록. 정답 코드보다 그 문제에서 처음 알게 된 절 · 함수와 막혔던 지점을 남긴다.",
     tag: "프로그래머스",
   },
+  {
+    id: "in-sight",
+    title: "in-sight",
+    description:
+      "주인장 박효인의 시선으로, 정답이 정해져 있지 않은 것들에 대한 생각을 담는다.",
+    tag: "in-sight",
+  },
 ];
 
 export interface SeriesSummary extends SeriesDef {
