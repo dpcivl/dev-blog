@@ -24,6 +24,8 @@ featured: false
 
 핵심은 **라우터에서 판단하고 백엔드에서 실행한다**는 것이다.
 
+자세한 내용은 저장소의 [code-walkthrough.md](https://github.com/dpcivl/ai-routing-trial/blob/main/docs/code-walkthrough.md) 에 있다. 그걸 그대로 옮겨 적으려다가, 그건 그냥 읽으면 되니까 여기서는 읽으면서 깨달은 것만 남기기로 했다.
+
 ## `types.py` 읽기
 
 첫 번째로 `src/ai_router/types.py` 를 읽었다.
