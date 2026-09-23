@@ -50,26 +50,30 @@ const pageDesc =
   <Header />
   <div class="page-narrow">
     <main id="main-content" data-layout="index">
-      {/* ===== 히어로 ===== */}
-      <section class="grid gap-10 pt-16 pb-10 sm:grid-cols-[1fr_132px]">
-        <div class="order-2 sm:order-1">
-          <p
-            class="font-code text-[0.72rem] font-bold tracking-[0.16em] text-accent"
-          >
-            박효인 · PARK HYOIN
-          </p>
+      {
+        /* ===== 히어로 = 묻는 자리 =====
+          입력창이 홈의 중심이지만 메뉴와 아래 글 목록은 걷지 않는다.
+          h1 은 AskBox 안에 있다 — 여기서 또 쓰면 h1 이 둘이 된다. */
+      }
+      <AskBox />
 
-          <h1
-            class="mt-4 text-[2.9rem] leading-[1.28] font-bold tracking-[-0.02em] text-balance"
-          >
-            만든 것과 <span class="hl">막힌 것</span>을 그때그때 기록합니다.
-          </h1>
-
-          <p class="mt-5 max-w-[44rem] text-[1.05rem] text-pretty text-muted">
+      {/* ===== 소개 ===== */}
+      <section class="mt-14 flex flex-wrap items-center gap-6">
+        <img
+          src="/profile.webp"
+          alt="박효인"
+          width="96"
+          height="96"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          class="size-24 rounded-full border-2 border-border object-cover"
+        />
+        <div class="min-w-0 flex-1">
+          <p class="max-w-[44rem] text-[1.02rem] text-pretty text-muted">
             {SITE.desc}
           </p>
-
-          <div class="mt-7 flex flex-wrap gap-3">
+          <div class="mt-5 flex flex-wrap gap-3">
             <a href="/portfolio" class="hero-btn hero-btn-primary">
               프로젝트 보기 <span class="arw">→</span>
             </a>
@@ -88,26 +92,7 @@ const pageDesc =
             </a>
           </div>
         </div>
-
-        <img
-          src="/profile.webp"
-          alt="박효인"
-          width="132"
-          height="132"
-          loading="eager"
-          fetchpriority="high"
-          decoding="async"
-          class="order-1 size-[132px] rounded-full border-2 border-border object-cover sm:order-2"
-        />
       </section>
-
-      {
-        /* ===== 찾기 =====
-          기존 메뉴와 아래 글 목록을 대신하는 게 아니라 그 위에 얹는다.
-          홈은 검색엔진이 제일 많이 읽는 페이지라, 입력창만 남기면
-          가져갈 내용이 사라진다. */
-      }
-      <AskBox />
 
       {/* ===== 지표 ===== */}
       <StatGrid items={stats} />

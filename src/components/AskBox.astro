@@ -1,63 +1,84 @@
 ---
-// 홈 입력창 — 찾고 싶은 것을 적으면 주제 카드와 글을 바로 보여준다.
+// 홈 히어로 — 찾고 싶은 것을 적으면 주제 카드와 글을 바로 보여준다.
 //
-// 두 군데를 뒤진다.
+// 공공데이터포털처럼 "묻는 자리" 가 홈의 중심이 되게 했다. 다만 기존 메뉴와
+// 아래 글 목록은 걷지 않는다. 홈은 검색엔진이 제일 많이 읽는 페이지라
+// 입력창만 남기면 가져갈 내용이 사라지고, 채용 담당자가 들어왔을 때도
+// 대화창 하나보다 글 목록이 먼저 보이는 편이 낫다.
+//
+// 두 군데를 뒤진다. 둘 다 서버를 안 거친다.
 //   1. 주제 표 (src/data/topics.ts) — 포트폴리오 · 시리즈 · 주요 페이지.
 //      Pagefind 가 블로그 글만 색인하므로 그 바깥은 여기가 담당한다.
-//   2. Pagefind — 블로그 글 본문. 정적 인덱스라 서버를 안 거친다.
-//
-// 기존 메뉴와 글 목록은 그대로 둔다. 이 입력창은 그 위에 얹히는 것이지
-// 대신하는 것이 아니다. 검색엔진이 홈에서 가져갈 내용도 아래에 남아 있어야 한다.
+//   2. Pagefind — 블로그 글 본문. 빌드 때 만든 정적 인덱스.
 import { TOPICS } from "@/data/topics";
 
-// 추천 칩 — 빈 입력창은 무엇을 물어야 할지 알려주지 않는다.
-const SUGGESTIONS = ["포트폴리오", "julgot", "LLM 공부", "이 블로그", "검증"];
+// 추천 질문 — 빈 입력창은 무엇을 물어야 할지 알려주지 않는다.
+// 보여주는 문장과 실제로 던지는 말을 나눈다. 지금 검색은 낱말 기준이라
+// 문장을 그대로 넣으면 잘 안 맞는다. 나중에 LLM 을 붙이면 q 를 지우면 된다.
+const SUGGESTIONS = [
+  { label: "포트폴리오에 어떤 프로젝트가 있나요?", q: "포트폴리오" },
+  { label: "julgot 은 어떤 앱인가요?", q: "julgot" },
+  { label: "AI 답변을 어떻게 검증하나요?", q: "검증" },
+  { label: "이 블로그는 뭘로 만들었나요?", q: "이 블로그" },
+];
 ---
 
-<section class="ask" data-ask>
-  <label class="ask-label" for="ask-input">무엇을 찾으시나요</label>
+<section class="ask-hero" data-ask>
+  <p class="ask-eyebrow">박효인 · PARK HYOIN</p>
 
-  <div class="ask-field">
-    <svg
-      class="ask-icon"
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      aria-hidden="true"
-    >
-      <circle cx="11" cy="11" r="7"></circle>
-      <path d="m20 20-3.5-3.5"></path>
-    </svg>
-    <input
+  <h1 class="ask-title">
+    만든 것과 <span class="hl">막힌 것</span>을 그때그때 기록합니다.
+  </h1>
+
+  <div class="ask-box">
+    <label class="sr-only" for="ask-input">무엇을 찾으시나요</label>
+    <textarea
       id="ask-input"
-      type="search"
+      rows="2"
       autocomplete="off"
+      spellcheck="false"
       enterkeyhint="search"
-      placeholder="포트폴리오, julgot, 검증 …"
-      aria-describedby="ask-hint"
-    />
-    <button
-      type="button"
-      class="ask-clear"
-      data-ask-clear
-      hidden
-      aria-label="지우기">&times;</button
-    >
+      placeholder="무엇을 찾으시나요?"></textarea>
+    <button type="button" class="ask-go" data-ask-go aria-label="찾기">
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M12 19V5"></path>
+        <path d="m5 12 7-7 7 7"></path>
+      </svg>
+    </button>
   </div>
 
-  <p id="ask-hint" class="ask-hint">
+  <ul class="ask-suggest">
     {
       SUGGESTIONS.map(s => (
-        <button type="button" class="chip" data-chip={s}>
-          {s}
-        </button>
+        <li>
+          <button type="button" class="sug" data-q={s.q}>
+            <svg
+              class="sug-mark"
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M12 2.5 13.9 9 20.5 11 13.9 13 12 19.5 10.1 13 3.5 11 10.1 9z" />
+              <path d="M18.5 2.5 19.4 5.1 22 6l-2.6.9-.9 2.6-.9-2.6L15 6l2.6-.9z" />
+            </svg>
+            <span>“{s.label}”</span>
+          </button>
+        </li>
       ))
     }
-  </p>
+  </ul>
 
   <div class="ask-results" data-ask-results aria-live="polite" hidden></div>
 </section>
@@ -69,31 +90,10 @@ const SUGGESTIONS = ["포트폴리오", "julgot", "LLM 공부", "이 블로그",
 
     const input = root.querySelector("#ask-input");
     const panel = root.querySelector("[data-ask-results]");
-    const clearBtn = root.querySelector("[data-ask-clear]");
+    const goBtn = root.querySelector("[data-ask-go]");
 
     // 글자와 숫자만 남긴다. "parkhyo.in" 과 "parkhyo in" 이 같아진다.
     const norm = s => s.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
-
-    // Pagefind 가 진짜로 맞춘 것인지 본다.
-    //
-    // 점수로는 못 가른다 — "zzzzz"(4.85)가 "julgot"(3.92)보다 높게 나온다.
-    // Pagefind 가 질의를 쪼개서 조각까지 맞추기 때문이다. 실제로 "asdfqwer" 는
-    // "LLM-as-Judge" 의 as 에, "zzzzz" 는 코드 예제의 'z' 에 걸렸다.
-    //
-    // 대신 발췌의 <mark> 를 본다. Pagefind 가 "무엇을 맞췄다고 보는지" 가
-    // 거기 표시된다. 표시된 말이 질의를 품거나, 질의의 상당 부분이어야 통과시킨다.
-    function matched(query, excerpt) {
-      const q = norm(query);
-      if (!q) return false;
-      const marks = [...excerpt.matchAll(/<mark>(.*?)<\/mark>/g)].map(m =>
-        norm(m[1])
-      );
-      const min = Math.max(2, Math.ceil(q.length * 0.6));
-      return marks.some(
-        m =>
-          m.length >= 2 && (m.includes(q) || (q.includes(m) && m.length >= min))
-      );
-    }
     const esc = s =>
       String(s).replace(
         /[&<>"']/g,
@@ -107,7 +107,7 @@ const SUGGESTIONS = ["포트폴리오", "julgot", "LLM 공부", "이 블로그",
           })[c]
       );
 
-    // ── 주제 표 (서버에서 그대로 넘겨받는다) ──
+    // ── 주제 표 ──
     function findTopics(query, limit = 3) {
       const q = norm(query);
       if (q.length < 2) return [];
@@ -116,7 +116,9 @@ const SUGGESTIONS = ["포트폴리오", "julgot", "LLM 공부", "이 블로그",
       for (const t of TOPICS) {
         const keys = [norm(t.id), norm(t.title), ...t.aliases.map(norm)];
         if (keys.some(k => k === q)) exact.push(t);
-        else if (keys.some(k => k.includes(q) || q.includes(k)))
+        else if (
+          keys.some(k => k.length >= 2 && (k.includes(q) || q.includes(k)))
+        )
           partial.push(t);
       }
       return [...exact, ...partial].slice(0, limit);
@@ -137,21 +139,94 @@ const SUGGESTIONS = ["포트폴리오", "julgot", "LLM 공부", "이 블로그",
       }
     }
 
-    async function searchPosts(query, limit = 5) {
+    // Pagefind 가 진짜로 맞춘 것인지 본다.
+    //
+    // 점수로는 못 가른다 — "zzzzz"(4.85)가 "julgot"(3.92)보다 높게 나온다.
+    // Pagefind 가 질의를 쪼개서 조각까지 맞추기 때문이다. 실제로 "asdfqwer" 는
+    // "LLM-as-Judge" 의 as 에, "zzzzz" 는 코드 예제의 'z' 에 걸렸다.
+    //
+    // 대신 발췌의 <mark> 를 본다. Pagefind 가 "무엇을 맞췄다고 보는지" 가
+    // 거기 표시된다. 표시된 말이 질의를 품거나 질의의 상당 부분이어야 통과시킨다.
+    function matched(query, excerpt) {
+      const q = norm(query);
+      if (!q) return false;
+      const marks = [...excerpt.matchAll(/<mark>(.*?)<\/mark>/g)].map(m =>
+        norm(m[1])
+      );
+      const min = Math.max(2, Math.ceil(q.length * 0.6));
+      return marks.some(
+        m =>
+          m.length >= 2 && (m.includes(q) || (q.includes(m) && m.length >= min))
+      );
+    }
+
+    // 문장으로 물었을 때를 위한 낱말 뽑기.
+    // "julgot 은 어떤 앱인가요?" 를 통째로 던지면 안 맞으니 긴 낱말부터 다시 던진다.
+    const STOP = new Set([
+      "무엇",
+      "뭐",
+      "어떤",
+      "어떻게",
+      "알려줘",
+      "알려주세요",
+      "있나요",
+      "있어요",
+      "인가요",
+      "관련",
+      "대해",
+      "대한",
+      "정보",
+      "내용",
+      "그리고",
+      "해줘",
+      "보여줘",
+      "찾아줘",
+      "포스트",
+      "방법",
+    ]);
+    function keywords(query) {
+      return query
+        .split(/[\s,.?!·…"'“”‘’()[\]]+/)
+        .map(w => w.replace(/[은는이가을를의에서로와과도만]$/u, "") || w)
+        .filter(w => norm(w).length >= 2 && !STOP.has(w))
+        .sort((a, b) => norm(b).length - norm(a).length)
+        .slice(0, 3);
+    }
+
+    async function runPagefind(term, limit) {
       const pf = await getPagefind();
-      if (!pf) return null; // 인덱스 없음 — 못 찾은 것과 구분한다
-      const res = await pf.search(query);
-      // 거르고 나면 줄어드니 넉넉히 받아온다
+      if (!pf) return null;
+      const res = await pf.search(term);
       const rows = await Promise.all(
         res.results.slice(0, limit * 3).map(r => r.data())
       );
       return rows
-        .filter(d => matched(query, d.excerpt ?? ""))
+        .filter(d => matched(term, d.excerpt ?? ""))
         .map(d => ({
           title: d.meta?.title ?? d.url,
           url: d.url.replace(/\.html$/, ""),
           excerpt: d.excerpt ?? "",
         }));
+    }
+
+    async function searchPosts(query, limit = 5) {
+      const direct = await runPagefind(query, limit);
+      if (direct === null) return null; // 인덱스 없음 — 못 찾은 것과 구분한다
+      if (direct.length) return direct;
+
+      // 통째로 안 맞으면 낱말로 다시 — 문장으로 물었을 때를 위해
+      const seen = new Set();
+      const merged = [];
+      for (const w of keywords(query)) {
+        const rows = await runPagefind(w, limit);
+        for (const r of rows ?? []) {
+          if (seen.has(r.url)) continue;
+          seen.add(r.url);
+          merged.push(r);
+        }
+        if (merged.length >= limit) break;
+      }
+      return merged;
     }
 
     // ── 그리기 ──
@@ -186,11 +261,12 @@ const SUGGESTIONS = ["포트폴리오", "julgot", "LLM 공부", "이 블로그",
       if (posts === null) {
         html += `<p class="ask-note">검색 인덱스를 못 불러왔습니다. <code>pnpm build</code> 를 한 번 돌리면 생깁니다.</p>`;
       } else if (posts.length) {
-        html += `<div class="ask-section">글 ${Math.min(posts.length, 5)}편</div>`;
-        html += `<div class="ask-rows">${posts.slice(0, 5).map(postRow).join("")}</div>`;
+        const shown = posts.slice(0, 5);
+        html += `<div class="ask-section">글 ${shown.length}편</div>`;
+        html += `<div class="ask-rows">${shown.map(postRow).join("")}</div>`;
         html += `<a class="ask-more" href="/search?q=${encodeURIComponent(query)}">검색 페이지에서 더 보기 →</a>`;
       } else if (!topics.length) {
-        html = `<p class="ask-note">"${esc(query)}" 로 찾은 게 없습니다. 다른 말로 해보시거나 <a href="/archives">전체 글</a>을 보세요.</p>`;
+        html = `<p class="ask-note">“${esc(query)}” 로 찾은 게 없습니다. 다른 말로 해보시거나 <a href="/archives">전체 글</a>을 보세요.</p>`;
       }
 
       panel.innerHTML = html;
@@ -203,23 +279,26 @@ const SUGGESTIONS = ["포트폴리오", "julgot", "LLM 공부", "이 블로그",
 
     async function run(query) {
       const q = query.trim();
-      clearBtn.hidden = !q;
       if (!q) return render("", [], []);
 
       const mine = ++seq;
       const topics = findTopics(q);
-      // 주제는 즉시 그리고, 글은 오는 대로 덧붙인다
-      render(q, topics, []);
+      render(q, topics, []); // 주제는 즉시, 글은 오는 대로
       const posts = await searchPosts(q);
       if (mine === seq) render(q, topics, posts);
     }
 
     input.addEventListener("input", () => {
       clearTimeout(timer);
-      timer = setTimeout(() => run(input.value), 180);
+      timer = setTimeout(() => run(input.value), 200);
     });
 
     input.addEventListener("keydown", e => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        clearTimeout(timer);
+        run(input.value);
+      }
       if (e.key === "Escape") {
         input.value = "";
         run("");
@@ -227,15 +306,15 @@ const SUGGESTIONS = ["포트폴리오", "julgot", "LLM 공부", "이 블로그",
       }
     });
 
-    clearBtn.addEventListener("click", () => {
-      input.value = "";
-      run("");
+    goBtn.addEventListener("click", () => {
+      clearTimeout(timer);
+      run(input.value);
       input.focus();
     });
 
-    root.querySelectorAll("[data-chip]").forEach(btn => {
+    root.querySelectorAll("[data-q]").forEach(btn => {
       btn.addEventListener("click", () => {
-        input.value = btn.dataset.chip;
+        input.value = btn.dataset.q;
         input.focus();
         run(input.value);
       });
@@ -251,96 +330,157 @@ const SUGGESTIONS = ["포트폴리오", "julgot", "LLM 공부", "이 블로그",
 </script>
 
 <style>
-  .ask {
-    margin-top: 2.25rem;
-  }
-  .ask-label {
-    display: block;
-    font-size: 0.78rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    color: var(--muted);
-    margin-bottom: 0.5rem;
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
-  .ask-field {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 0 14px;
+  .ask-hero {
+    margin: 1.5rem 0 0;
+    padding: 3rem 1.5rem 2.75rem;
     border: 1px solid var(--border);
-    border-radius: 12px;
-    background: var(--surface);
+    border-radius: 20px;
+    text-align: center;
+    background:
+      radial-gradient(
+        120% 130% at 50% 0%,
+        color-mix(in oklab, var(--accent) 13%, transparent) 0%,
+        transparent 62%
+      ),
+      var(--surface);
+  }
+  @media (min-width: 768px) {
+    .ask-hero {
+      padding: 4rem 2.5rem 3.25rem;
+    }
+  }
+
+  .ask-eyebrow {
+    font-family: var(--font-code, ui-monospace, monospace);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+    margin: 0;
+  }
+  .ask-title {
+    margin: 0.85rem auto 0;
+    max-width: 22em;
+    font-size: clamp(1.75rem, 4.4vw, 2.6rem);
+    line-height: 1.3;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    word-break: keep-all;
+  }
+
+  /* ── 입력 상자 ── */
+  .ask-box {
+    position: relative;
+    max-width: 44rem;
+    margin: 2rem auto 0;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: var(--background);
     transition:
       border-color 0.15s ease,
       box-shadow 0.15s ease;
   }
-  .ask-field:focus-within {
+  .ask-box:focus-within {
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 16%, transparent);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 14%, transparent);
   }
-  .ask-icon {
-    flex: none;
-    color: var(--muted);
-  }
-  .ask-field input {
-    flex: 1;
-    min-width: 0;
-    padding: 13px 0;
+  .ask-box textarea {
+    display: block;
+    width: 100%;
+    /* 아래쪽은 화살표 버튼 자리로 비워둔다 */
+    padding: 18px 20px 52px;
     border: 0;
     outline: none;
+    resize: none;
     background: transparent;
     color: inherit;
     font-family: inherit;
-    font-size: 1rem;
+    font-size: 1.02rem;
+    line-height: 1.6;
+    text-align: left;
   }
-  .ask-field input::-webkit-search-cancel-button {
-    display: none;
+  .ask-box textarea::placeholder {
+    color: var(--muted);
   }
-  .ask-clear {
-    flex: none;
+  .ask-go {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
     border: 0;
-    background: transparent;
-    color: var(--muted);
-    font-size: 1.3rem;
-    line-height: 1;
-    padding: 0 2px;
-    cursor: pointer;
-  }
-  .ask-clear:hover {
-    color: var(--accent);
-  }
-
-  .ask-hint {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin: 0.7rem 0 0;
-  }
-  .chip {
-    padding: 5px 11px;
-    border: 1px solid var(--border);
     border-radius: 999px;
-    background: transparent;
-    color: var(--muted);
-    font-family: inherit;
-    font-size: 0.8rem;
+    background: var(--accent);
+    color: var(--background);
     cursor: pointer;
-    transition:
-      color 0.15s ease,
-      border-color 0.15s ease;
+    transition: opacity 0.15s ease;
   }
-  .chip:hover {
-    color: var(--accent);
-    border-color: var(--accent);
+  .ask-go:hover {
+    opacity: 0.85;
   }
 
-  .ask-results {
-    margin-top: 1rem;
+  /* ── 추천 질문 ── */
+  .ask-suggest {
+    list-style: none;
+    max-width: 44rem;
+    margin: 0.9rem auto 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .sug {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px 16px;
     border: 1px solid var(--border);
     border-radius: 12px;
-    background: var(--surface);
+    background: color-mix(in oklab, var(--accent) 5%, transparent);
+    color: inherit;
+    font-family: inherit;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    text-align: left;
+    cursor: pointer;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .sug:hover {
+    border-color: var(--accent);
+    background: var(--accent-bg);
+  }
+  .sug-mark {
+    flex: none;
+    color: var(--accent);
+  }
+
+  /* ── 결과 ── */
+  .ask-results {
+    max-width: 44rem;
+    margin: 1.25rem auto 0;
     padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--background);
+    text-align: left;
   }
 
   :global(.ask-cards) {
