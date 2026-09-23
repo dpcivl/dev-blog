@@ -15,7 +15,7 @@ import { SERIES } from "@/data/series";
  */
 export interface Topic {
   id: string;
-  kind: "포트폴리오" | "시리즈" | "페이지";
+  kind: "포트폴리오" | "시리즈" | "페이지" | "태그";
   title: string;
   summary: string;
   href: string;
@@ -23,6 +23,8 @@ export interface Topic {
   meta?: string;
   /** 이 말이 들어오면 이 주제를 띄운다. 전부 소문자 · 공백 없이 적을 것 */
   aliases: string[];
+  /** 카드 아래에 붙는 목록. "최신 글" · "포트폴리오 전체" 처럼 답이 목록인 질문용 */
+  items?: { title: string; desc?: string; href: string }[];
 }
 
 const PORTFOLIO: Topic[] = [
@@ -88,28 +90,26 @@ const PORTFOLIO: Topic[] = [
 
 const PAGES: Topic[] = [
   {
-    id: "portfolio",
-    kind: "페이지",
-    title: "포트폴리오",
-    summary:
-      "직접 만들고 배포한 것들을 모아둔 페이지. 접속 가능한 사이트가 있는 프로젝트만 올린다.",
-    href: "/portfolio",
-    aliases: [
-      "포트폴리오",
-      "portfolio",
-      "프로젝트",
-      "만든것",
-      "작업물",
-      "만든거",
-    ],
-  },
-  {
+    // 요약은 /about 에 작성자가 직접 쓴 문장을 그대로 옮긴다.
+    // 자기소개 카피를 내가 지어내지 않는다 (CLAUDE.md 지침 4번).
     id: "about",
     kind: "페이지",
-    title: "소개",
-    summary: "박효인이 누구인지, 무엇에 관심이 있는지.",
+    title: "박효인 (Park Hyoin)",
+    summary:
+      "임베디드 HW 1년 / 임베디드 SW 2년 2개월 의 실무 경험과 엣지 AI 프로젝트 경험이 있습니다. 문과 출신으로 임베디드 하드웨어 설계로 커리어를 시작해 C · Python 을 독학하고 임베디드 SW 로 옮겨갔습니다.",
     href: "/about",
-    aliases: ["소개", "about", "누구", "자기소개", "프로필"],
+    aliases: [
+      "소개",
+      "about",
+      "누구",
+      "자기소개",
+      "프로필",
+      "박효인",
+      "parkhyoin",
+      "hyoin",
+      "작성자",
+      "주인장",
+    ],
   },
   {
     id: "archives",
@@ -138,24 +138,60 @@ export function norm(s: string): string {
   return s.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
 }
 
+/** 질의를 낱말로 쪼갠다. 조사를 떼고 두 글자 이상만 남긴다 */
+export function tokens(query: string): string[] {
+  return query
+    .split(/[\s,.?!·…"'\u201c\u201d\u2018\u2019()[\]]+/)
+    .map(w => w.replace(/[은는이가을를의에서로와과도만]$/u, "") || w)
+    .map(norm)
+    .filter(w => w.length >= 2);
+}
+
 /**
  * 입력한 말과 맞는 주제를 찾는다.
  *
- * 완전히 같은 것을 먼저 주고, 없으면 별칭을 포함하는 것까지 본다.
- * 두 글자 미만은 아무것도 안 준다 — 한 글자로는 뭐든 걸린다.
+ * 낱말 단위까지 보는 게 핵심이다. "이 블로그는 어떤 글로 구성되어 있나요?" 처럼
+ * 문장으로 물으면 통째로는 어떤 별칭과도 안 맞는다. 조사를 떼고 낱말로 쪼개야
+ * "구성되어" 가 「구성」 에 닿는다.
+ *
+ * 점수: 전체가 별칭과 똑같으면 3, 낱말 하나가 똑같으면 2, 어느 쪽이든 포함하면 1.
+ * 같은 점수면 더 긴 별칭이 맞은 쪽을 앞에 둔다 — 우연히 걸린 짧은 말보다 낫다.
  */
 export function findTopics(query: string, limit = 3): Topic[] {
   const q = norm(query);
   if (q.length < 2) return [];
+  const words = tokens(query);
 
-  const exact: Topic[] = [];
-  const partial: Topic[] = [];
+  const scored: { t: Topic; score: number; len: number }[] = [];
 
   for (const t of TOPICS) {
-    const keys = [norm(t.id), norm(t.title), ...t.aliases.map(norm)];
-    if (keys.some(k => k === q)) exact.push(t);
-    else if (keys.some(k => k.includes(q) || q.includes(k))) partial.push(t);
+    const keys = [norm(t.id), norm(t.title), ...t.aliases.map(norm)].filter(
+      k => k.length >= 2
+    );
+    // 점수와 길이를 "가장 잘 맞은 별칭 하나" 기준으로 같이 잡는다.
+    // 따로 최대값을 취하면, 약하게 걸린 긴 별칭의 길이가 강하게 걸린
+    // 짧은 별칭에 얹혀서 순위가 뒤집힌다.
+    let score = 0;
+    let len = 0;
+    for (const k of keys) {
+      let s = 0;
+      if (k === q) s = 3;
+      else if (words.includes(k)) s = 2;
+      else if (k.includes(q) || q.includes(k)) s = 1;
+      else if (words.some(w => w.includes(k) || k.includes(w))) s = 1;
+      if (s > score || (s === score && s > 0 && k.length > len)) {
+        score = s;
+        len = k.length;
+      }
+    }
+    if (score > 0) scored.push({ t, score, len });
   }
 
-  return [...exact, ...partial].slice(0, limit);
+  scored.sort((a, b) => b.score - a.score || b.len - a.len);
+  // 1등보다 확실히 약한 것은 버린다. 곁다리 카드가 답을 흐린다
+  const top = scored[0]?.score ?? 0;
+  return scored
+    .filter(x => x.score >= top - 1 && !(top === 3 && x.score < 3))
+    .slice(0, limit)
+    .map(x => x.t);
 }

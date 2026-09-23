@@ -10,16 +10,132 @@
 //   1. 주제 표 (src/data/topics.ts) — 포트폴리오 · 시리즈 · 주요 페이지.
 //      Pagefind 가 블로그 글만 색인하므로 그 바깥은 여기가 담당한다.
 //   2. Pagefind — 블로그 글 본문. 빌드 때 만든 정적 인덱스.
-import { TOPICS } from "@/data/topics";
+import { getCollection } from "astro:content";
+import getSortedPosts from "@/utils/getSortedPosts";
+import { getSeriesSummary } from "@/data/series";
+import { filterByLang } from "@/utils/i18n";
+import { getPath } from "@/utils/getPath";
+import { slugifyStr } from "@/utils/slugify";
+import { TOPICS, type Topic } from "@/data/topics";
 
-// 추천 질문 — 빈 입력창은 무엇을 물어야 할지 알려주지 않는다.
-// 보여주는 문장과 실제로 던지는 말을 나눈다. 지금 검색은 낱말 기준이라
-// 문장을 그대로 넣으면 잘 안 맞는다. 나중에 LLM 을 붙이면 q 를 지우면 된다.
+// 검색이 아니라 "목록" 이 답인 질문들이 있다. 최신 글 · 블로그 구성 · 포트폴리오
+// 전체가 그렇다. Pagefind 로는 안 되고 주제 표에 손으로 적어둘 수도 없다 —
+// 글이 늘 때마다 갈라진다. 그래서 빌드할 때 실제 데이터로 만든다.
+const koPosts = getSortedPosts(filterByLang(await getCollection("blog"), "ko"));
+const seriesSummary = getSeriesSummary(
+  filterByLang(await getCollection("blog"), "ko")
+);
+const portfolio = (await getCollection("portfolio")).sort(
+  (a, b) => (b.data.order ?? 0) - (a.data.order ?? 0)
+);
+
+const fmtDate = (d: Date | string) => {
+  const x = new Date(d);
+  return `${x.getFullYear()}.${String(x.getMonth() + 1).padStart(2, "0")}.${String(x.getDate()).padStart(2, "0")}`;
+};
+
+const firstPost = koPosts[koPosts.length - 1];
+const lastPost = koPosts[0];
+
+const DYNAMIC: Topic[] = [
+  {
+    id: "recent",
+    kind: "페이지",
+    title: "최신 글",
+    summary: `가장 최근에 올린 글부터 다섯 편. 전체 ${koPosts.length}편은 아카이브에 있다.`,
+    href: "/archives",
+    meta: lastPost
+      ? `최근 발행 ${fmtDate(lastPost.data.pubDatetime)}`
+      : undefined,
+    aliases: ["최신", "최신글", "최근", "최근글", "새글", "요즘", "업데이트"],
+    items: koPosts.slice(0, 5).map(p => ({
+      title: p.data.title,
+      desc: p.data.description,
+      href: `${getPath(p.id, p.filePath)}/`,
+    })),
+  },
+  {
+    id: "overview",
+    kind: "페이지",
+    title: "이 블로그는 어떤 글로 되어 있나",
+    summary:
+      `${firstPost ? fmtDate(firstPost.data.pubDatetime) : ""}부터 ${koPosts.length}편. ` +
+      `한 주제를 여러 편으로 나눈 시리즈가 ${seriesSummary.length}개이고, ` +
+      `나머지는 그때그때 막힌 것을 남긴 단발 기록이다.`,
+    href: "/series",
+    aliases: ["구성", "구성되어", "어떤글", "무슨글", "주제", "통계", "시리즈"],
+    items: seriesSummary.map(sr => ({
+      title: `${sr.title} · ${sr.count}편`,
+      desc: sr.description,
+      href: `/series#${sr.id}`,
+    })),
+  },
+  {
+    id: "portfolio",
+    kind: "페이지",
+    title: "포트폴리오",
+    summary:
+      "직접 만들고 배포한 것들. 접속 가능한 사이트가 있는 프로젝트만 올린다.",
+    href: "/portfolio",
+    meta: `${portfolio.length}개`,
+    aliases: [
+      "포트폴리오",
+      "portfolio",
+      "프로젝트",
+      "만든것",
+      "만든거",
+      "작업물",
+      "제품",
+    ],
+    items: portfolio.map(pr => ({
+      title: pr.data.title,
+      desc: pr.data.period,
+      href: `/portfolio#${pr.id}`,
+    })),
+  },
+];
+
+// 태그도 주제로 넣는다. "RAG 관련 글" 처럼 주제어 하나만 던지는 질문이
+// 제일 흔한데, 그때 글 목록만 나오는 것보다 "이 태그에 N편" 이 먼저 보이는
+// 편이 답에 가깝다. 두 편 이하인 태그는 뺀다 — 169개를 다 넣으면 잡음이 된다.
+const tagCount = new Map<string, { name: string; posts: typeof koPosts }>();
+for (const post of koPosts) {
+  for (const raw of post.data.tags ?? []) {
+    const key = slugifyStr(raw);
+    if (!tagCount.has(key)) tagCount.set(key, { name: raw, posts: [] });
+    tagCount.get(key)!.posts.push(post);
+  }
+}
+
+const TAG_TOPICS: Topic[] = [...tagCount.entries()]
+  .filter(([, v]) => v.posts.length >= 3)
+  .sort((a, b) => b[1].posts.length - a[1].posts.length)
+  .map(([slug, v]) => ({
+    id: `tag-${slug}`,
+    kind: "태그" as const,
+    title: `#${v.name}`,
+    summary: `이 태그가 붙은 글 ${v.posts.length}편.`,
+    href: `/tags/${slug}/`,
+    meta: `${v.posts.length}편`,
+    aliases: [v.name, slug],
+    items: v.posts.slice(0, 5).map(pp => ({
+      title: pp.data.title,
+      desc: pp.data.description,
+      href: `${getPath(pp.id, pp.filePath)}/`,
+    })),
+  }));
+
+// 동적인 것을 앞에 둔다 — 같은 점수면 먼저 걸린 쪽이 위로 온다
+const ALL_TOPICS: Topic[] = [...DYNAMIC, ...TAG_TOPICS, ...TOPICS];
+
+// 추천 질문. 보여주는 문장과 실제로 던지는 말을 나눈다 — 지금 검색은 낱말
+// 기준이라 문장을 그대로 넣으면 잘 안 맞는다. LLM 을 붙이면 q 를 지우면 된다.
 const SUGGESTIONS = [
-  { label: "포트폴리오에 어떤 프로젝트가 있나요?", q: "포트폴리오" },
-  { label: "julgot 은 어떤 앱인가요?", q: "julgot" },
-  { label: "AI 답변을 어떻게 검증하나요?", q: "검증" },
-  { label: "이 블로그는 뭘로 만들었나요?", q: "이 블로그" },
+  { label: "최신 글 목록 보여주세요.", q: "최신 글" },
+  { label: "이 블로그는 어떤 글로 구성되어 있나요?", q: "블로그 구성" },
+  { label: "RAG 관련 글", q: "RAG" },
+  { label: "포트폴리오 보여주세요.", q: "포트폴리오" },
+  { label: "Park Hyoin에 대해 소개해주세요.", q: "박효인 소개" },
 ];
 ---
 
@@ -83,7 +199,7 @@ const SUGGESTIONS = [
   <div class="ask-results" data-ask-results aria-live="polite" hidden></div>
 </section>
 
-<script define:vars={{ TOPICS }}>
+<script define:vars={{ TOPICS: ALL_TOPICS }}>
   (() => {
     const root = document.querySelector("[data-ask]");
     if (!root) return;
@@ -108,20 +224,54 @@ const SUGGESTIONS = [
       );
 
     // ── 주제 표 ──
+    // 낱말 단위까지 보는 게 핵심이다. "이 블로그는 어떤 글로 구성되어 있나요?"
+    // 처럼 문장으로 물으면 통째로는 어떤 별칭과도 안 맞는다. 조사를 떼고
+    // 쪼개야 "구성되어" 가 「구성」 에 닿는다.
+    const PARTICLE = /[은는이가을를의에서로와과도만]$/u;
+    function tokenize(query) {
+      return query
+        .split(/[\s,.?!·…"'“”‘’()[\]]+/)
+        .map(w => w.replace(PARTICLE, "") || w)
+        .map(norm)
+        .filter(w => w.length >= 2);
+    }
+
     function findTopics(query, limit = 3) {
       const q = norm(query);
       if (q.length < 2) return [];
-      const exact = [];
-      const partial = [];
+      const words = tokenize(query);
+      const scored = [];
+
       for (const t of TOPICS) {
-        const keys = [norm(t.id), norm(t.title), ...t.aliases.map(norm)];
-        if (keys.some(k => k === q)) exact.push(t);
-        else if (
-          keys.some(k => k.length >= 2 && (k.includes(q) || q.includes(k)))
-        )
-          partial.push(t);
+        const keys = [norm(t.id), norm(t.title), ...t.aliases.map(norm)].filter(
+          k => k.length >= 2
+        );
+        // 점수와 길이를 "가장 잘 맞은 별칭 하나" 기준으로 같이 잡는다.
+        // 따로 최대값을 취하면, 약하게 걸린 긴 별칭의 길이가 강하게 걸린
+        // 짧은 별칭에 얹혀서 순위가 뒤집힌다.
+        let score = 0;
+        let len = 0;
+        for (const k of keys) {
+          let sc = 0;
+          if (k === q) sc = 3;
+          else if (words.includes(k)) sc = 2;
+          else if (k.includes(q) || q.includes(k)) sc = 1;
+          else if (words.some(w => w.includes(k) || k.includes(w))) sc = 1;
+          if (sc > score || (sc === score && sc > 0 && k.length > len)) {
+            score = sc;
+            len = k.length;
+          }
+        }
+        if (score > 0) scored.push({ t, score, len });
       }
-      return [...exact, ...partial].slice(0, limit);
+
+      scored.sort((a, b) => b.score - a.score || b.len - a.len);
+      // 1등보다 확실히 약한 것은 버린다. 곁다리 카드가 답을 흐린다
+      const top = scored[0]?.score ?? 0;
+      return scored
+        .filter(x => x.score >= top - 1 && !(top === 3 && x.score < 3))
+        .slice(0, limit)
+        .map(x => x.t);
     }
 
     // ── Pagefind (빌드 결과물이라 dev 에서는 없을 수 있다) ──
@@ -230,15 +380,32 @@ const SUGGESTIONS = [
     }
 
     // ── 그리기 ──
-    const topicCard = t => `
-      <a class="ask-card" href="${esc(t.href)}">
+    const topicItem = it => `
+      <a class="ask-item" href="${esc(it.href)}">
+        <span class="ask-item-title">${esc(it.title)}</span>
+        ${it.desc ? `<span class="ask-item-desc">${esc(it.desc)}</span>` : ""}
+      </a>`;
+
+    // 목록이 있는 주제는 카드 전체를 링크로 감싸지 않는다 — 안에 링크가 들어간다
+    const topicCard = t => {
+      const head = `
         <div class="ask-card-head">
           <span class="ask-kind">${esc(t.kind)}</span>
           ${t.meta ? `<span class="ask-meta">${esc(t.meta)}</span>` : ""}
-        </div>
+        </div>`;
+      const body = `
         <div class="ask-card-title">${esc(t.title)}</div>
-        <p class="ask-card-desc">${esc(t.summary)}</p>
-      </a>`;
+        <p class="ask-card-desc">${esc(t.summary)}</p>`;
+
+      if (!t.items?.length) {
+        return `<a class="ask-card" href="${esc(t.href)}">${head}${body}</a>`;
+      }
+      return `<div class="ask-card is-list">
+        ${head}
+        <a class="ask-card-link" href="${esc(t.href)}">${body}</a>
+        <div class="ask-items">${t.items.map(topicItem).join("")}</div>
+      </div>`;
+    };
 
     const postRow = p => `
       <a class="ask-row" href="${esc(p.url)}">
@@ -525,6 +692,50 @@ const SUGGESTIONS = [
     line-height: 1.6;
     color: var(--muted);
     margin: 5px 0 0;
+  }
+
+  :global(.ask-card.is-list:hover) {
+    background: transparent;
+  }
+  :global(.ask-card-link) {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+  :global(.ask-items) {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+  }
+  :global(.ask-item) {
+    display: block;
+    padding: 8px 8px;
+    margin: 0 -8px;
+    border-radius: 7px;
+    text-decoration: none;
+    color: inherit;
+  }
+  :global(.ask-item:hover) {
+    background: var(--accent-bg);
+  }
+  :global(.ask-item-title) {
+    display: block;
+    font-size: 0.88rem;
+    font-weight: 500;
+    line-height: 1.45;
+  }
+  :global(.ask-item-desc) {
+    display: block;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: var(--muted);
+    margin-top: 2px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 
   :global(.ask-section) {
