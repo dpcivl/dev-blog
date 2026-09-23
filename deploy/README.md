@@ -1,10 +1,40 @@
 # Lightsail 배포
 
-Vercel → Lightsail 이전을 위한 서버 설정. 전체 계획과 전환 절차는 이전 런북 참고.
+Vercel → Lightsail 이전을 위한 서버 설정.
 
-**현재 상태: 준비만 해둔 것. 아직 어디에도 연결되어 있지 않다.**
-`.github/workflows/deploy.yml` 은 Secrets 가 없으면 실패하므로, 서버가 준비될 때까지는
-그냥 두거나 워크플로를 비활성화해둔다.
+**현재 상태: 2026-09-06 부터 운영 중.** `parkhyo.in` 이 이 서버로 서빙되고 있다.
+`main` 에 푸시하면 GitHub Actions 가 빌드해서 rsync 하고 심볼릭 링크를 바꾼다.
+
+## 서버에 들어가기
+
+**두 계정이 있고 키가 다르다.** 헷갈리기 쉬우니 먼저 적어둔다.
+
+| 키 | 계정 | 용도 | sudo |
+| --- | --- | --- | --- |
+| `~/.ssh/blog-prod-key.pem` | `ubuntu` | **사람이 관리할 때** | ✅ |
+| `~/.ssh/parkhyoin-deploy` | `deploy` | CI 배포 전용 | ❌ |
+
+```bash
+ssh -i ~/.ssh/blog-prod-key.pem ubuntu@parkhyo.in
+```
+
+고정 IP 대신 **도메인으로 붙어도 된다.** IP 는 개인정보가 아니지만 이 저장소가
+공개라 적지 않는다 — 필요하면 Lightsail 콘솔에서 본다.
+
+`deploy` 에 sudo 를 안 준 것은 의도다. 하는 일이 파일 받기와 심볼릭 링크 교체뿐이라
+그 이상의 권한이 필요 없다. **패키지 설치나 nginx 설정 변경은 `ubuntu` 로 해야 한다.**
+
+키는 두 기기(Windows · macOS)에 각각 있어야 한다. 저장소에 커밋하거나 채팅에
+붙여넣지 말고 1Password · AirDrop · USB 로 옮긴다.
+
+`~/.ssh/config` 에 넣어두면 `ssh blog` 로 끝난다.
+
+```
+Host blog
+    HostName parkhyo.in
+    User ubuntu
+    IdentityFile ~/.ssh/blog-prod-key.pem
+```
 
 ## 구성
 
@@ -98,6 +128,27 @@ nginx 설정을 갱신하고 반영한다 (`/stats/` 블록이 추가돼 있다)
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
+#### 대시보드 로그인
+
+**아이디는 `admin`** 이다. 비밀번호는 `/etc/nginx/.htpasswd-stats` 에 **단방향 해시**로
+저장돼 있어서 **꺼내볼 수 없다. 잊었으면 재설정한다.**
+
+```bash
+sudo htpasswd -B /etc/nginx/.htpasswd-stats admin
+```
+
+- **`-c` 를 붙이지 말 것.** 파일을 새로 만드는 옵션이라 기존 사용자가 날아간다
+- `-B` 는 bcrypt. 최초 설정 때 쓴 APR1(MD5)은 요즘 기준으로 약하니 바꾸는 김에 올린다
+- nginx 는 요청마다 이 파일을 읽으므로 **리로드가 필요 없다**
+
+아이디를 바꾸려면 새 계정을 먼저 넣고, **로그인되는 것을 확인한 다음** 예전 것을 지운다.
+순서를 바꾸면 잠긴다.
+
+```bash
+sudo htpasswd -B /etc/nginx/.htpasswd-stats <새아이디>
+sudo htpasswd -D /etc/nginx/.htpasswd-stats admin
+```
+
 시간마다 갱신되도록 cron 을 건다.
 
 ```bash
@@ -170,9 +221,84 @@ access.log   전체 — 크롤러 리포트 · 디버깅
 human.log    사람 요청만 — 방문 통계
 ```
 
-`map` 세 개로 판정한다 — UA 가 봇 · 자동화 도구 · 빈 값이면 제외,
-정적 파일과 `/stats/` 자체도 제외. 사후 grep 과 달리 **GoAccess 가 파일을 직접
-읽으므로 증분 처리(`--persist`)가 그대로 작동한다.**
+`map` 네 개로 판정한다 — UA · 경로 · IP · **상태 코드**. 사후 grep 과 달리
+**GoAccess 가 파일을 직접 읽으므로 증분 처리(`--persist`)가 그대로 작동한다.**
+
+#### UA 필터만으로는 안 됐다 (2026-09-23)
+
+위 방식으로 3주를 돌린 뒤 대시보드가 **방문자 4,290 · 페이지뷰 18,660** 을
+가리켰다. 개인 블로그 숫자로 이상해서 로그를 직접 열었다.
+
+```
+하루 776 요청 중 404 가 604 (78%)
+그중 234 개가 wp-login · .env · phpmyadmin 같은 취약점 탐색 경로
+GCP 대역 IP 두 개가 각각 281 개 경로를 같은 1 초 안에 훑고 감
+```
+
+**두 IP 의 UA 가 평범한 크롬이었다.** `Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+AppleWebKit/537.36` — 위 문자열 목록에 걸릴 단어가 하나도 없다. **UA 는 요청자가
+적어 보내는 값이라 애초에 못 믿는다.** 목록을 아무리 늘려도 같은 일이 반복된다.
+
+그래서 **상태 코드로 거른다.** 진짜 독자는 404 를 거의 안 낸다.
+
+```nginx
+map $status $status_human {
+    default        0;
+    "~^(200|304)$" 1;
+}
+```
+
+두 IP 만 빼도 **방문당 페이지가 6.2 → 1.7** 로 떨어졌다. 학습 블로그 통상
+범위(1.5–2.5)다. 대시보드가 그 벤치마크를 이미 화면에 적고 있었는데도
+3주 동안 못 알아봤다.
+
+`301` 은 일부러 뺀다. `/portfolio` → `/portfolio/` 처럼 곧바로 200 이 따라오므로
+같이 세면 한 번의 방문이 두 번으로 잡힌다.
+
+**누적 DB 는 고쳐도 안 낫는다.** `--persist` 가 쌓아둔 과거는 필터를 바꿔도
+그대로 남는다. 숫자를 처음부터 다시 보려면 옮기고 새로 쌓아야 한다.
+
+```bash
+sudo mv /var/lib/goaccess /var/lib/goaccess.polluted-$(date +%Y%m%d)
+sudo mkdir -p /var/lib/goaccess
+sudo mv /var/log/nginx/human.log /var/log/nginx/human.log.polluted-$(date +%Y%m%d)
+sudo nginx -s reopen
+sudo /usr/local/bin/generate-stats
+```
+
+> `rm` 대신 `mv` 를 쓴다. 판단이 틀렸을 때 되돌릴 수 있어야 한다.
+
+#### ⚠️ server 블록의 `access_log` 는 상위를 덮어쓴다
+
+같은 날 찾은 별개 버그다. **nginx 는 server 블록에 `access_log` 를 쓰는 순간
+http 레벨에서 물려받은 기본 로그를 쓰지 않는다.** 443 블록에 `human.log` 만
+적어두면 **필터에 걸러진 HTTPS 요청이 어디에도 안 남는다.**
+
+실제로 `access.log` 467 줄 중 436 줄이 308(포트 80 리다이렉트)이고 200 은
+20 줄뿐이었다 — HTTPS 트래픽이 통째로 빠져 있었다. 크롤러 리포트가 제구실을
+못 한 이유이고, 나중에 "이 트래픽이 뭐였나" 를 되짚을 수도 없었다.
+
+**443 블록에 두 줄을 다 적어야 한다.**
+
+```nginx
+access_log /var/log/nginx/access.log combined;                  # 전체
+access_log /var/log/nginx/human.log  combined if=$log_human;    # 사람만
+```
+
+#### 필터를 테스트할 때
+
+`curl` 기본 UA 는 자동화 도구 목록에 걸려서 **테스트 자체가 안 된다.**
+브라우저 UA 를 씌워야 한다.
+
+```bash
+UA="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 \
+(KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36"
+
+curl -s -o /dev/null -A "$UA" "https://parkhyo.in/?probe=ok"        # human.log 에 있어야
+curl -s -o /dev/null -A "$UA" "https://parkhyo.in/wp-admin/probe"   # human.log 에 없어야
+```
+
+리로드 직후에는 옛 워커가 남은 요청을 처리하므로 **몇 초 기다렸다가** 확인한다.
 
 > 서버 로그 분석의 구조적 한계이기도 하다. Vercel Analytics 는 클라이언트 JS 로
 > 셌기 때문에 JS 를 실행하지 않는 봇이 자연히 빠졌다. 광고 차단기에 안 막히는
@@ -193,6 +319,10 @@ EOF
 
 ### 알아둘 것
 
+- **`human-probe.log` 는 임시다 (2026-09-23~).** `combined` 뒤에 `Accept-Language` 를
+  덧붙여 남긴다. 필터를 통과한 요청 중 진짜 사람이 얼마나 되는지 판정하려는 것이다
+  — 브라우저는 이 헤더를 거의 항상 보내고 스크레이퍼는 자주 빼먹는다.
+  **판정이 끝나면 `log_format human_probe` 와 해당 `access_log` 한 줄을 지운다.**
 - **누적 DB** (`/var/lib/goaccess`) 를 쓰므로 logrotate 가 로그를 지워도 통계는 남는다.
   이걸 안 켜면 Ubuntu 기본 설정(매일 회전 · 14개 보관) 때문에 2주 뒤 과거가 사라진다.
 - 정적 파일(`.webp` · `.woff2` 등)은 GoAccess 가 별도 패널로 분리하므로

@@ -79,6 +79,14 @@ function detectPublicIp(content) {
     (a === 203 && b === 0) ||         // RFC 5737 (203.0.113.x)
     a >= 224;                         // 멀티캐스트 · 예약
 
+  // `Chrome/144.0.0.0` · `nginx/1.24.0.1` 같은 제품명/버전 표기.
+  //
+  // 글자 하나 뒤의 슬래시까지 요구하는 게 핵심이다. 주소를 URL 로 적으면
+  // 슬래시가 둘(`http://203.0.113.1`)이라 이 예외에 걸리지 않는다. 즉 진짜
+  // IP 는 계속 잡힌다. (2026-09-23: User-Agent 예시가 오탐으로 막혔다)
+  const isVersionAfterName = (line, idx) =>
+    line[idx - 1] === "/" && /[A-Za-z]/.test(line[idx - 2] ?? "");
+
   lines.forEach((line, i) => {
     // 버전 번호(1.24.0.1 같은 것)와 혼동되지 않도록 앞뒤 문맥이 버전이면 건너뛴다
     if (/\b(v|version|버전)\s*\d/i.test(line)) return;
@@ -86,6 +94,7 @@ function detectPublicIp(content) {
       const [a, b, c, d] = m.slice(1).map(Number);
       if ([a, b, c, d].some(n => n > 255)) continue;
       if (isAllowed(a, b)) continue;
+      if (isVersionAfterName(line, m.index)) continue;
       findings.push({ line: i + 1, ip: m[0], snippet: line.trim().slice(0, 90) });
     }
   });
