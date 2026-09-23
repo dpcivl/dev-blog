@@ -48,6 +48,13 @@ import Footer from "@/components/Footer.astro";
 
         <div class="stack">
           <div class="card">
+            <div class="card-head">
+              <h2>어디서 보나</h2>
+              <span class="hint">IP 기준 · 국가까지만</span>
+            </div>
+            <div data-countries></div>
+          </div>
+          <div class="card">
             <div class="card-head"><h2>유입 경로</h2></div>
             <div data-referrers></div>
           </div>
@@ -69,7 +76,12 @@ import Footer from "@/components/Footer.astro";
       <section class="banner" data-bots hidden></section>
 
       <p class="foot-note">
-        nginx 접근 로그 · 크롤러 제외 · <a href="/stats/raw/">GoAccess 원본</a>
+        nginx 접근 로그 · 크롤러 제외 · <a href="/stats/raw/">GoAccess 원본</a
+        ><br />
+        국가 판별: <a href="https://db-ip.com" rel="noopener"
+          >IP Geolocation by DB-IP</a
+        >
+        (CC BY 4.0)
       </p>
     </main>
   </div>
@@ -309,6 +321,16 @@ import Footer from "@/components/Footer.astro";
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  /* 국가 코드 배지. 국기 이모지는 윈도우에서 글자쌍으로 떨어져서 안 쓴다. */
+  :global(.stats .cc) {
+    display: inline-block;
+    min-width: 2.1em;
+    margin-right: 6px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+    font-weight: 600;
+    opacity: 0.55;
+  }
   :global(.stats .mini-track) {
     width: 56px;
     height: 5px;
@@ -415,6 +437,37 @@ import Footer from "@/components/Footer.astro";
     not_found?: Panel;
     status_codes?: Panel;
     browsers?: Panel;
+    geolocation?: GeoPanel;
+  };
+
+  // GoAccess 의 지역 패널만 모양이 다르다. 최상위가 대륙이고 국가는 items 안에
+  // 들어 있다. 화면에는 대륙이 필요 없으니 국가만 펴서 쓴다.
+  type GeoRow = Row & { items?: Row[] };
+  type GeoPanel = { data?: GeoRow[] };
+
+  // 자주 나올 만한 것만 한국어로. 없으면 GoAccess 가 준 영문명을 그대로 쓴다.
+  const COUNTRY_NAMES: Record<string, string> = {
+    KR: "대한민국",
+    US: "미국",
+    JP: "일본",
+    CN: "중국",
+    TW: "대만",
+    HK: "홍콩",
+    SG: "싱가포르",
+    IN: "인도",
+    VN: "베트남",
+    DE: "독일",
+    GB: "영국",
+    FR: "프랑스",
+    NL: "네덜란드",
+    BE: "벨기에",
+    IE: "아일랜드",
+    FI: "핀란드",
+    SE: "스웨덴",
+    RU: "러시아",
+    CA: "캐나다",
+    BR: "브라질",
+    AU: "호주",
   };
 
   const REFERRER_NAMES: Record<string, string> = {
@@ -567,6 +620,37 @@ import Footer from "@/components/Footer.astro";
                 <div class="bar"><span style="width:${(p.hits / maxHits) * 100}%"></span></div>
               </div>
               <div class="row-num">${p.hits.toLocaleString()}</div>
+            </div>`
+          )
+          .join("")
+      : `<p class="empty">아직 기록이 없습니다</p>`;
+
+    // ── 어디서 보나 ──
+    // GoAccess 는 "KR South Korea" 처럼 코드와 영문명을 한 칸 띄워 준다.
+    // 국기 이모지는 안 쓴다 — 윈도우가 국기를 안 그리고 글자쌍으로 떨어뜨린다.
+    const geo = (rep.geolocation?.data ?? [])
+      .flatMap(c => c.items ?? [])
+      .map(r => {
+        const raw = String(r.data ?? "").trim();
+        const code = raw.slice(0, 2).toUpperCase();
+        const name = raw.slice(2).trim();
+        return {
+          code,
+          name: COUNTRY_NAMES[code] ?? name ?? code,
+          visitors: num(r.visitors?.count),
+        };
+      })
+      .filter(c => c.visitors > 0)
+      .sort((a, b) => b.visitors - a.visitors)
+      .slice(0, 8);
+    const maxGeo = Math.max(1, ...geo.map(c => c.visitors));
+    $("[data-countries]")!.innerHTML = geo.length
+      ? geo
+          .map(
+            c => `<div class="mini">
+              <span class="mini-name"><span class="cc">${esc(c.code)}</span>${esc(c.name)}</span>
+              <span class="mini-track"><span style="width:${(c.visitors / maxGeo) * 100}%"></span></span>
+              <span class="mini-num">${c.visitors}</span>
             </div>`
           )
           .join("")

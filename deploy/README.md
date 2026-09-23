@@ -317,6 +317,37 @@ EOF
 주소를 추가할 때는 같은 파일에 `<제외할 IP> 0;` 형식으로 한 줄씩 넣고
 `sudo nginx -t && sudo systemctl reload nginx`. 집 IP 는 바뀌므로 완벽하진 않다.
 
+### 나라별 방문자 (GeoIP)
+
+GoAccess 는 `--enable-geoip=mmdb` 로 빌드돼 있어서(`goaccess --version` 으로 확인)
+DB 파일만 있으면 국가를 판별한다. 설치 직후에는 `--ignore-panel=GEO_LOCATION` 으로
+꺼둔 상태였다.
+
+```bash
+sudo install -m 755 deploy/bin/update-geoip /usr/local/bin/update-geoip
+sudo /usr/local/bin/update-geoip          # /var/lib/GeoIP/ 에 약 8MB
+
+# 매달 1일 갱신
+echo '17 4 1 * * root /usr/local/bin/update-geoip >/dev/null 2>&1' \
+  | sudo tee /etc/cron.d/geoip-update
+sudo chmod 644 /etc/cron.d/geoip-update
+```
+
+**MaxMind GeoLite2 대신 DB-IP Lite 를 쓴다.** GeoLite2 는 2019 년부터 계정과
+라이선스 키를 요구해서, 키가 만료되면 조용히 갱신이 멈춘다. DB-IP 는 계정 없이
+직접 받을 수 있어 **서버에 비밀을 하나도 안 둬도 된다.**
+
+**라이선스가 CC BY 4.0 이라 저작자 표시가 필요하다.** `/stats/` 화면 하단에
+"IP Geolocation by DB-IP" 를 넣어뒀다 ([src/pages/stats.astro](../src/pages/stats.astro)).
+지우지 말 것.
+
+`generate-stats` 는 DB 가 없으면 `--geoip-database` 를 안 붙이고 그냥 넘어간다.
+지역 패널만 비고 나머지 통계는 그대로 나온다.
+
+> **국가까지만 본다.** 도시 단위는 개인 블로그 통계에 필요가 없고, 로그에 남는
+> IP 로 사람을 좁히는 방향은 피한다. GoAccess 의 JSON 은 대륙이 최상위고 국가가
+> `items` 안에 들어 있어서, 대시보드가 `items` 만 펴서 쓴다.
+
 ### 알아둘 것
 
 - **`human-probe.log` 는 임시다 (2026-09-23~).** `combined` 뒤에 `Accept-Language` 를

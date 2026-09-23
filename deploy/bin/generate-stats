@@ -42,6 +42,11 @@ COMMON=(
   --static-file=.woff2 --static-file=.mp4
 )
 
+# 국가 판별 (2026-09-23~). DB 가 없으면 조용히 건너뛴다 — 지역 패널만 비고
+# 나머지 통계는 그대로 나온다. 설치는 update-geoip 참고.
+GEO_DB=/var/lib/GeoIP/dbip-country-lite.mmdb
+[ -r "$GEO_DB" ] && COMMON+=(--geoip-database="$GEO_DB")
+
 # 보고 나서 할 일이 없는 패널은 숨긴다
 HIDE=(
   --ignore-panel=REQUESTS_STATIC
@@ -54,12 +59,12 @@ HIDE=(
   --ignore-panel=KEYPHRASES
   --ignore-panel=REMOTE_USER
   --ignore-panel=CACHE_STATUS
-  --ignore-panel=GEO_LOCATION
   --ignore-panel=ASN
   --ignore-panel=MIME_TYPE
   --ignore-panel=TLS_TYPE
 )
-# 남는 것: VISITORS(추세) · REQUESTS(인기 글) · NOT_FOUND(404) · REFERRING_SITES(유입) · STATUS_CODES
+# 남는 것: VISITORS(추세) · REQUESTS(인기 글) · NOT_FOUND(404) · REFERRING_SITES(유입)
+#          · STATUS_CODES · GEO_LOCATION(국가)
 
 # ── 1. 사람 방문 (누적) ──
 # 1차 필터는 nginx 가 이미 했다(human.log). --ignore-crawlers 는 2차 방어선.

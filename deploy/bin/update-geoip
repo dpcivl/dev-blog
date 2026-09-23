@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# 국가 판별용 GeoIP DB 를 받아둔다. 매달 1회 cron 이 호출.
+#   설치: sudo install -m 755 update-geoip /usr/local/bin/update-geoip
+#
+# DB-IP Lite 를 쓰는 이유: MaxMind GeoLite2 는 2019 년부터 계정과 라이선스 키를
+# 요구한다. 키가 만료되거나 기기를 옮기면 조용히 갱신이 멈춘다. DB-IP 는 계정
+# 없이 직접 받을 수 있어서 서버에 비밀을 하나도 안 둬도 된다.
+#
+# 라이선스: CC BY 4.0 — 저작자 표시가 필요하다. /stats/ 화면 하단에
+# "IP Geolocation by DB-IP" 를 넣어뒀다 (src/pages/stats.astro). 지우지 말 것.
+#
+# 정확도는 국가 단위로 충분한 수준이다. 도시까지는 안 본다 — 개인 블로그
+# 통계에 필요도 없고, 로그에 남는 IP 로 사람을 좁히는 방향은 피한다.
+set -euo pipefail
+
+DEST=/var/lib/GeoIP/dbip-country-lite.mmdb
+TMP=$(mktemp)
+trap 'rm -f "$TMP"' EXIT
+
+# 이번 달 것이 아직 안 올라왔을 수 있으니 지난달까지 시도한다.
+for ago in 0 1; do
+  YM=$(date -u -d "-${ago} month" +%Y-%m 2>/dev/null || date -u -v-${ago}m +%Y-%m)
+  URL="https://download.db-ip.com/free/dbip-country-lite-${YM}.mmdb.gz"
+  if curl -fsSL "$URL" | gunzip -c > "$TMP" 2>/dev/null && [ -s "$TMP" ]; then
+    mkdir -p "$(dirname "$DEST")"
+    # 받기를 끝낸 뒤에 바꾼다. 중간에 끊겨도 기존 DB 가 깨지지 않는다.
+    install -m 644 "$TMP" "$DEST"
+    echo "GeoIP DB 갱신: $YM ($(du -h "$DEST" | cut -f1))"
+    exit 0
+  fi
+done
+
+echo "GeoIP DB 내려받기 실패 — 기존 DB 를 그대로 둔다." >&2
+[ -r "$DEST" ] || echo "  (기존 DB 도 없다. 지역 패널은 비어 있게 된다)" >&2
+exit 1
