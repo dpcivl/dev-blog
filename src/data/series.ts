@@ -56,9 +56,12 @@ export const SERIES: SeriesDef[] = [
       "SQL 을 실제로 쓰면서 배우려고 프로그래머스 문제를 하나씩 푼 기록. 정답 코드보다 그 문제에서 처음 알게 된 절 · 함수와 막혔던 지점을 남긴다.",
     tag: "프로그래머스",
   },
-  // in-sight (작성자가 직접 쓰는 에세이 시리즈) 는 보류 — 첫 글이 나오면 다시 등록한다.
-  // 항목이 남아 있으면 /series 에 "0편" 빈 블록이 그대로 공개된다 (getSeriesSummary 의
-  // count > 0 필터는 홈 타일에만 걸린다). 정의는 46a907b · 7856e45 참고.
+  {
+    id: "in-sight",
+    title: "in-sight",
+    description: "정답이 정해져 있지 않은 것들에 대한 생각을 담는다.",
+    tag: "in-sight",
+  },
 ];
 
 export interface SeriesSummary extends SeriesDef {
