@@ -6,6 +6,7 @@ import Footer from "@/components/Footer.astro";
 import Grass from "@/components/Grass.astro";
 import StatGrid from "@/components/StatGrid.astro";
 import PostRow from "@/components/PostRow.astro";
+import AskBox from "@/components/AskBox.astro";
 import getSortedPosts from "@/utils/getSortedPosts";
 import { getPublishActivity } from "@/utils/getPublishActivity";
 import { getSeriesSummary } from "@/data/series";
@@ -99,6 +100,14 @@ const pageDesc =
           class="order-1 size-[132px] rounded-full border-2 border-border object-cover sm:order-2"
         />
       </section>
+
+      {
+        /* ===== 찾기 =====
+          기존 메뉴와 아래 글 목록을 대신하는 게 아니라 그 위에 얹는다.
+          홈은 검색엔진이 제일 많이 읽는 페이지라, 입력창만 남기면
+          가져갈 내용이 사라진다. */
+      }
+      <AskBox />
 
       {/* ===== 지표 ===== */}
       <StatGrid items={stats} />
