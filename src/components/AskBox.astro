@@ -423,17 +423,23 @@ const SUGGESTIONS = [
       if (direct === null) return null; // 인덱스 없음 — 못 찾은 것과 구분한다
       if (direct.length) return direct;
 
-      // 통째로 안 맞으면 낱말로 다시 — 문장으로 물었을 때를 위해
+      // 통째로 안 맞으면 낱말로 다시 — 문장으로 물었을 때를 위해.
+      //
+      // 낱말마다 따로 검색해서 번갈아 섞는다. 예전에는 긴 낱말부터 채우고
+      // 자리가 차면 멈췄는데, "배포 자동화" 가 "자동화" 로 5칸을 다 채워서
+      // 정작 "배포" 는 검색조차 안 됐다. 여러 낱말이면 골고루 나와야 한다.
+      const perWord = await Promise.all(
+        keywords(query).map(w => runPagefind(w, limit))
+      );
       const seen = new Set();
       const merged = [];
-      for (const w of keywords(query)) {
-        const rows = await runPagefind(w, limit);
-        for (const r of rows ?? []) {
-          if (seen.has(r.url)) continue;
+      for (let rank = 0; rank < limit; rank++) {
+        for (const rows of perWord) {
+          const r = rows?.[rank];
+          if (!r || seen.has(r.url)) continue;
           seen.add(r.url);
           merged.push(r);
         }
-        if (merged.length >= limit) break;
       }
       return merged;
     }
