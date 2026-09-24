@@ -63,7 +63,20 @@ const DYNAMIC: Topic[] = [
       `한 주제를 여러 편으로 나눈 시리즈가 ${seriesSummary.length}개이고, ` +
       `나머지는 그때그때 막힌 것을 남긴 단발 기록이다.`,
     href: "/series",
-    aliases: ["구성", "구성되어", "어떤글", "무슨글", "주제", "통계", "시리즈"],
+    // "블로그구성" 은 통째로 일치시키려고 둔다. 줄여서 "블로그 구성" 이라고
+    // 물으면 낱말이 "블로그" + "구성" 으로 갈리면서 포트폴리오의
+    // 「개인 블로그 인프라」가 먼저 걸린다.
+    aliases: [
+      "블로그구성",
+      "구성",
+      "구성되어",
+      "어떤글",
+      "어떤글로",
+      "무슨글",
+      "주제",
+      "통계",
+      "시리즈",
+    ],
     items: seriesSummary.map(sr => ({
       title: `${sr.title} · ${sr.count}편`,
       desc: sr.description,
@@ -140,11 +153,13 @@ const SUGGESTIONS = [
 ---
 
 <section class="ask-hero" data-ask>
-  <p class="ask-eyebrow">박효인 · PARK HYOIN</p>
+  <div class="ask-head">
+    <p class="ask-eyebrow">박효인 · PARK HYOIN</p>
 
-  <h1 class="ask-title">
-    만든 것과 <span class="hl">막힌 것</span>을 그때그때 기록합니다.
-  </h1>
+    <h1 class="ask-title">
+      만든 것과 <span class="hl">막힌 것</span>을 그때그때 기록합니다.
+    </h1>
+  </div>
 
   <div class="ask-box">
     <label class="sr-only" for="ask-input">무엇을 찾으시나요</label>
@@ -196,7 +211,32 @@ const SUGGESTIONS = [
     }
   </ul>
 
-  <div class="ask-results" data-ask-results aria-live="polite" hidden></div>
+  <div class="ask-answer" data-ask-answer hidden>
+    <div class="ask-answer-head">
+      <p class="ask-q">
+        <span class="ask-q-label">찾은 것</span>
+        <strong data-ask-echo></strong>
+      </p>
+      <button type="button" class="ask-reset" data-ask-reset>
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M19 12H5"></path>
+          <path d="m12 19-7-7 7-7"></path>
+        </svg>
+        처음으로
+      </button>
+    </div>
+    <div class="ask-results" data-ask-results aria-live="polite"></div>
+  </div>
 </section>
 
 <script define:vars={{ TOPICS: ALL_TOPICS }}>
@@ -207,6 +247,17 @@ const SUGGESTIONS = [
     const input = root.querySelector("#ask-input");
     const panel = root.querySelector("[data-ask-results]");
     const goBtn = root.querySelector("[data-ask-go]");
+    const answer = root.querySelector("[data-ask-answer]");
+    const echo = root.querySelector("[data-ask-echo]");
+    const resetBtn = root.querySelector("[data-ask-reset]");
+
+    // 검색 전/후를 화면으로 구분한다. 결과가 추천 질문 밑에 그냥 붙으면
+    // 검색이 됐는지조차 안 보인다.
+    function setAnswered(on, query) {
+      root.classList.toggle("is-answered", on);
+      answer.hidden = !on;
+      if (on) echo.textContent = `“${query}”`;
+    }
 
     // 글자와 숫자만 남긴다. "parkhyo.in" 과 "parkhyo in" 이 같아진다.
     const norm = s => s.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
@@ -268,10 +319,18 @@ const SUGGESTIONS = [
       scored.sort((a, b) => b.score - a.score || b.len - a.len);
       // 1등보다 확실히 약한 것은 버린다. 곁다리 카드가 답을 흐린다
       const top = scored[0]?.score ?? 0;
-      return scored
-        .filter(x => x.score >= top - 1 && !(top === 3 && x.score < 3))
-        .slice(0, limit)
-        .map(x => x.t);
+      const kept = [];
+      const names = new Set();
+      for (const x of scored) {
+        if (x.score < top - 1 || (top === 3 && x.score < 3)) continue;
+        // 「포트폴리오」와 「#포트폴리오」가 나란히 뜨면 같은 말을 두 번 한다
+        const name = norm(x.t.title.replace(/^#/, ""));
+        if (names.has(name)) continue;
+        names.add(name);
+        kept.push(x.t);
+        if (kept.length >= limit) break;
+      }
+      return kept;
     }
 
     // ── Pagefind (빌드 결과물이라 dev 에서는 없을 수 있다) ──
@@ -415,10 +474,11 @@ const SUGGESTIONS = [
 
     function render(query, topics, posts) {
       if (!query) {
-        panel.hidden = true;
+        setAnswered(false);
         panel.innerHTML = "";
         return;
       }
+      setAnswered(true, query);
 
       let html = "";
       if (topics.length) {
@@ -437,7 +497,6 @@ const SUGGESTIONS = [
       }
 
       panel.innerHTML = html;
-      panel.hidden = false;
     }
 
     // ── 입력 처리 ──
@@ -455,6 +514,16 @@ const SUGGESTIONS = [
       if (mine === seq) render(q, topics, posts);
     }
 
+    // 추천을 눌렀을 때는 결과가 화면에 들어오게 한다
+    function runAndReveal(query) {
+      clearTimeout(timer);
+      run(query).then(() => {
+        // 결과가 아니라 히어로 위쪽으로 맞춘다. 결과에 맞추면 입력창이
+        // 화면 밖으로 밀려서 고쳐 묻기가 어려워진다.
+        root.scrollIntoView({ block: "start", behavior: "smooth" });
+      });
+    }
+
     input.addEventListener("input", () => {
       clearTimeout(timer);
       timer = setTimeout(() => run(input.value), 200);
@@ -463,14 +532,20 @@ const SUGGESTIONS = [
     input.addEventListener("keydown", e => {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
-        clearTimeout(timer);
-        run(input.value);
+        runAndReveal(input.value);
       }
       if (e.key === "Escape") {
         input.value = "";
         run("");
         input.blur();
       }
+    });
+
+    resetBtn.addEventListener("click", () => {
+      input.value = "";
+      render("", [], []);
+      input.focus();
+      root.scrollIntoView({ block: "start", behavior: "smooth" });
     });
 
     goBtn.addEventListener("click", () => {
@@ -482,8 +557,7 @@ const SUGGESTIONS = [
     root.querySelectorAll("[data-q]").forEach(btn => {
       btn.addEventListener("click", () => {
         input.value = btn.dataset.q;
-        input.focus();
-        run(input.value);
+        runAndReveal(input.value);
       });
     });
 
@@ -639,10 +713,85 @@ const SUGGESTIONS = [
     color: var(--accent);
   }
 
-  /* ── 결과 ── */
-  .ask-results {
+  /* ── 검색한 뒤 ──
+     결과가 추천 질문 밑에 그냥 붙으면 검색이 됐는지조차 안 보인다.
+     머리말을 접고 추천을 감춰서 화면 자체를 결과로 바꾼다. */
+  .ask-hero.is-answered {
+    padding-top: 2rem;
+  }
+  .ask-hero.is-answered .ask-head {
+    display: none;
+  }
+  .ask-hero.is-answered .ask-suggest {
+    display: none;
+  }
+  .ask-hero.is-answered .ask-box {
+    margin-top: 0;
+  }
+  .ask-hero.is-answered .ask-box textarea {
+    padding-bottom: 18px;
+    padding-right: 58px;
+  }
+  .ask-hero.is-answered .ask-go {
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+  }
+
+  .ask-answer {
     max-width: 44rem;
-    margin: 1.25rem auto 0;
+    margin: 1rem auto 0;
+    text-align: left;
+  }
+  .ask-answer-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .ask-q {
+    margin: 0;
+    min-width: 0;
+    font-size: 0.86rem;
+    color: var(--muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ask-q-label {
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    margin-right: 6px;
+  }
+  .ask-q strong {
+    font-weight: 600;
+    color: var(--foreground, inherit);
+  }
+  .ask-reset {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 11px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition:
+      color 0.15s ease,
+      border-color 0.15s ease;
+  }
+  .ask-reset:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .ask-results {
     padding: 14px;
     border: 1px solid var(--border);
     border-radius: 14px;
