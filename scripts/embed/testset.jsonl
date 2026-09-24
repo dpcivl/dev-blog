@@ -1,0 +1,21 @@
+// 검색 품질 측정용 테스트셋. 한 줄에 한 문항 (JSONL).
+//
+// 필드
+//   id              q01.. (긍정) / n01.. (부정)
+//   question        실제로 입력할 질문. 오타 금지
+//   answer_sources  정답 글의 slug 목록. 상위 5개 안에 하나라도 있으면 정답
+//                   부정 문항은 빈 배열
+//   level           easy | hard    (부정 문항은 생략)
+//                   easy = 글에 있는 낱말을 씀
+//                   hard = 글의 낱말을 안 쓰고 개념만 설명  ← 변별은 여기서 난다
+//   note            (선택) 왜 이 라벨인지. 나중에 자기가 다시 볼 때 쓴다
+//
+// slug 는 src/data/blog/ko/<slug>.md 의 파일명에서 .md 를 뺀 것.
+// 다 쓰면 검사: node scripts/embed/check-testset.mjs
+//
+// ── 아래 4개는 형식 예시다. 지우고 직접 채울 것 ──────────────────────
+
+{"id":"q01","question":"JWT 는 왜 서버가 기억하지 않아도 되나요?","answer_sources":["feature-study-02-jwt-auth"],"level":"easy"}
+{"id":"q02","question":"요청이 자꾸 실패할 때 재시도 간격을 어떻게 잡나?","answer_sources":["claude-api-error-handling-and-retry"],"level":"hard","note":"원문엔 exponential backoff 로만 나온다"}
+{"id":"n01","question":"쿠버네티스 파드가 자꾸 재시작되는 이유","answer_sources":[],"note":"인접하지만 이 블로그에 없는 기술"}
+{"id":"n02","question":"부동산 청약 1순위 조건","answer_sources":[],"note":"완전 무관"}
