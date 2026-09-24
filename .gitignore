@@ -40,3 +40,5 @@ src/scratch/
 # pagefind
 
 public/pagefind
+# 검색 인덱스 (scripts/embed) — 5MB 짜리 파일이 글마다 바뀌면 저장소가 무거워진다
+.cache/
