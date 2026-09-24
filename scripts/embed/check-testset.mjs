@@ -9,7 +9,7 @@
 // 검사 항목
 //   1. slug 가 실제로 있는가 (오타 · 없어진 글)
 //   2. 부정 문항이 정말 "없는 주제" 인가 (코퍼스에 낱말이 있으면 경고)
-//   3. 긍정 문항이 정답 글의 제목을 그대로 베끼지 않았는가 (너무 쉬운 문항)
+//   3. hard 문항이 정답 글의 제목을 베끼지 않았는가 (easy 는 겹쳐도 정상)
 //   4. easy / hard 균형
 //   5. id 중복
 
@@ -63,7 +63,7 @@ const words = q =>
 const problems = [];
 const warnings = [];
 const seen = new Set();
-let pos = 0, neg = 0, easy = 0, hard = 0;
+let pos = 0, neg = 0, easy = 0, hard = 0, titleish = 0;
 
 for (const r of rows) {
   const at = `L${r._line} ${r.id ?? "(id 없음)"}`;
@@ -96,17 +96,26 @@ for (const r of rows) {
     else if (r.level === "hard") hard++;
     else problems.push(`${at}: level 은 easy 또는 hard`);
 
-    // 제목을 그대로 베낀 문항은 변별력이 없다
+    // 제목과 낱말이 겹치는지 본다.
+    //
+    // easy 는 "글에 있는 낱말을 쓴다" 가 정의라 겹치는 게 정상이다. 작성자가
+    // "나라면 키워드로 검색한다" 고 해서 easy 를 키워드형으로 고쳐 쓴 뒤로는
+    // 겹침이 오히려 실제 사용에 가깝다. 그래서 세기만 하고 경고하지 않는다.
+    //
+    // hard 에서 겹치면 라벨이 잘못 붙은 것이다 — 낱말을 피했어야 하는데
+    // 안 피한 문항이므로 경고한다.
     for (const s of r.answer_sources) {
       const title = titles.get(s);
       if (!title) continue;
       const tw = new Set(words(title).map(norm));
       const qw = words(r.question).map(norm);
       const overlap = qw.filter(w => tw.has(w));
-      if (qw.length >= 2 && overlap.length / qw.length >= 0.7) {
-        warnings.push(
-          `${at}: 정답 글 제목과 낱말이 ${Math.round((overlap.length / qw.length) * 100)}% 겹친다 — 너무 쉬운 문항일 수 있다`
-        );
+      if (qw.length < 2 || overlap.length / qw.length < 0.7) continue;
+      const pct = Math.round((overlap.length / qw.length) * 100);
+      if (r.level === "hard") {
+        warnings.push(`${at}: hard 인데 정답 글 제목과 낱말이 ${pct}% 겹친다 — easy 로 옮기거나 낱말을 피해 다시 쓸 것`);
+      } else {
+        titleish++;
       }
     }
   }
@@ -115,6 +124,7 @@ for (const r of rows) {
 // ── 보고 ──
 console.log(`문항      긍정 ${pos} · 부정 ${neg} · 합계 ${rows.length}`);
 console.log(`난이도    easy ${easy} · hard ${hard}`);
+console.log(`제목겹침   easy ${titleish}개 (키워드 검색 흉내 — 정상)`);
 console.log();
 
 const want = [];

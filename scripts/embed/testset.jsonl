@@ -25,16 +25,16 @@
 
 // ── 긍정 · easy (글에 있는 낱말을 씀) ──
 {"id":"q01","question":"프롬프트 캐싱은 어떻게 동작하나요?","answer_sources":["claude-api-prompt-caching"],"level":"easy"}
-{"id":"q02","question":"SQL 에서 결과를 정렬하려면","answer_sources":["programmers-sql-02-order-by"],"level":"easy"}
+{"id":"q02","question":"SQL 정렬 어떻게","answer_sources":["programmers-sql-02-order-by"],"level":"easy"}
 {"id":"q03","question":"N+1 문제와 fetch join","answer_sources":["spring-boot-log-04-transaction-lazy-loading-n-plus-1"],"level":"easy"}
-{"id":"q04","question":"자바에서 null 을 안전하게 다루려면 뭘 쓰나","answer_sources":["java-study-log-02-collections-and-streams"],"level":"easy"}
+{"id":"q04","question":"자바에서 null","answer_sources":["java-study-log-02-collections-and-streams"],"level":"easy"}
 {"id":"q05","question":"PostgreSQL 한글 정렬이 이상할 때","answer_sources":["postgresql-sql-basics"],"level":"easy"}
-{"id":"q06","question":"loc 와 iloc 는 뭐가 다른가","answer_sources":["data-analysis-03-series-indexing-and-filtering"],"level":"easy"}
+{"id":"q06","question":"loc 와 iloc 차이","answer_sources":["data-analysis-03-series-indexing-and-filtering"],"level":"easy"}
 {"id":"q07","question":"MCP 서버를 처음 만들어보려면","answer_sources":["mcp-study-log-01"],"level":"easy"}
-{"id":"q08","question":"STM32CubeIDE 에서 ioc 파일이 안 생긴다","answer_sources":["stm32-cubeide-cubemx-separation"],"level":"easy"}
+{"id":"q08","question":"STM32CubeIDE ioc 파일 안생김","answer_sources":["stm32-cubeide-cubemx-separation"],"level":"easy"}
 {"id":"q09","question":"Deno 가 뭔가요","answer_sources":["what-is-deno-and-supabase-edge-functions"],"level":"easy"}
 {"id":"q10","question":"ResNet18 전이학습과 Grad-CAM","answer_sources":["ndt-defect-classification-pytorch-resnet18"],"level":"easy"}
-{"id":"q11","question":"Supabase 에 카카오 로그인 붙이기","answer_sources":["supabase-social-login-multiple-keys"],"level":"easy"}
+{"id":"q11","question":"Supabase 카카오 로그인","answer_sources":["supabase-social-login-multiple-keys"],"level":"easy"}
 {"id":"q12","question":"LangGraph 에서 사람 승인을 받는 방법","answer_sources":["langgraph-study-log-03-human-in-the-loop"],"level":"easy"}
 {"id":"q13","question":"TTFT 가 왜 중요한가","answer_sources":["claude-api-streaming-ttft-and-events"],"level":"easy"}
 {"id":"q14","question":"수출입 프로세스와 식별자","answer_sources":["port-domain-02-export-import-process"],"level":"easy"}
