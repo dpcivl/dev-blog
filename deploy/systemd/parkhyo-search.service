@@ -1,0 +1,61 @@
+# 검색 서비스. /etc/systemd/system/parkhyo-search.service 로 둔다.
+#
+#   sudo cp deploy/systemd/parkhyo-search.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now parkhyo-search
+#   curl -s localhost:8787/api/search/health | jq
+#
+# 램에 대하여 — 맥에서 재면 RSS 가 120MB 쯤 나오는데, 그중 실제로 쓰는 건
+# 41MB (V8 힙 29 + 인덱스 등 12) 다. 나머지는 Node 런타임 자체와 아직
+# 안 돌려준 페이지고, 맥은 페이지가 16KB 라 이게 부풀려 잡힌다. 리눅스에선
+# 더 낮게 나오지만 추측에 기대지 않고 아래 두 가지로 막는다.
+#
+#   --max-old-space-size=96   V8 이 힙을 96MB 넘게 못 키운다
+#   MemoryMax=192M            넘으면 커널이 이 서비스만 죽인다
+#
+# MemoryMax 가 없으면 이 서비스가 부풀 때 nginx 가 밀린다. 512MB 인스턴스에서
+# 블로그가 안 열리는 것과 검색이 안 되는 것 중 후자가 훨씬 낫다.
+
+[Unit]
+Description=parkhyo.in 검색 (벡터 + 낱말)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/parkhyo.in/current
+
+# OPENAI_API_KEY 가 여기 있다. 저장소에 올리지 않는다.
+#   sudo install -o root -g www-data -m 0640 /dev/null /etc/parkhyo/search.env
+#   sudo tee -a /etc/parkhyo/search.env <<< 'OPENAI_API_KEY=sk-...'
+EnvironmentFile=/etc/parkhyo/search.env
+
+Environment=NODE_ENV=production
+Environment=SEARCH_HOST=127.0.0.1
+Environment=SEARCH_PORT=8787
+Environment=SEARCH_INDEX=/var/www/parkhyo.in/current/search/index.bin
+Environment=SEARCH_KEYWORDS=/var/www/parkhyo.in/current/search/keywords.json
+
+ExecStart=/usr/bin/node --max-old-space-size=96 /var/www/parkhyo.in/current/server/search-service.mjs
+
+Restart=on-failure
+RestartSec=5s
+
+# 램 — MemoryHigh 를 넘으면 커널이 회수를 압박하고, MemoryMax 를 넘으면 죽인다.
+# 죽어도 Restart 로 5초 뒤 살아나고, 그동안 블로그 본체는 멀쩡하다.
+MemoryHigh=128M
+MemoryMax=192M
+
+# 이 서비스는 인덱스를 읽고 OpenAI 를 부르는 것 외에 할 일이 없다.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadOnlyPaths=/var/www/parkhyo.in
+RestrictAddressFamilies=AF_INET AF_INET6
+MemoryDenyWriteExecute=false
+
+[Install]
+WantedBy=multi-user.target

@@ -1,46 +1,67 @@
 // 질문을 받아 글 링크를 돌려주는 작은 서비스.
 //
-//   node server/search-service.mjs
+//   node --max-old-space-size=128 server/search-service.mjs
 //   curl 'http://127.0.0.1:8787/api/search?q=프롬프트 캐싱'
 //
-// 하는 일은 셋뿐이다.
-//   1. 질문을 OpenAI 로 보내 벡터로 바꾼다  (199ms — 여기가 전부다)
-//   2. 램에 든 인덱스와 내적한다              (2ms)
-//   3. 점수가 하한선을 넘는 것만 링크로 돌려준다
+// 하는 일
+//   1. 질문을 OpenAI 로 보내 벡터로 바꾼다        199ms — 여기가 전부다
+//   2. 램에 든 인덱스와 내적한다                    2ms
+//   3. 질문의 낱말이 실제로 나오는 글을 밀어 올린다     1ms
+//   4. 하한선을 넘는 것만 링크로 돌려준다
 //
-// 모델을 서버에 안 올리는 이유: bge-m3 는 가중치만 1.13GB 라 512MB 인스턴스에
-// 안 들어간다. 대신 질문만 밖으로 내보낸다. 질문 1건이 약 20토큰이라
-// 월 1만 건에 $0.03 이다.
+// 모델을 서버에 안 올리는 이유: bge-m3 는 가중치만 1.13GB 라 512MB
+// 인스턴스에 안 들어간다. 대신 질문만 밖으로 내보낸다. 질문 1건이 약
+// 20토큰이라 월 1만 건에 $0.03 이다.
 //
 // ⚠️ 이 엔드포인트 뒤에는 유료 API 키가 있다. 누가 두들기면 그대로 청구서가
-//    된다. nginx 쪽 limit_req 와 별개로 여기서도 막는다 (앞단 설정이 언젠가
-//    실수로 빠질 수 있으므로 돈이 나가는 자리는 두 겹으로 둔다).
+//    된다. nginx 쪽 limit_req 와 별개로 여기서도 막는다 — 돈이 나가는 자리는
+//    앞단 설정이 언젠가 실수로 빠질 것을 가정하고 두 겹으로 둔다.
 
 import { createServer } from "node:http";
-import { loadIndex, search } from "../scripts/embed/read-index.mjs";
+import { readFile } from "node:fs/promises";
+import { loadIndex } from "../scripts/embed/read-index.mjs";
+import { keywordScores } from "../scripts/embed/keyword.mjs";
 
 const PORT = Number(process.env.SEARCH_PORT ?? 8787);
 const HOST = process.env.SEARCH_HOST ?? "127.0.0.1";
 const INDEX = process.env.SEARCH_INDEX ?? "public/search/index.bin";
+const KEYWORDS = process.env.SEARCH_KEYWORDS ?? "public/search/keywords.json";
 const KEY = process.env.OPENAI_API_KEY;
 
-// 하한선 — score.mjs 의 맞바꿈 곡선에서 골랐다 (text-embedding-3-large 기준).
+// ── 운영점 ──
+// score-hybrid.mjs 로 쓸어서 고른 값이다. 테스트셋 50문항 기준.
 //
-//   0.408   정답 31/35 유지 · 헛답 6/15
-//   0.422   정답 30/35 유지 · 헛답 3/15   ← 기본값
-//   0.433   정답 27/35 유지 · 헛답 2/15
-//   0.495   정답 25/35 유지 · 헛답 0/15
+// 헛답 수를 같게 놓고 견줘야 공정하다 (하한선을 한쪽만 고정하면 혼합이
+// 손해 보는 것처럼 보인다). 같은 헛답에서 맞힌 수는 이렇다.
 //
-// 헛답을 0 으로 만들려면 맞히던 것의 4분의 1을 버려야 한다. 없는 걸 없다고
-// 하는 것보다 있는 걸 보여주는 쪽이 이 블로그엔 낫다고 보고 0.422 로 둔다.
-// 모델을 바꾸면 이 숫자는 못 쓴다 — 점수의 절대값은 모델 간에 비교가 안 된다.
-const FLOOR = Number(process.env.SEARCH_FLOOR ?? 0.422);
+//   헛답 0/15   혼합 28/35   벡터만 26/35
+//   헛답 1/15   혼합 28/35   벡터만 26/35
+//   헛답 2/15   혼합 29/35   벡터만 28/35
+//   헛답 3/15   혼합 30/35   벡터만 30/35
+//
+// 헛답 0 지점을 골랐다. 없는 걸 없다고 말하는 게 이 화면의 요구였고,
+// 맞힘은 한 문항 차이다. 더 보여주고 싶으면 SEARCH_FLOOR 를 낮추면 된다
+// (0.44 로 내리면 30/35 · 헛답 3/15).
+//
+// 관문은 품질에는 기여하지 않는다 — 제일 좋은 설정들이 전부 관문 0 이었다.
+// 그런데도 낮게 남겨두는 이유는 돈이다. 「김치찌개 끓이는 법」처럼 블로그의
+// 낱말이 하나도 안 걸리는 질문은 OpenAI 를 부르기 전에 끊는다. 긍정 문항
+// 중 제일 낮은 값이 0.307 이라 0.05 는 넉넉히 안전하다.
+//
+// 모델을 바꾸면 이 세 숫자는 전부 다시 재야 한다. 점수의 절대값은 모델
+// 간에 비교가 안 된다. 남은 개선안은 docs/search-backlog.md.
+const GATE = Number(process.env.SEARCH_GATE ?? 0.05);
+const BOOST = Number(process.env.SEARCH_BOOST ?? 0.15);
+const FLOOR = Number(process.env.SEARCH_FLOOR ?? 0.47);
 
-const MAX_QUERY = 100;   // 글자. 이보다 긴 건 질문이 아니라 본문 붙여넣기다
+const MAX_QUERY = 100;   // 글자. 이보다 길면 질문이 아니라 본문 붙여넣기다
 const TOP = 5;
-const CACHE_MAX = 500;
 
-// 분당 요청 수 (IP 당). 사람이 검색창을 두들겨도 분당 20을 넘기 어렵다.
+// 질문 벡터 캐시. 화면의 템플릿 질문 다섯 개가 제일 많이 눌릴 텐데 매번
+// API 를 부를 이유가 없다. 200개면 1,024차원 float32 기준 약 0.8MB 다
+// (평범한 배열로 두면 숫자 하나가 8바이트라 두 배가 된다).
+const CACHE_MAX = Number(process.env.SEARCH_CACHE ?? 200);
+
 const RATE_PER_MIN = Number(process.env.SEARCH_RATE ?? 20);
 
 if (!KEY) {
@@ -49,17 +70,18 @@ if (!KEY) {
 }
 
 const index = await loadIndex(INDEX);
+const keywords = new Map(Object.entries(JSON.parse(await readFile(KEYWORDS, "utf8"))));
 console.log(
-  `인덱스 ${INDEX} · ${index.meta.model} · ${index.dims}차원 · 조각 ${index.count}개 · ${index.meta.builtAt}`
+  `인덱스 ${index.meta.model} · ${index.dims}차원 · 조각 ${index.count}개 · 낱말 ${keywords.size}편 · ${index.meta.builtAt}`
 );
+if (keywords.size === 0) console.warn("⚠ 낱말 파일이 비었다 — 보정과 관문이 무력해진다");
 
-// ── 질문 벡터 캐시 ──
-// 화면의 템플릿 질문 다섯 개가 제일 많이 눌릴 텐데 매번 API 를 부를 이유가 없다.
+// ── 질문 벡터 캐시 (LRU) ──
 const cache = new Map();
 const cached = q => {
   const v = cache.get(q);
   if (v) {
-    cache.delete(q);      // 최근 쓴 것을 뒤로 — 오래된 것부터 밀려나게
+    cache.delete(q);       // 최근 쓴 것을 뒤로 — 오래된 것부터 밀려나게
     cache.set(q, v);
   }
   return v;
@@ -99,9 +121,30 @@ async function embedQuery(q) {
     signal: AbortSignal.timeout(8000),
   });
   if (!res.ok) throw new Error(`OpenAI ${res.status}`);
-  const vector = (await res.json()).data[0].embedding;
+  // float32 로 담는다. 평범한 배열은 숫자 하나에 8바이트라 캐시가 두 배가 되고,
+  // 인덱스가 float32 라 어차피 그 정밀도 이상은 쓰이지도 않는다.
+  const vector = Float32Array.from((await res.json()).data[0].embedding);
   remember(q, vector);
   return { vector, cached: false };
+}
+
+// 벡터 점수에 낱말 덮음을 얹어 글 단위 상위 k개
+function rank(qvec, kw) {
+  const { dims, count, meta, vectors } = index;
+  const best = new Map();
+  for (let i = 0; i < count; i++) {
+    const off = i * dims;
+    let s = 0;
+    for (let d = 0; d < dims; d++) s += qvec[d] * vectors[off + d];
+    const c = meta.chunks[i];
+    const prev = best.get(c.slug);
+    if (!prev || s > prev.vec) best.set(c.slug, { ...c, vec: s });
+  }
+  return [...best.values()]
+    .map(r => ({ ...r, score: r.vec + BOOST * (kw.coverage.get(r.slug) ?? 0) }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, TOP)
+    .filter(r => r.score >= FLOOR);
 }
 
 const json = (res, code, body) => {
@@ -122,8 +165,16 @@ createServer(async (req, res) => {
       ok: true,
       model: index.meta.model,
       chunks: index.count,
+      posts: keywords.size,
       builtAt: index.meta.builtAt,
+      gate: GATE,
+      boost: BOOST,
       floor: FLOOR,
+      // 운영 중에 램이 어디로 가는지 보려고 통째로 낸다. rss 만 보면
+      // V8 이 아직 안 돌려준 페이지인지, 정말 쓰고 있는 건지 구분이 안 된다.
+      memoryMb: Object.fromEntries(
+        Object.entries(process.memoryUsage()).map(([k, v]) => [k, Math.round(v / 1024 / 1024)])
+      ),
     });
   }
   if (url.pathname !== "/api/search") return json(res, 404, { error: "not found" });
@@ -138,8 +189,15 @@ createServer(async (req, res) => {
 
   const t0 = Date.now();
   try {
+    // 낱말 검사를 먼저 한다. 관문에 걸리면 OpenAI 를 부르지 않아도 되므로
+    // 돈과 시간을 둘 다 아낀다.
+    const kw = keywordScores(keywords, q);
+    if (kw.best < GATE) {
+      return json(res, 200, { query: q, results: [], reason: "no-topic", tookMs: Date.now() - t0 });
+    }
+
     const { vector, cached: fromCache } = await embedQuery(q);
-    const rows = search(index, vector, TOP).filter(r => r.score >= FLOOR);
+    const rows = rank(vector, kw);
     return json(res, 200, {
       query: q,
       results: rows.map(r => ({
@@ -157,5 +215,5 @@ createServer(async (req, res) => {
     return json(res, 503, { error: "검색을 잠시 쓸 수 없다" });
   }
 }).listen(PORT, HOST, () => {
-  console.log(`듣는 중 http://${HOST}:${PORT}/api/search · 하한선 ${FLOOR} · 분당 ${RATE_PER_MIN}회`);
+  console.log(`듣는 중 http://${HOST}:${PORT}/api/search · 관문 ${GATE} · 보정 ${BOOST} · 하한선 ${FLOOR} · 분당 ${RATE_PER_MIN}회`);
 });
