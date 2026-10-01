@@ -115,7 +115,8 @@ sudo mkdir -p /var/www/stats /var/lib/goaccess
 
 # 대시보드 접근용 비밀번호 (사용자 이름은 원하는 대로)
 sudo htpasswd -c /etc/nginx/.htpasswd-stats admin
-sudo chown root:www-data /etc/nginx/.htpasswd-stats
+# 비밀번호 변경 서비스를 붙인 뒤로는 소유자가 statspw 다 (아래 참고)
+sudo chown statspw:www-data /etc/nginx/.htpasswd-stats
 sudo chmod 640 /etc/nginx/.htpasswd-stats
 
 # 첫 리포트 생성
@@ -133,12 +134,18 @@ sudo nginx -t && sudo systemctl reload nginx
 **아이디는 `admin`** 이다. 비밀번호는 `/etc/nginx/.htpasswd-stats` 에 **단방향 해시**로
 저장돼 있어서 **꺼내볼 수 없다. 잊었으면 재설정한다.**
 
+**들어갈 수는 있는데 바꾸고 싶은 거라면** `/stats/password/` 에서 하면 된다
+(아래 "통계 비밀번호를 브라우저에서 바꾸기"). 아래 명령은 **잠겨서 못 들어갈
+때** 쓰는 길이다.
+
 ```bash
-sudo htpasswd -B /etc/nginx/.htpasswd-stats admin
+printf '%s' '새비밀번호' | sudo htpasswd -i -B /etc/nginx/.htpasswd-stats admin
 ```
 
 - **`-c` 를 붙이지 말 것.** 파일을 새로 만드는 옵션이라 기존 사용자가 날아간다
-- `-B` 는 bcrypt. 최초 설정 때 쓴 APR1(MD5)은 요즘 기준으로 약하니 바꾸는 김에 올린다
+- **`-b` 도 쓰지 말 것.** 비밀번호가 명령줄에 실려 `ps` 출력과 셸 히스토리에
+  평문으로 남는다. `-i` 는 표준입력으로 받는다
+- `-B` 는 bcrypt. 최초 설정 때 쓴 APR1(MD5)은 요즘 기준으로 약하다 (2026-10-01 에 올렸다)
 - nginx 는 요청마다 이 파일을 읽으므로 **리로드가 필요 없다**
 
 아이디를 바꾸려면 새 계정을 먼저 넣고, **로그인되는 것을 확인한 다음** 예전 것을 지운다.
@@ -267,6 +274,79 @@ sudo /usr/local/bin/generate-stats
 ```
 
 > `rm` 대신 `mv` 를 쓴다. 판단이 틀렸을 때 되돌릴 수 있어야 한다.
+
+### 통계 비밀번호를 브라우저에서 바꾸기
+
+`/stats/password/` 에서 바꾼다. 아이디는 `admin` 고정이다.
+
+**인증을 두 번 하지 않는다.** 이 경로는 nginx 가 basic auth 로 막은
+`location` 안에 있어서, 화면에 닿은 사람은 이미 현재 비밀번호를 아는
+사람이다. 그래서 화면에서 현재 비밀번호를 다시 묻지 않고, 뒤의 서비스도
+인증을 하지 않는다.
+
+**바꾼 뒤에 로그인 창이 다시 뜨는 것은 정상이다.** 브라우저가 옛 비밀번호를
+계속 들고 있어서 다음 요청이 401 이 된다. basic auth 에는 로그아웃이 없다.
+
+#### 구조
+
+```
+/stats/password/        Astro 가 빌드하는 정적 페이지 (릴리스에 실림)
+/stats/api/password     nginx → 유닉스 소켓 → 파이썬 서비스
+```
+
+**서비스는 상주하지 않는다.** systemd 소켓 활성화로 요청이 올 때만 뜨고
+60초 조용하면 스스로 내려간다. 떠 있을 때 19MB, 쉴 때 0 이다. 비밀번호는
+몇 달에 한 번 바꾸는 것이라 램 412MB 짜리에서 상시로 물고 있을 이유가 없다.
+
+```bash
+sudo useradd --system --no-create-home --shell /usr/sbin/nologin statspw
+sudo chown statspw:www-data /etc/nginx/.htpasswd-stats   # statspw 쓰기 · nginx 읽기
+sudo chmod 640 /etc/nginx/.htpasswd-stats
+sudo mkdir -p /opt/parkhyo/server
+sudo cp server/stats_password_service.py /opt/parkhyo/server/
+sudo cp deploy/systemd/parkhyo-stats-password.* /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now parkhyo-stats-password.socket   # .service 가 아니라 .socket
+```
+
+> **`sudo` 규칙을 주지 않는다.** sudoers 는 한 줄 잘못 쓰면 범위가 넓어지는데,
+> 파일 소유권을 바꾸면 그 파일 하나로 끝난다.
+
+#### 🔑 잠겼을 때 — 복구 경로
+
+**비밀번호 변경 기능이 생기면서 성질이 하나 바뀌었다.** 전에는 비밀번호가
+새도 통계를 읽히는 게 전부였는데, 이제 남이 바꿔서 주인을 잠글 수 있다.
+그래서 브라우저와 무관한 경로를 반드시 남겨둔다.
+
+```bash
+ssh -i ~/.ssh/blog-prod-key.pem ubuntu@parkhyo.in
+printf '%s' '새비밀번호' | sudo htpasswd -i -B /etc/nginx/.htpasswd-stats admin
+```
+
+- **`-b` 를 쓰지 말 것.** 비밀번호가 명령줄에 실려 `ps` 출력과 셸 히스토리에
+  평문으로 남는다. `-i` 는 표준입력으로 받는다
+- **`-c` 를 쓰지 말 것.** 파일을 새로 만드는 옵션이라 기존 사용자가 날아간다
+- `-B` 는 bcrypt. 예전 해시는 `$apr1$`(Apache MD5) 였고 2026-10-01 에 올렸다
+
+#### 서버에 Node 가 없다 (2026-10-01에 알게 됨)
+
+이 서비스를 처음에 Node 로 썼다가 `status=203/EXEC` 로 안 떴다. **빌드는 CI
+에서 하고 서버는 정적 파일만 서빙해 왔으므로 Node 가 설치된 적이 없다.**
+작은 일 하나 때문에 런타임을 더 들이지 않고 파이썬으로 다시 썼다. 파이썬은
+이미 `generate-stats` 가 쓰고 있다.
+
+**검색 서비스(`server/search-service.mjs`)도 같은 문제가 있다.** 배포하려면
+Node 를 설치하거나 파이썬으로 옮겨야 한다. `docs/search-backlog.md` 참고.
+
+#### 소켓 활성화로 돌릴 때 걸린 것
+
+`PrivateNetwork=true` 를 주면 AF_INET 소켓을 아예 못 만든다. 그런데
+`socketserver` 는 `bind_and_activate=False` 여도 **생성자에서 소켓을 먼저
+만든다.** `address_family` 를 `AF_UNIX` 로 안 맞추면 그 자리에서 죽는다.
+
+```
+OSError: [Errno 97] Address family not supported by protocol
+```
 
 #### 상태 코드로도 안 됐다 — 200 으로 긁어가는 쪽 (2026-10-01)
 

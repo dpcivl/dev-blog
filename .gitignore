@@ -45,3 +45,7 @@ public/pagefind
 
 # 검색 인덱스 — 글이 바뀔 때마다 5MB 가 통째로 바뀐다. CI 에서 만들어 릴리스에 싣는다
 public/search/
+
+# 파이썬 바이트코드
+__pycache__/
+*.pyc

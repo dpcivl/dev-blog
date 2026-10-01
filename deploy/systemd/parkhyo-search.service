@@ -21,11 +21,18 @@ Description=parkhyo.in 검색 (벡터 + 낱말)
 After=network-online.target
 Wants=network-online.target
 
+# 코드는 /opt/parkhyo, 인덱스는 릴리스에서 읽는다.
+#
+# 배포는 dist/ 만 rsync 하므로 서비스 코드가 릴리스에 들어가지 않는다.
+# 그리고 들어가더라도 넣으면 안 된다 — current 심볼릭 링크는 배포 때마다
+# 갈리는데, 돌고 있는 프로세스의 코드가 발밑에서 바뀌는 건 좋지 않다.
+# 반면 인덱스는 글과 짝이 맞아야 하므로 릴리스를 따라가는 게 맞다.
+
 [Service]
 Type=simple
 User=www-data
 Group=www-data
-WorkingDirectory=/var/www/parkhyo.in/current
+WorkingDirectory=/opt/parkhyo
 
 # OPENAI_API_KEY 가 여기 있다. 저장소에 올리지 않는다.
 #   sudo install -o root -g www-data -m 0640 /dev/null /etc/parkhyo/search.env
@@ -38,7 +45,7 @@ Environment=SEARCH_PORT=8787
 Environment=SEARCH_INDEX=/var/www/parkhyo.in/current/search/index.bin
 Environment=SEARCH_KEYWORDS=/var/www/parkhyo.in/current/search/keywords.json
 
-ExecStart=/usr/bin/node --max-old-space-size=96 /var/www/parkhyo.in/current/server/search-service.mjs
+ExecStart=/usr/bin/node --max-old-space-size=96 /opt/parkhyo/server/search-service.mjs
 
 Restart=on-failure
 RestartSec=5s
@@ -53,7 +60,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-ReadOnlyPaths=/var/www/parkhyo.in
+ReadOnlyPaths=/var/www/parkhyo.in /opt/parkhyo
 RestrictAddressFamilies=AF_INET AF_INET6
 MemoryDenyWriteExecute=false
 
