@@ -268,6 +268,54 @@ sudo /usr/local/bin/generate-stats
 
 > `rm` 대신 `mv` 를 쓴다. 판단이 틀렸을 때 되돌릴 수 있어야 한다.
 
+#### 상태 코드로도 안 됐다 — 200 으로 긁어가는 쪽 (2026-10-01)
+
+404 봇을 거른 뒤에도 수치가 이상해서 이틀치 365 건을 다시 뜯었다. 이번엔
+**정상 페이지를 200 으로 받아가는** 쪽이었다.
+
+```
+Accept-Language    zh-CN 123 · 헤더없음 121 · en-US 113 · ko 2
+IP 당 1 건짜리      239 / 264 개
+자산을 안 받은 IP    220 / 264 개   (CSS·폰트 없이 HTML 만)
+```
+
+**한국어 블로그인데 한국어 요청이 이틀에 2 건이었다.** 같은 UA 가 IP 59 개에
+흩어져 `/` 한 장씩만 받아가는 모양이었고, 집계된 것의 81% 가 봇이었다.
+
+들어오는 문이 따로 있었다. **레퍼러 1 위가 도메인이 아니라 EC2 기본 호스트명**
+이었다 (`ec2-….ap-northeast-2.compute.amazonaws.com` 1,238 건 vs 도메인 685 건).
+
+```
+nginx 는 default_server 가 없으면 아무 Host 로 온 요청을 첫 server 블록으로 보낸다
+→ 생 IP · EC2 호스트명으로도 사이트가 통째로 서빙되고 있었다
+```
+
+그래서 둘을 더했다.
+
+```nginx
+# ① 도메인이 아닌 Host 는 안 받는다 — 근본
+server { listen 80 default_server; server_name _; return 444; }
+server { listen 443 ssl http2 default_server; server_name _; ssl_reject_handshake on; }
+
+# ② Accept-Language 가 없으면 브라우저가 아니다 — 33% 가 걸러진다
+map $http_accept_language $lang_human { default 1; "" 0; }
+```
+
+**언어 종류로는 안 거른다.** `zh-CN` 독자가 실제로 올 수 있고, 언어로 사람을
+가르는 건 필터가 아니다. 헤더가 *아예 없는* 것만 뺀다.
+
+**`human-probe.log` 는 일부러 언어 조건 '전' 으로 남겨둔다** (`$log_probe`).
+두 로그의 줄 수 차이가 곧 새 필터가 거른 양이라, 다음에 또 의심될 때 근거가
+된다. 필터를 고치면 그 효과를 재는 수단도 같이 남겨야 한다.
+
+**443 default 블록에 `http2` 를 빼면 안 된다.** nginx 1.24 에서 `http2` 는
+listen 소켓 단위 설정이라 같은 포트의 다른 블록과 다르면
+`protocol options redefined` 경고가 난다.
+
+> **백업을 `sites-enabled/` 안에 두지 말 것.** `include sites-enabled/*` 라
+> `.bak` 파일까지 읽혀서 `duplicate "log_format"` 으로 `nginx -t` 가 죽는다.
+> 실제로 한 번 걸렸다. `/root/nginx-backups/` 같은 바깥에 둔다.
+
 #### ⚠️ server 블록의 `access_log` 는 상위를 덮어쓴다
 
 같은 날 찾은 별개 버그다. **nginx 는 server 블록에 `access_log` 를 쓰는 순간
