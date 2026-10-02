@@ -47,12 +47,16 @@ if [ ! -s "$HUMAN" ]; then
   echo "  (로그를 지웠다면 sudo nginx -s reopen 이 필요하다)" >&2
   HUMAN_OK=0
 fi
-BEACON_OK=1
-if [ ! -s "$BEACON" ]; then
-  echo "$BEACON 이 없거나 비었다 — 비콘 리포트는 건너뛴다." >&2
-  echo "  배포가 반영됐는지, 반영 후 브라우저로 한 번이라도 들어왔는지 확인할 것." >&2
-  BEACON_OK=0
-fi
+# 비콘 로그는 비어 있어도 그냥 돌린다.
+#
+# human.log 와 다르다. human.log 는 없을 때 access.log 로 폴백하면 누적 DB가
+# 영구히 오염되므로 건너뛰어야 했다. 비콘은 폴백 대상이 없으므로 그 위험이
+# 없고, GoAccess 는 빈 로그로도 "방문 0" 짜리 정상 리포트를 만든다.
+#
+# 건너뛰면 안 되는 이유가 더 크다 — 건너뛰면 report.json 에 옛 수치가 그대로
+# 남아서, 대시보드가 로그 기반 숫자를 비콘 수치인 척 보여준다. 0 을 보여주는
+# 쪽이 정직하다.
+[ -e "$BEACON" ] || install -m 640 -o www-data -g adm /dev/null "$BEACON" 2>/dev/null || touch "$BEACON"
 
 mkdir -p "$OUT_DIR/raw" "$OUT_DIR/bots" "$DB" "$DB_BEACON"
 
@@ -91,14 +95,12 @@ HIDE=(
 # ── 1. 사람 방문 (누적) — 대시보드가 읽는 수치 ──
 # beacon.log 에는 JS 를 실행한 브라우저만 들어 있다. nginx 가 UA 필터와
 # 본인 IP 제외까지 이미 적용했다. --ignore-crawlers 는 3차 방어선.
-if [ "$BEACON_OK" = 1 ]; then
 goaccess "$BEACON" "${COMMON[@]}" "${HIDE[@]}" \
   --ignore-crawlers \
   --persist --restore --db-path="$DB_BEACON" \
   --html-report-title="parkhyo.in — 방문 (비콘)" \
   --date-spec=date \
   -o "$OUT_DIR/report.json"
-fi
 
 # ── 1b. 로그 기반 수치 (비교용) ──
 # 비콘과 이 숫자의 차이가 "봇이 얼마나 오고 있나" 다. 비콘만 두면 그게

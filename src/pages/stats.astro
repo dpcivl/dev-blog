@@ -76,8 +76,12 @@ import Footer from "@/components/Footer.astro";
       <section class="banner" data-bots hidden></section>
 
       <p class="foot-note">
-        nginx 접근 로그 · 크롤러 제외 · <a href="/stats/raw/">GoAccess 원본</a>
-        · <a href="/stats/password/">비밀번호 변경</a><br />
+        <strong>비콘 집계</strong> — 페이지를 띄우고 JS 를 실행한 브라우저만 센다.
+        봇은 대부분 JS 를 돌리지 않아 자연히 빠지고, 대신 JS 를 끈 방문자는 안 세어진다.<br
+        />
+        같은 기간의 <a href="/stats/raw/">접근 로그 기반 수치</a>와 비교하면
+        차이가 곧 봇 유입량이다. · <a href="/stats/password/">비밀번호 변경</a
+        ><br />
         국가 판별: <a href="https://db-ip.com" rel="noopener"
           >IP Geolocation by DB-IP</a
         >
