@@ -234,5 +234,48 @@ const structuredData = pubDatetime
 
     <!-- Load full theme logic -->
     <script src="../scripts/theme.ts"></script>
+
+    <!--
+      방문 비콘 (2026-10-02~).
+
+      nginx 로그만으로는 사람과 봇이 안 갈린다 — 로그는 "서버에 도착한 요청" 을
+      세기 때문에 봇도 전부 들어온다. 이 비콘은 "페이지를 띄우고 JS 를 돌린 것"
+      만 센다. 봇은 대부분 JS 를 실행하지 않으므로 추측이 필요 없다.
+      (Vercel Analytics 가 쓰던 방식이고, 그래서 그쪽 숫자가 사람에 가까웠다)
+
+      서버는 204 만 돌려주고 nginx 가 beacon.log 에 한 줄 적는다. 보내는 것은
+      경로 하나뿐이다 — 쿠키도 식별자도 없다.
+    -->
+    <script is:inline>
+      (function () {
+        let last = null;
+
+        function ping() {
+          try {
+            const p = location.pathname;
+            // 대시보드 자신은 세지 않는다
+            if (p.indexOf("/stats") === 0) return;
+            // 같은 경로를 연달아 보내지 않는다. 아래에서 즉시 한 번 부르고
+            // astro:page-load 도 듣는데, ClientRouter 는 첫 로드에서도 그
+            // 이벤트를 쏘기 때문에 첫 페이지가 두 번 세어진다.
+            if (p === last) return;
+            last = p;
+
+            // 경로를 쿼리가 아니라 URL 경로에 붙인다. 쿼리로 보내면 nginx
+            // 쪽에서 디코딩이 안 된 날값($arg_p)을 받게 돼 검증이 안 된다.
+            const url = "/b" + p;
+            if (navigator.sendBeacon) navigator.sendBeacon(url);
+            else new Image().src = url;
+          } catch {
+            /* 통계가 페이지를 망가뜨리면 안 된다 */
+          }
+        }
+
+        // 즉시 한 번 — ClientRouter 가 없거나 실패해도 세어진다
+        ping();
+        // 그리고 이후의 화면 이동마다 (전체 새로고침이 아니라 못 잡힌다)
+        document.addEventListener("astro:page-load", ping);
+      })();
+    </script>
   </body>
 </html>

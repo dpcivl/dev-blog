@@ -13,12 +13,27 @@
 set -euo pipefail
 
 LOG=/var/log/nginx/access.log        # 전체 — 크롤러 리포트용
-HUMAN=/var/log/nginx/human.log       # 사람 요청만 — nginx 가 분리해 기록
+HUMAN=/var/log/nginx/human.log       # 로그 기반 추정 — nginx 가 필터해 기록
+BEACON=/var/log/nginx/beacon.log     # JS 를 실행한 브라우저만 — 대시보드의 주 수치
 OUT_DIR=/var/www/stats
 DB=/var/lib/goaccess
+DB_BEACON=/var/lib/goaccess-beacon
 
 command -v goaccess >/dev/null || { echo "goaccess 미설치" >&2; exit 1; }
 [ -r "$LOG" ] || { echo "로그를 읽을 수 없다: $LOG" >&2; exit 1; }
+
+# 대시보드가 보여주는 수치는 beacon.log 다 (2026-10-02~).
+#
+# 왜 바꿨나 — 로그는 "서버에 도착한 요청" 을 센다. 봇도 요청을 보내므로 전부
+# 들어오고, 사람인지는 추측해야 한다. 실측에서 로그 기반 156건 중 자산까지
+# 받은 것(= 브라우저로 보이는 것)이 39건이었다. 필터를 두 번 고쳤지만
+# 추측이라는 성질은 안 바뀐다.
+#
+# 비콘은 "페이지를 띄우고 JS 를 돌린 것" 을 센다. 봇은 대부분 JS 를 실행하지
+# 않으므로 추측이 필요 없다. 대신 과소 집계된다 (JS 끈 사람, 차단기).
+#
+# 둘을 같이 남긴다. report.json 은 비콘, /stats/raw/ 는 로그 기반이다.
+# 두 숫자의 차이가 곧 "봇이 얼마나 오고 있나" 라서 그 자체가 정보다.
 
 # human.log 는 nginx 설정을 반영한 뒤 첫 요청이 와야 생긴다.
 #
@@ -32,7 +47,14 @@ if [ ! -s "$HUMAN" ]; then
   echo "  (로그를 지웠다면 sudo nginx -s reopen 이 필요하다)" >&2
   HUMAN_OK=0
 fi
-mkdir -p "$OUT_DIR/raw" "$OUT_DIR/bots" "$DB"
+BEACON_OK=1
+if [ ! -s "$BEACON" ]; then
+  echo "$BEACON 이 없거나 비었다 — 비콘 리포트는 건너뛴다." >&2
+  echo "  배포가 반영됐는지, 반영 후 브라우저로 한 번이라도 들어왔는지 확인할 것." >&2
+  BEACON_OK=0
+fi
+
+mkdir -p "$OUT_DIR/raw" "$OUT_DIR/bots" "$DB" "$DB_BEACON"
 
 COMMON=(
   --log-format=COMBINED
@@ -66,16 +88,29 @@ HIDE=(
 # 남는 것: VISITORS(추세) · REQUESTS(인기 글) · NOT_FOUND(404) · REFERRING_SITES(유입)
 #          · STATUS_CODES · GEO_LOCATION(국가)
 
-# ── 1. 사람 방문 (누적) ──
-# 1차 필터는 nginx 가 이미 했다(human.log). --ignore-crawlers 는 2차 방어선.
+# ── 1. 사람 방문 (누적) — 대시보드가 읽는 수치 ──
+# beacon.log 에는 JS 를 실행한 브라우저만 들어 있다. nginx 가 UA 필터와
+# 본인 IP 제외까지 이미 적용했다. --ignore-crawlers 는 3차 방어선.
+if [ "$BEACON_OK" = 1 ]; then
+goaccess "$BEACON" "${COMMON[@]}" "${HIDE[@]}" \
+  --ignore-crawlers \
+  --persist --restore --db-path="$DB_BEACON" \
+  --html-report-title="parkhyo.in — 방문 (비콘)" \
+  --date-spec=date \
+  -o "$OUT_DIR/report.json"
+fi
+
+# ── 1b. 로그 기반 수치 (비교용) ──
+# 비콘과 이 숫자의 차이가 "봇이 얼마나 오고 있나" 다. 비콘만 두면 그게
+# 안 보여서, 필터가 샐 때 알아차릴 길이 없어진다.
 if [ "$HUMAN_OK" = 1 ]; then
 goaccess "$HUMAN" "${COMMON[@]}" "${HIDE[@]}" \
   --ignore-crawlers \
   --persist --restore --db-path="$DB" \
-  --html-report-title="parkhyo.in — 방문 (원본)" \
+  --html-report-title="parkhyo.in — 로그 기반 (봇 섞임, 비교용)" \
   --date-spec=date \
   -o "$OUT_DIR/raw/index.html" \
-  -o "$OUT_DIR/report.json"
+  -o "$OUT_DIR/raw/report.json"
 fi
 
 # ── 2. 크롤러 활동 (검색엔진 봇만, 최근 이틀) ──
