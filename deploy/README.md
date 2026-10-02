@@ -174,14 +174,36 @@ sudo fail2ban-client status
 > 같은 이름 문제로 `systemctl reload sshd` 도 "Unit not found" 로 죽는다.
 > **이 서버에서 ssh 유닛은 `ssh`다.**
 
-**`nginx-http-auth` 는 일부러 느슨하게 잡았다.** 이 화면에 로그인하는 사람은
-작성자 한 명이고, 비밀번호를 잘못 치는 일이 실제로 있다. `maxretry 5` ·
-`bantime 2h` 로 두면 **오타 몇 번에 주인이 두 시간 잠긴다.** 막아야 할 대상은
-수천 번 시도하는 자동화이고 그건 15회로도 걸린다.
+**`nginx-http-auth` 는 켰다가 껐다.** 처음에 `maxretry 5` 가 위험하다고 보고
+15 로 늘렸는데 **그래도 주인 IP 를 두 번 차단했다.** 두 번째에는 연결 자체가
+끊겨서(`HTTP 000`) 원인을 찾는 데만 한참 걸렸다.
 
+원인은 구조적이다. **이 화면에 로그인하는 사람이 한 명이라 실패가 전부 그
+한 명에게 몰린다.** 비밀번호를 잘못 알고 있던 동안의 시도, 설정을 확인하는
+호출이 쌓이면 15회도 금방이다.
+
+끈 근거는 **막을 것이 이미 막혀 있다** 는 것이다.
+
+| 수단 | 효과 |
+| --- | --- |
+| nginx `limit_req` | `/stats` 전체를 분당 60회로 묶는다 |
+| 비밀번호 | 23자 낱말 조합 |
+
+분당 60회로 23자를 때려 맞히는 건 계산할 가치가 없다. **이 jail 이 실제로
+한 일은 주인을 잠근 것뿐이고 막아준 것은 없다.**
+
+> **다시 켤 조건** — `/stats` 에 로그인하는 사람이 둘 이상이 되거나, 외부에서
+> 반복 시도가 들어오는 것을 `error.log` 에서 실제로 확인했을 때.
+
+#### 잠겼을 때 푸는 법
+
+```bash
+sudo fail2ban-client status nginx-http-auth      # 차단 목록 확인
+sudo fail2ban-client set nginx-http-auth unbanip <IP>
 ```
-maxretry = 15 · findtime = 5m · bantime = 10m
-```
+
+증상이 **401 이 아니라 연결 실패(`HTTP 000`)** 로 나타난다는 점을 기억해둘
+것. 비밀번호 문제로 보이지 않아서 엉뚱한 곳을 먼저 뒤지게 된다.
 
 #### 과거 기록은 안 센다
 
@@ -235,6 +257,15 @@ sudo nginx -t && sudo systemctl reload nginx
 ```bash
 printf '%s' '새비밀번호' | sudo htpasswd -i -B /etc/nginx/.htpasswd-stats admin
 ```
+
+- **바꾼 뒤 파일이 실제로 바뀌었는지 확인할 것.** 2026-10-02 에 `htpasswd` 가
+  "Updating password for user admin" 을 찍고도 파일이 안 바뀐 일이 있었다.
+  그 뒤 알려준 비밀번호로 로그인이 안 됐다
+
+  ```bash
+  sudo stat -c "%y" /etc/nginx/.htpasswd-stats      # mtime 이 방금이어야 한다
+  sudo cut -d: -f2 /etc/nginx/.htpasswd-stats | cut -c1-10   # 해시가 달라져야 한다
+  ```
 
 - **`-c` 를 붙이지 말 것.** 파일을 새로 만드는 옵션이라 기존 사용자가 날아간다
 - **`-b` 도 쓰지 말 것.** 비밀번호가 명령줄에 실려 `ps` 출력과 셸 히스토리에
