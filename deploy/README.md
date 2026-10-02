@@ -101,6 +101,100 @@ sudo certbot renew --dry-run   # 갱신이 실제로 되는지 한 번은 확인
 > 방문자 브라우저에 HSTS 가 캐시되어 있다. **전환 시점에 유효한 인증서가 없으면
 > 브라우저가 경고를 건너뛰고 접속 자체를 거부한다.** 인증서를 먼저 확보할 것.
 
+## 보안 점검 (2026-10-02)
+
+봇이 끊임없이 오는 것이 위험한 건지 확인하면서 한 점검이다. **결론은 "시끄럽지만
+위험하지 않다" 였고**, 그래도 구멍 셋을 메웠다.
+
+### 재본 것
+
+```
+스캐너가 찔러보는 것   /wp.php · /simple.php · /ops.php · /v1/graphql …   404 675건
+SSH 로그인 실패        1,914회
+```
+
+**둘 다 구조적으로 막혀 있다.**
+
+| 공격 | 왜 안 통하나 |
+| --- | --- |
+| PHP 파일 탐색 | 이 서버에 PHP 가 없다. 정적 파일만 서빙한다 — DB · 관리자 화면 · 입력 폼이 전부 없다 |
+| SSH 무차별 대입 | `passwordauthentication no`. 키가 없으면 횟수는 무의미하다 |
+| 생 IP · EC2 호스트명 | `default_server` 가 444 로 끊는다 (2026-10-01) |
+
+나머지도 확인했다.
+
+```
+자동 보안 업데이트     active · 밀린 보안 패치 0건
+바깥에 열린 포트       22 · 80 · 443 뿐 (53은 localhost 전용)
+```
+
+> **정적 사이트의 공격면이 작다는 것이 여기서 이득으로 돌아온다.** 스캐너가
+> 찾는 것이 우리에게 하나도 없다. 로그가 시끄러운 것과 위험한 것은 다르다.
+
+### 메운 구멍 셋
+
+**① `/stats` 로그인에 횟수 제한이 없었다.** 비밀번호 변경 엔드포인트는 분당
+5회로 막아뒀는데 basic auth 자체는 무제한이었다. `limit_req` 로 분당 60회로
+묶었다. 조이면 안 되는 이유는 대시보드 한 번 열 때 3건이 나가기 때문이다.
+
+**② root 로그인을 닫았다.** `PermitRootLogin no` · `MaxAuthTries 3`
+([deploy/ssh/99-hardening.conf](ssh/99-hardening.conf)). 키로만 되니 이미
+안전했지만 쓰지 않는 문은 닫아두는 쪽이 맞다.
+
+```bash
+sudo install -m 644 deploy/ssh/99-hardening.conf /etc/ssh/sshd_config.d/
+sudo sshd -t && sudo systemctl reload ssh   # ⚠️ sshd 가 아니라 ssh 다
+```
+
+> **sshd 설정을 건드릴 때는 되돌리기를 먼저 예약한다.** 잠기면 복구가 번거롭다.
+>
+> ```bash
+> sudo nohup sh -c 'sleep 300; rm -f /etc/ssh/sshd_config.d/99-hardening.conf; systemctl reload ssh' &
+> # 새 연결로 접속 확인 후
+> sudo pkill -f "sleep 300"
+> ```
+
+**③ fail2ban 을 들였다** ([deploy/fail2ban/jail.d-parkhyo.local](fail2ban/jail.d-parkhyo.local)).
+램 34MB 를 쓴다.
+
+```bash
+sudo apt install -y fail2ban
+sudo install -m 644 deploy/fail2ban/jail.d-parkhyo.local /etc/fail2ban/jail.d/parkhyo.local
+sudo systemctl enable --now fail2ban
+sudo fail2ban-client status
+```
+
+#### fail2ban 에서 걸린 것 둘
+
+**`backend = systemd` 로는 SSH 실패를 하나도 못 본다.** 필터의 기본
+`journalmatch` 가 `_SYSTEMD_UNIT=sshd.service` 인데 **이 시스템의 유닛 이름은
+`ssh.service`** 다. 실패가 1,914건인데 `Total failed` 가 0 으로 나와서 알았다.
+`backend = polling` + `logpath = /var/log/auth.log` 로 바꿨다.
+
+> 같은 이름 문제로 `systemctl reload sshd` 도 "Unit not found" 로 죽는다.
+> **이 서버에서 ssh 유닛은 `ssh`다.**
+
+**`nginx-http-auth` 는 일부러 느슨하게 잡았다.** 이 화면에 로그인하는 사람은
+작성자 한 명이고, 비밀번호를 잘못 치는 일이 실제로 있다. `maxretry 5` ·
+`bantime 2h` 로 두면 **오타 몇 번에 주인이 두 시간 잠긴다.** 막아야 할 대상은
+수천 번 시도하는 자동화이고 그건 15회로도 걸린다.
+
+```
+maxretry = 15 · findtime = 5m · bantime = 10m
+```
+
+#### 과거 기록은 안 센다
+
+fail2ban 은 **새로 들어오는 줄만** 본다. 켠 직후 `Total failed` 가 0 인 것은
+정상이다. 동작을 확인하려면 실패를 직접 만들어 보는데, **차단 한계보다 적게**
+한다 (자기 IP 를 차단하면 잠긴다).
+
+```bash
+ssh -o BatchMode=yes nosuchuser_test@parkhyo.in   # 2회만
+sudo fail2ban-client status sshd                   # Total failed 가 늘었나
+sudo fail2ban-client set sshd unban --all          # 테스트 기록 정리
+```
+
 ## 방문 통계 (GoAccess)
 
 Vercel Analytics 를 걷어낸 자리를 nginx 로그 분석으로 대신한다.
