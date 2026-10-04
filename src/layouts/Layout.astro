@@ -21,6 +21,7 @@ type Props = {
   modDatetime?: Date | null;
   scrollSmooth?: boolean;
   noIndex?: boolean;
+  noBeacon?: boolean;
   htmlLang?: string;
   hreflangAlternates?: HreflangAlt[];
 };
@@ -36,6 +37,7 @@ const {
   modDatetime,
   scrollSmooth = false,
   noIndex = false,
+  noBeacon = false,
   htmlLang,
   hreflangAlternates,
 } = Astro.props;
@@ -99,6 +101,8 @@ const structuredData = pubDatetime
     <link rel="canonical" href={canonicalURL} />
     <meta name="generator" content={Astro.generator} />
     {noIndex && <meta name="robots" content="noindex, nofollow" />}
+    {/* 404 는 방문 통계에서 뺀다 — 없는 주소를 두드린 건 읽은 게 아니다 */}
+    {noBeacon && <meta name="x-beacon" content="off" />}
 
     {
       hreflangAlternates?.map(alt => (
@@ -255,6 +259,11 @@ const structuredData = pubDatetime
             const p = location.pathname;
             // 대시보드 자신은 세지 않는다
             if (p.indexOf("/stats") === 0) return;
+            // 404 는 세지 않는다. 주소 형태만 보면 /posts/x/ 같은 탐색 요청이
+            // 글 페이지와 구별이 안 되므로, 없는 글이라는 사실을 아는 여기서
+            // 끊는다. ClientRouter 가 head 까지 갈아끼우므로 이동 후에도 맞다.
+            if (document.querySelector('meta[name="x-beacon"][content="off"]'))
+              return;
             // 같은 경로를 연달아 보내지 않는다. 아래에서 즉시 한 번 부르고
             // astro:page-load 도 듣는데, ClientRouter 는 첫 로드에서도 그
             // 이벤트를 쏘기 때문에 첫 페이지가 두 번 세어진다.

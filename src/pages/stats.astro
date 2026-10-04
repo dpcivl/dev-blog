@@ -76,11 +76,15 @@ import Footer from "@/components/Footer.astro";
       <section class="banner" data-bots hidden></section>
 
       <p class="foot-note">
-        <strong>비콘 집계</strong> — 페이지를 띄우고 JS 를 실행한 브라우저만 센다.
-        봇은 대부분 JS 를 돌리지 않아 자연히 빠지고, 대신 JS 를 끈 방문자는 안 세어진다.<br
+        <strong>글을 연 방문만 센다</strong> — JS 를 실행한 브라우저가 글 페이지(<code
+          >/posts/…</code
+        >)를 띄웠을 때만 한 줄이 남는다. 목록 · 홈 · 404 는 세지 않는다.<br />
+        JS 실행만으로는 사람을 못 가린다는 걸 확인해서 이렇게 바꿨다 (2026-10-04).
+        폰트까지 받아가며 비콘을 쏘는 봇이 실제로 있었고, 그것들은 목록 페이지를 한
+        장 보고 사라졌다. 대신 JS 를 끈 방문자와 홈만 보고 간 방문자는 안 세어진다.<br
         />
         같은 기간의 <a href="/stats/raw/">접근 로그 기반 수치</a>와 비교하면
-        차이가 곧 봇 유입량이다. · <a href="/stats/password/">비밀번호 변경</a
+        차이가 곧 걸러낸 양이다. · <a href="/stats/password/">비밀번호 변경</a
         ><br />
         국가 판별: <a href="https://db-ip.com" rel="noopener"
           >IP Geolocation by DB-IP</a

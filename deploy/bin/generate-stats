@@ -14,7 +14,9 @@ set -euo pipefail
 
 LOG=/var/log/nginx/access.log        # 전체 — 크롤러 리포트용
 HUMAN=/var/log/nginx/human.log       # 로그 기반 추정 — nginx 가 필터해 기록
-BEACON=/var/log/nginx/beacon.log     # JS 를 실행한 브라우저만 — 대시보드의 주 수치
+BEACON=/var/log/nginx/beacon.log     # 글을 연 방문만 — 대시보드의 주 수치
+# beacon-all.log 는 거르기 전 기준선. 리포트를 만들지는 않고, 줄 수 차이로
+# 목록 페이지에서 걸러낸 양을 확인하는 데 쓴다 (human-probe.log 와 같은 역할).
 OUT_DIR=/var/www/stats
 DB=/var/lib/goaccess
 DB_BEACON=/var/lib/goaccess-beacon
@@ -93,8 +95,12 @@ HIDE=(
 #          · STATUS_CODES · GEO_LOCATION(국가)
 
 # ── 1. 사람 방문 (누적) — 대시보드가 읽는 수치 ──
-# beacon.log 에는 JS 를 실행한 브라우저만 들어 있다. nginx 가 UA 필터와
-# 본인 IP 제외까지 이미 적용했다. --ignore-crawlers 는 3차 방어선.
+# beacon.log 에는 글 페이지를 띄운 브라우저만 들어 있다. nginx 가 UA 필터 ·
+# 본인 IP 제외 · 글 페이지 판정까지 이미 적용했다. --ignore-crawlers 는 3차 방어선.
+#
+# 2026-10-04: 「JS 를 실행했으니 사람」이 틀렸다. 헤드리스 브라우저로 폰트까지
+# 받아가며 비콘을 쏘는 크롤러가 있었다 (209개 IP · 185개가 1회 · 글을 연 건 7개).
+# 그래서 글 페이지만 센다. 자세한 건 deploy/README.md 의 "봇을 거르는 방식" 절.
 goaccess "$BEACON" "${COMMON[@]}" "${HIDE[@]}" \
   --ignore-crawlers \
   --persist --restore --db-path="$DB_BEACON" \
