@@ -501,6 +501,22 @@ import Footer from "@/components/Footer.astro";
       c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!
     );
 
+  /**
+   * 경로를 사람이 읽는 형태로 푼다. 실패하면 받은 그대로 둔다.
+   *
+   * decodeURIComponent 는 잘못된 % 를 만나면 예외를 던진다 (/posts/%E0%A4/).
+   * 그대로 쓰면 예외가 render() 전체를 멈춰서, 누가 이상한 경로로 요청 한 번만
+   * 보내도 그 줄이 집계에서 밀려날 때까지 대시보드가 안 떴다 (2026-10-09).
+   * 경로는 방문자가 정하는 값이니 어떤 문자열이 와도 화면은 그려져야 한다.
+   */
+  const decodePath = (s: string) => {
+    try {
+      return decodeURIComponent(s);
+    } catch {
+      return s;
+    }
+  };
+
   /** GoAccess 의 날짜 키는 설정에 따라 20260906 또는 2026-09-06 로 온다. */
   function parseDay(v: string): Date | null {
     const m = /^(\d{4})-?(\d{2})-?(\d{2})$/.exec(v.trim());
@@ -624,7 +640,7 @@ import Footer from "@/components/Footer.astro";
           .map(
             p => `<div class="row">
               <div>
-                <div class="row-title"><a href="${esc(p.path)}">${esc(decodeURIComponent(p.path))}</a></div>
+                <div class="row-title"><a href="${esc(p.path)}">${esc(decodePath(p.path))}</a></div>
                 <div class="bar"><span style="width:${(p.hits / maxHits) * 100}%"></span></div>
               </div>
               <div class="row-num">${p.hits.toLocaleString()}</div>
@@ -734,7 +750,7 @@ import Footer from "@/components/Footer.astro";
       ? nf
           .map(
             n => `<div class="mini">
-              <span class="path mini-name">${esc(decodeURIComponent(n.path))}</span>
+              <span class="path mini-name">${esc(decodePath(n.path))}</span>
               <span class="mini-num">${n.hits}</span>
             </div>`
           )

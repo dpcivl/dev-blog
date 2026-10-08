@@ -10,9 +10,23 @@
 스스로 내려간다. 비밀번호는 몇 달에 한 번 바꾸는 것이라 그걸 위해 프로세스
 하나를 상시로 물고 있을 이유가 없다.
 
-인증은 하지 않는다 — nginx 가 이미 했다. 이 엔드포인트는 basic auth 로 막힌
-location 안에 있어서, 여기까지 온 요청은 현재 비밀번호를 아는 요청이다.
-같은 검사를 두 번 하면 틀릴 자리만 늘어난다.
+nginx 의 basic auth 만으로는 부족하다 (2026-10-09 정정).
+
+처음엔 "여기까지 온 요청은 현재 비밀번호를 아는 요청이니 다시 검사하지
+않는다" 고 적었는데 틀렸다. basic auth 가 증명하는 건 **브라우저가 비밀번호를
+기억하고 있다**는 것이지, **사람이 이 요청을 보내려 했다**는 게 아니다.
+브라우저는 기억한 basic auth 를 다른 사이트에서 시작된 요청에도 붙인다.
+그래서 로그인한 브라우저로 남의 페이지를 열면, 그 페이지의
+<form enctype="text/plain"> 이 비밀번호를 바꿀 수 있었다 (CSRF). 로컬에서
+재현했다 — 본문을 Content-Type 확인 없이 JSON 으로 읽었기 때문이다.
+
+그래서 세 겹으로 막는다. 하나만 뚫려서는 바뀌지 않는다.
+
+  1. Content-Type 이 application/json 이어야 한다. 남의 사이트의 폼은 이
+     타입을 못 보낸다 (보내려면 사전 요청이 필요한데 여기는 CORS 를 안 연다)
+  2. Origin 이 이 사이트여야 한다
+  3. 현재 비밀번호를 다시 받는다. 위 둘이 어떻게든 뚫려도 공격자는 이걸
+     모른다
 
 ⚠️ 이걸 만들면서 성질이 하나 바뀐다. 전에는 비밀번호가 새도 통계를 읽히는
    게 전부였는데, 이제 남이 비밀번호를 바꿔 주인을 잠글 수 있다. 그래서
@@ -33,6 +47,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 FILE = os.environ.get("HTPASSWD_FILE", "/etc/nginx/.htpasswd-stats")
 USER = os.environ.get("HTPASSWD_USER", "admin")
 IDLE_SEC = float(os.environ.get("IDLE_SEC", "60"))
+ALLOWED_ORIGIN = os.environ.get("ALLOWED_ORIGIN", "https://parkhyo.in")
 
 # 비밀번호 규칙은 길이만 본다.
 #
@@ -54,6 +69,21 @@ def touch():
     _timer = threading.Timer(IDLE_SEC, lambda: os._exit(0))
     _timer.daemon = True
     _timer.start()
+
+
+def check_password(pw: str) -> bool:
+    """현재 비밀번호가 맞는지 본다. 파일은 건드리지 않는다.
+
+    htpasswd -v 는 맞으면 0, 틀리면 3 으로 끝난다. 비밀번호는 여기서도
+    명령줄이 아니라 표준 입력으로 넘긴다.
+    """
+    r = subprocess.run(
+        ["htpasswd", "-v", "-i", FILE, USER],
+        input=pw.encode(),
+        capture_output=True,
+        timeout=15,
+    )
+    return r.returncode == 0
 
 
 def set_password(pw: str):
@@ -99,6 +129,14 @@ class Handler(BaseHTTPRequestHandler):
         if not self.path.startswith("/stats/api/password"):
             return self._json(404, {"error": "not found"})
 
+        # 본문을 읽기 전에 거른다 — 남의 사이트에서 온 요청은 여기서 끝난다
+        ctype = (self.headers.get("Content-Type") or "").split(";")[0].strip().lower()
+        if ctype != "application/json":
+            return self._json(415, {"error": "요청 형식이 잘못됐습니다"})
+        if self.headers.get("Origin") != ALLOWED_ORIGIN:
+            sys.stderr.write(f"[stats-pw] 거부: Origin={self.headers.get('Origin')!r}\n")
+            return self._json(403, {"error": "다른 사이트에서 온 요청은 받지 않습니다"})
+
         try:
             length = int(self.headers.get("Content-Length") or 0)
         except ValueError:
@@ -107,9 +145,14 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(400, {"error": "요청 형식이 잘못됐습니다"})
 
         try:
-            pw = str(json.loads(self.rfile.read(length)).get("password", ""))
+            body = json.loads(self.rfile.read(length))
+            pw = str(body.get("password", ""))
+            current = str(body.get("current", ""))
         except (ValueError, AttributeError):
             return self._json(400, {"error": "요청 형식이 잘못됐습니다"})
+
+        if not current:
+            return self._json(400, {"error": "현재 비밀번호를 넣어주세요"})
 
         if len(pw) < MIN_LEN:
             return self._json(400, {"error": f"{MIN_LEN}자 이상이어야 합니다"})
@@ -118,6 +161,16 @@ class Handler(BaseHTTPRequestHandler):
         # 해시된 뒤라 콜론은 파일을 안 깨뜨리지만 줄바꿈은 실제로 망가뜨린다
         if "\n" in pw or "\r" in pw:
             return self._json(400, {"error": "줄바꿈은 쓸 수 없습니다"})
+
+        # 새 비밀번호 규칙을 다 통과한 뒤에 확인한다. bcrypt 검증은 느리므로
+        # 형식이 틀린 요청에는 쓰지 않는다
+        try:
+            if not check_password(current):
+                sys.stderr.write("[stats-pw] 거부: 현재 비밀번호 불일치\n")
+                return self._json(403, {"error": "현재 비밀번호가 틀렸습니다"})
+        except Exception as e:  # noqa: BLE001
+            sys.stderr.write(f"[stats-pw] 확인 실패: {e}\n")
+            return self._json(500, {"error": "서버에서 확인하지 못했습니다"})
 
         try:
             set_password(pw)
