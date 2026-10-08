@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# deploy 키로 들어온 SSH 가 할 수 있는 일을 둘로 제한한다 (2026-10-09~).
+#
+#   설치: sudo install -m 755 -o root -g root deploy-gate /usr/local/bin/deploy-gate
+#   authorized_keys 의 키 줄 앞에:
+#     restrict,command="/usr/local/bin/deploy-gate" ssh-ed25519 AAAA... github-actions
+#
+# 왜: 전에는 이 키가 제약 없는 셸이었다. CI 에서 빌드 중 남의 코드가 도는데
+# 그 키가 같은 자리에 있었으니, 의존성 하나가 뚫리면 서버 셸까지 넘어갔다.
+# 이제 키가 새도 할 수 있는 건 "releases/ 에 파일 올리기" 와 "릴리스 활성화"
+# 뿐이다. 셸 · 서버 파일 읽기 · 포트 포워딩은 안 된다 (restrict 가 막는다).
+#
+# SSH_ORIGINAL_COMMAND 를 eval 하지 않는다. 정해진 모양과 정확히 맞을 때만
+# 이쪽에서 명령을 새로 조립해 실행한다.
+set -euo pipefail
+
+RELEASES=/var/www/parkhyo.in/releases
+cmd="${SSH_ORIGINAL_COMMAND:-}"
+
+# ① 업로드 — rrsync 가 rsync 옵션과 경로를 다시 검사한다.
+#    -wo     쓰기만. 서버에서 파일을 내려받는 건(--sender) 거부된다
+#    -munge  올라온 심볼릭 링크를 무력화한다. 이게 없으면 x -> /etc/nginx/.htpasswd-stats
+#            같은 링크를 올리고 활성화해서 nginx(www-data) 가 읽을 수 있는 파일을
+#            웹으로 꺼내갈 수 있다. 이 서버의 rrsync 는 기본값이 꺼짐이라 직접 켠다.
+#    경로는 RELEASES 기준이다 — 클라이언트는 /<릴리스id>/ 로 보내야 한다.
+#    .. 는 rrsync 가 거부한다.
+if [[ "$cmd" == "rsync --server "* ]]; then
+  exec /usr/bin/rrsync -wo -munge "$RELEASES"
+fi
+
+# ② 활성화 — 릴리스 id 형식(YYYYMMDD-HHMMSS-커밋7자)과 정확히 맞을 때만
+re="^/usr/local/bin/activate-release '([0-9]{8}-[0-9]{6}-[0-9a-f]{7})'$"
+if [[ "$cmd" =~ $re ]]; then
+  exec /usr/local/bin/activate-release "${BASH_REMATCH[1]}"
+fi
+
+logger -t deploy-gate "거부: ${cmd:0:200}"
+echo "deploy-gate: 허용되지 않은 명령" >&2
+exit 1

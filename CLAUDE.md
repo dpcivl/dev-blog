@@ -521,6 +521,7 @@ main 푸시 → GitHub Actions 빌드 → rsync → releases/<시각>-<sha>/ →
 ```
 
 - 워크플로: [.github/workflows/deploy.yml](.github/workflows/deploy.yml) · 서버 설정: [deploy/](deploy/)
+- **빌드와 배포는 다른 job 이다** (2026-10-09~). 빌드 job 에는 시크릿이 없고, 배포 job 은 산출물만 받아 rsync 한다. **CI 의 deploy 키는 셸이 아니다** — `deploy/bin/deploy-gate` 가 releases/ 업로드와 `activate-release` 만 허용한다. 서버에서 deploy 로 작업할 일이 있으면 `ubuntu` 로 들어가 `sudo -u deploy` 로 한다. Action 은 커밋 SHA 로 고정돼 있다 (`deploy/README.md` "배포 키 제약")
 - 빌드는 **CI 에서** 한다. 서버(512MB)는 정적 파일만 서빙한다 — 빌드 중 OG 이미지 150여 장을 resvg 로 렌더하고 Pagefind 색인을 만들어서 작은 인스턴스로는 감당이 안 된다
 - 배포 실패해도 **직전 릴리스가 그대로 서빙**된다 (심볼릭 링크를 안 바꾸므로). 롤백은 서버에서 `activate-release <이전-id>`
 - 인증서는 Let's Encrypt · webroot 방식 자동 갱신. `certbot renew --dry-run` 으로 확인

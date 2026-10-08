@@ -43,6 +43,7 @@ Host blog
 | `nginx/parkhyo.in.bootstrap.conf` | 인증서 받기 전 임시 (HTTP 전용) |
 | `nginx/parkhyo.in.conf` | 인증서 받은 뒤 교체 (HTTPS · 308 · 캐시) |
 | `bin/activate-release` | `/usr/local/bin/` (실행 권한 755) |
+| `bin/deploy-gate` | `/usr/local/bin/` (root 소유 755) — deploy 키가 할 수 있는 일을 묶는다 |
 
 ## 서버 준비 (Phase 1a)
 
@@ -61,13 +62,16 @@ sudo adduser --disabled-password --gecos "" deploy
 sudo mkdir -p /var/www/parkhyo.in/releases /var/www/certbot
 sudo chown -R deploy:deploy /var/www/parkhyo.in
 
-# CI 전용 키를 로컬에서 만들어 공개키만 서버에 넣는다
+sudo install -m 755 deploy/bin/activate-release /usr/local/bin/activate-release
+sudo install -m 755 -o root -g root deploy/bin/deploy-gate /usr/local/bin/deploy-gate
+
+# CI 전용 키를 로컬에서 만들어 공개키만 서버에 넣는다.
+# 키 줄 앞에 제약을 붙인다 — 이 키로는 셸이 안 열린다 (아래 "배포 키 제약" 참고)
 sudo -u deploy mkdir -p /home/deploy/.ssh
-sudo -u deploy tee /home/deploy/.ssh/authorized_keys < deploy-ci.pub
+echo "restrict,command=\"/usr/local/bin/deploy-gate\" $(cat deploy-ci.pub)" \
+  | sudo -u deploy tee /home/deploy/.ssh/authorized_keys
 sudo -u deploy chmod 700 /home/deploy/.ssh
 sudo -u deploy chmod 600 /home/deploy/.ssh/authorized_keys
-
-sudo install -m 755 deploy/bin/activate-release /usr/local/bin/activate-release
 ```
 
 `deploy` 사용자에게 sudo 는 주지 않는다. 하는 일은 파일 받기와 심볼릭 링크 교체뿐이다.
@@ -216,6 +220,79 @@ ssh -o BatchMode=yes nosuchuser_test@parkhyo.in   # 2회만
 sudo fail2ban-client status sshd                   # Total failed 가 늘었나
 sudo fail2ban-client set sshd unban --all          # 테스트 기록 정리
 ```
+
+## 배포 키 제약 (2026-10-09)
+
+**전에는 CI 의 SSH 키가 제약 없는 셸이었다.** 그리고 같은 CI job 이 그 키를
+쓰기 전에 `pnpm install` · `pnpm build` 로 의존성 수백 개의 코드를 돌렸다.
+의존성 하나가 뚫리면, 남아 있다가 나중에 기록되는 키를 가져가 서버 셸까지
+갈 수 있었다. 세 겹으로 끊었다.
+
+```
+남의 코드가 돈다 ──▶ 열쇠를 가져간다 ──▶ 서버에서 셸을 연다
+       ▲                   ▲                     ▲
+   SHA 고정             job 분리             열쇠 제약
+```
+
+| 겹 | 어디 | 무엇 |
+| --- | --- | --- |
+| Action SHA 고정 | `.github/workflows/*.yml` | 태그(`@v4`)는 옮길 수 있다. 커밋 SHA 는 못 옮긴다 |
+| job 분리 | `deploy.yml` | `build`(시크릿 없음) → 산출물 → `deploy`(키 있음, npm 코드 안 돎) |
+| 키 제약 | `authorized_keys` + `deploy-gate` | 이 키로는 releases/ 업로드와 활성화만 된다 |
+
+> ⚠️ **분리로 못 막는 것** — 빌드가 오염되면 그 결과물은 그대로 배포된다.
+> 분리가 지키는 건 **서버 접근 권한**이지 사이트 내용이 아니다. 내용은
+> 의존성 관리(Astro 업그레이드 등)로 막는 영역이다.
+
+### 게이트가 허용하는 것
+
+`authorized_keys` 의 `command=` 때문에 클라이언트가 무엇을 보내든 sshd 는
+`deploy-gate` 를 실행한다. 클라이언트가 보낸 명령은 `SSH_ORIGINAL_COMMAND`
+로 들어오고, 게이트는 그걸 **eval 하지 않는다.** 정해진 모양과 정확히 맞을
+때만 명령을 새로 조립한다.
+
+| 들어온 명령 | 처리 |
+| --- | --- |
+| `rsync --server …` | `rrsync -wo -munge /var/www/parkhyo.in/releases` 로 넘긴다 |
+| `/usr/local/bin/activate-release '<YYYYMMDD-HHMMSS-커밋7자>'` | 그 id 로 실행 |
+| 그 밖의 전부 | 거부 · `journalctl -t deploy-gate` 에 남긴다 |
+
+`restrict` 는 셸 단말(pty) · 포트 포워딩 · 에이전트 포워딩 · X11 을 끈다.
+
+### 알아둘 것 — 직접 해보고 알았다
+
+- **이 서버의 `rrsync` 는 심볼릭 링크를 그대로 받는다.** `-munge` 가 기본값이
+  아니다(`rrsync --help` 에 "Enable" 이라고 적혀 있다). 안 켜면 `x -> /etc/nginx/.htpasswd-stats`
+  같은 링크를 올리고 활성화해서, nginx(`www-data`) 가 읽을 수 있는 파일을 웹으로
+  꺼내갈 수 있다. 켜면 링크가 `/rsyncd-munged//etc/…` 로 바뀌어 깨진다.
+  그래서 빌드 job 이 `dist` 에 링크가 있으면 먼저 멈춘다
+- **업로드 경로는 releases/ 기준이다.** `rrsync` 는 `/`로 시작하는 경로를 제한
+  디렉터리 **안에** 붙인다. 전체 경로(`/var/www/parkhyo.in/releases/<id>/`)를
+  보내면 그 안에 같은 경로를 또 만들려다 실패한다. CI 는 `/<id>/` 로 보낸다
+- **`..` 는 `rrsync` 가 거부한다.** 내려받기(`--sender`)는 `-wo` 가 거부한다
+- **포트 포워딩 시험은 터널로 실제 접속을 해봐야 한다.** `ssh -N -L` 만 띄우면
+  로컬에서 입구만 열리고 서버에는 아직 안 물어봐서, 막혀 있어도 그냥 떠 있다.
+  처음에 이걸 "막혔다" 로 읽을 뻔했다. 제약 없는 키로 같은 터널을 띄워 대조했다
+
+### 확인한 것
+
+시험용 키를 진짜 키 옆에 같은 제약으로 붙여서 돌렸다. 진짜 키는 다 통과한
+뒤에 바꿨다.
+
+```
+거부  명령 없이 접속 · id · htpasswd 읽기                        → 게이트
+거부  activate-release '../../tmp' · '<id>'; id                 → 게이트 (정규식)
+거부  rsync 내려받기                                             → rrsync -wo
+거부  rsync 로 /../escape/                                       → rrsync (..)
+거부  포트 포워딩 — 터널로 받은 것 ''  (대조: 제약 없는 키는 SSH-2.0-OpenSSH_9.6p)
+통과  activate-release '<없는 id>'  → "릴리스 없음" · 사이트 그대로
+통과  rsync -az --delete 업로드     → 링크는 /rsyncd-munged/ 로 무력화 · www-data 가 못 읽음
+```
+
+### 서버에서 deploy 로 무언가 해야 할 때
+
+키로는 못 들어간다. `ubuntu` 로 들어가서 `sudo -u deploy …` 로 한다.
+아래 롤백도 그렇게 한다.
 
 ## 방문 통계 (GoAccess)
 

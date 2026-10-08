@@ -4,6 +4,28 @@
 # 렌더하고 Pagefind 색인을 만든다. 작은 인스턴스에서는 메모리로 넘어지고,
 # 그러면 사이트가 아니라 배포가 멈춘다.
 #
+# 빌드와 배포를 다른 job 으로 나눈다 (2026-10-09~).
+#
+#   build   pnpm install · build — 의존성 수백 개의 코드가 여기서 돈다.
+#           비밀값이 없다. 결과물(dist)만 산출물로 넘긴다.
+#   deploy  산출물을 받아 rsync · ssh 만 한다. npm 코드는 하나도 안 돈다.
+#           SSH 키는 이 job 에만 있다.
+#
+# 전에는 한 job 이 빌드 뒤에 SSH 키를 썼다. 같은 러너라서, 빌드 중 돈 코드가
+# 남아 있다가 나중에 기록되는 키를 가져갈 수 있었다. 두 job 은 서로 다른
+# 러너라 실행 환경을 공유하지 않는다.
+#
+# ⚠️ 나눠도 못 막는 것: 빌드가 오염되면 그 결과물은 그대로 배포된다. 분리가
+#    지키는 건 서버 접근 권한이지 사이트 내용이 아니다.
+#
+# Action 은 태그가 아니라 커밋 SHA 로 고정한다. 태그(@v4)는 옮길 수 있어서,
+# 관리자 계정이 털리면 다음 실행에서 다른 코드가 돈다 (2025-03 tj-actions 사고).
+# 옆 주석의 버전은 사람이 읽으라고 둔 것이다 — 올릴 때는 SHA 를 바꾼다.
+#
+# 서버 쪽 키는 deploy/bin/deploy-gate 로 묶여 있다. 이 키로는 releases/ 에
+# 올리기와 activate-release 만 된다. 업로드 경로가 releases/ 기준이라
+# 목적지는 /<릴리스id>/ 다 (전체 경로를 쓰면 rrsync 가 그 안에 또 만든다).
+#
 # 필요한 Secrets:
 #   LIGHTSAIL_HOST         고정 IP 또는 호스트명
 #   LIGHTSAIL_SSH_KEY      deploy 사용자의 개인키 (전체 내용)
@@ -25,21 +47,25 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    name: Build & deploy
+  build:
+    name: Build
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
 
     steps:
       - name: "☁️ Checkout"
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          # 빌드에는 git 자격 증명이 필요 없다. 남겨두면 이 job 에서 도는
+          # 코드가 .git/config 에서 토큰을 읽을 수 있다.
+          persist-credentials: false
 
       - name: "📦 pnpm"
         # 버전은 package.json 의 packageManager 필드를 따른다
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
 
       - name: "📦 Node"
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version-file: .nvmrc
           cache: "pnpm"
@@ -48,6 +74,8 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: "🚀 Build"
+        # 사이트 소유 확인 값이다. 페이지 <meta> 에 그대로 실려 공개되므로
+        # 비밀이 아니다 — 빌드 job 에 있어도 된다.
         env:
           PUBLIC_GOOGLE_SITE_VERIFICATION: ${{ secrets.PUBLIC_GOOGLE_SITE_VERIFICATION }}
           PUBLIC_NAVER_SITE_VERIFICATION: ${{ secrets.PUBLIC_NAVER_SITE_VERIFICATION }}
@@ -58,11 +86,49 @@ jobs:
           test -s dist/index.html
           test -s dist/sitemap-index.xml
           test -d dist/pagefind
+          # rrsync 를 -munge 로 돌리므로 심볼릭 링크는 서버에서 깨진다.
+          # 지금은 하나도 없다. 생기면 여기서 먼저 멈춘다.
+          if [ -n "$(find dist -type l | head -1)" ]; then
+            echo "::error::dist 에 심볼릭 링크가 있다 — 서버에서 무력화된다"
+            find dist -type l
+            exit 1
+          fi
+          echo "파일 $(find dist -type f | wc -l)개 · $(du -sh dist | cut -f1)"
+
+      - name: "📦 산출물 올리기"
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+          # 배포 직후에만 필요하다. 오래 둘 이유가 없다.
+          retention-days: 1
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      # 이 job 에서 도는 코드는 GitHub 의 download-artifact 하나와 rsync · ssh ·
+      # curl 뿐이다. checkout 도 하지 않는다 — 저장소 파일이 필요 없다.
+      - name: "📥 산출물 받기"
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: dist
+          path: dist
+
+      - name: "🔎 받은 것 확인"
+        run: |
+          test -s dist/index.html
+          test -s dist/sitemap-index.xml
           echo "파일 $(find dist -type f | wc -l)개 · $(du -sh dist | cut -f1)"
 
       - name: "🔑 SSH 준비"
         # 시크릿은 env 로 넘긴다. run 스크립트에 직접 보간하면 줄바꿈이나
         # 따옴표가 섞였을 때 셸이 해석해버릴 수 있다.
+        # 산출물을 받은 뒤에 키를 쓴다 — 키가 있는 시간을 짧게.
         env:
           SSH_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           KNOWN_HOSTS: ${{ secrets.LIGHTSAIL_KNOWN_HOSTS }}
@@ -94,11 +160,16 @@ jobs:
         run: |
           RELEASE="$(date -u +%Y%m%d-%H%M%S)-${GITHUB_SHA::7}"
           echo "릴리스: $RELEASE"
-          rsync -az --delete \
-            -e "ssh -i ~/.ssh/deploy -o StrictHostKeyChecking=yes" \
-            dist/ "deploy@$HOST:/var/www/parkhyo.in/releases/$RELEASE/"
-          ssh -i ~/.ssh/deploy "deploy@$HOST" \
-            "/usr/local/bin/activate-release '$RELEASE'"
+          SSH="ssh -i $HOME/.ssh/deploy -o StrictHostKeyChecking=yes -o BatchMode=yes"
+          # 목적지는 /<릴리스id>/ — 서버의 rrsync 가 releases/ 기준으로 붙인다
+          rsync -az --delete -e "$SSH" dist/ "deploy@$HOST:/$RELEASE/"
+          # 이 문자열 모양은 deploy-gate 의 정규식과 정확히 맞아야 한다
+          $SSH "deploy@$HOST" "/usr/local/bin/activate-release '$RELEASE'"
+
+      - name: "🧹 키 지우기"
+        # 러너는 job 이 끝나면 버려지지만, 남은 단계가 없으니 바로 지운다
+        if: always()
+        run: rm -f ~/.ssh/deploy
 
       - name: "✅ 응답 확인"
         env:
