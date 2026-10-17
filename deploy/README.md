@@ -318,7 +318,7 @@ sudo fail2ban-client set sshd unban --all          # 테스트 기록 정리
 | 토큰이 닿는 곳 | fine-grained 토큰 — **scratch 저장소 하나 · Contents 읽기/쓰기만** |
 | 공개 블로그 | 토큰이 닿지 않는다. 서버가 뚫려도 블로그에 글이 올라가지 않는다 |
 | 다루는 파일 | 저장소 루트의 `.md` 와, 서버가 이름을 정한 `assets/<메모>/…` 이미지뿐. `published/` · `README.md` · `..` 는 거부 |
-| 로그인 | `/stats` 와 **다른** 비밀번호 (`.htpasswd-scratch`) |
+| 로그인 | 아이디 `dpcivl` · `/stats` 와 **다른** 비밀번호 (`.htpasswd-scratch`). `admin` 은 쓰지 않는다 — 봇이 가장 먼저 넣어보는 이름이다 |
 | 다른 사이트의 요청 | 쓰기는 `Content-Type: application/json` + `Origin` 이 이 사이트일 때만 (통계 비밀번호 CSRF 와 같은 이유) |
 | 남의 코드 | CSP `script-src 'self'` — 에디터는 외부 스크립트 · 글꼴 · 인라인 코드를 하나도 안 쓴다 |
 | 토큰 파일 | `/etc/parkhyo/scratch.env` root `600`. systemd 가 root 로 읽어 환경 변수로만 넘긴다 — 서비스 계정도 파일을 못 연다 |
@@ -368,7 +368,7 @@ sudo certbot certonly --webroot -w /var/www/certbot -d scratch.parkhyo.in \
 ```bash
 # 비밀번호 — 처음 한 번만 -c (파일을 새로 만든다. 두 번째부터 -c 를 쓰면 기존 사용자가 날아간다)
 ssh -t -i ~/.ssh/blog-prod-key.pem ubuntu@parkhyo.in \
-  'sudo htpasswd -c -B /etc/nginx/.htpasswd-scratch <아이디> \
+  'sudo htpasswd -c -B /etc/nginx/.htpasswd-scratch dpcivl \
    && sudo chown root:www-data /etc/nginx/.htpasswd-scratch \
    && sudo chmod 640 /etc/nginx/.htpasswd-scratch'
 
@@ -383,6 +383,14 @@ printf '토큰 붙여넣기: '; read -rs T; echo; printf 'GITHUB_TOKEN=%s\n' "$T
 > "토큰을 복사해둔 상태에서 실행" 하는 명령을 안내했는데, 그 명령을 터미널에 붙여넣으려고
 > 복사하는 순간 클립보드의 토큰이 명령문으로 바뀐다. 실제로 명령문 198자가 토큰 자리에
 > 들어갔다. 위처럼 **명령을 먼저 실행하고 프롬프트에 붙여넣는** 순서여야 한다.
+
+**아이디만 바꿀 때는 비밀번호를 다시 넣을 필요가 없다.** bcrypt 해시는 비밀번호만으로
+만들어지고 아이디는 앞에 붙은 이름표라서, 줄 앞부분만 고치면 같은 비밀번호가 그대로 통한다
+(2026-10-18 `admin` → `dpcivl` 을 이렇게 바꿨다).
+
+```bash
+sudo sed -i 's/^옛아이디:/새아이디:/' /etc/nginx/.htpasswd-scratch   # nginx reload 도 필요 없다
+```
 
 마지막의 `stop` 은 떠 있던 프로세스를 내려서, 다음 요청이 새 토큰으로 뜨게 한다
 (소켓은 그대로 살아 있다).
