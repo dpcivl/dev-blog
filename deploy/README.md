@@ -372,10 +372,17 @@ ssh -t -i ~/.ssh/blog-prod-key.pem ubuntu@parkhyo.in \
    && sudo chown root:www-data /etc/nginx/.htpasswd-scratch \
    && sudo chmod 640 /etc/nginx/.htpasswd-scratch'
 
-# 토큰 — 클립보드에 복사해둔 상태에서. umask 077 로 처음부터 600 으로 만든다
-{ printf 'GITHUB_TOKEN='; pbpaste; echo; } | ssh -i ~/.ssh/blog-prod-key.pem ubuntu@parkhyo.in \
-  'sudo sh -c "umask 077; cat > /etc/parkhyo/scratch.env" && sudo systemctl stop parkhyo-scratch.service'
+# 토큰 — 명령을 실행하면 「토큰 붙여넣기:」 가 뜬다. 그때 토큰을 붙여넣는다 (화면에 안 보인다)
+# umask 077 로 처음부터 600 으로 만든다
+printf '토큰 붙여넣기: '; read -rs T; echo; printf 'GITHUB_TOKEN=%s\n' "$T" \
+  | ssh -i ~/.ssh/blog-prod-key.pem ubuntu@parkhyo.in \
+  'sudo sh -c "umask 077; cat > /etc/parkhyo/scratch.env" && sudo systemctl stop parkhyo-scratch.service'; unset T
 ```
+
+> ⚠️ **클립보드(`pbpaste`)로 넘기면 안 된다 (2026-10-17 실제로 틀렸다).** 처음엔
+> "토큰을 복사해둔 상태에서 실행" 하는 명령을 안내했는데, 그 명령을 터미널에 붙여넣으려고
+> 복사하는 순간 클립보드의 토큰이 명령문으로 바뀐다. 실제로 명령문 198자가 토큰 자리에
+> 들어갔다. 위처럼 **명령을 먼저 실행하고 프롬프트에 붙여넣는** 순서여야 한다.
 
 마지막의 `stop` 은 떠 있던 프로세스를 내려서, 다음 요청이 새 토큰으로 뜨게 한다
 (소켓은 그대로 살아 있다).
