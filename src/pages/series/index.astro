@@ -5,7 +5,7 @@ import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import { SERIES } from "@/data/series";
 import { filterByLang } from "@/utils/i18n";
-import { getPath } from "@/utils/getPath";
+import { getPostHref } from "@/utils/getPath";
 import { SITE } from "@/config";
 
 // 시리즈 정의는 src/data/series.ts 로 이동 (홈의 시리즈 타일 · 글 목록 라벨과 공유)
@@ -81,7 +81,7 @@ function formatDate(d?: Date) {
                 {s.posts.map((p, idx) => (
                   <li>
                     <a
-                      href={`${getPath(p.id, p.filePath)}/`}
+                      href={getPostHref(p.id, p.filePath)}
                       class="series-item group"
                     >
                       <span class="series-idx">

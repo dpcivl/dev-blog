@@ -8,7 +8,7 @@ title: "About"
 **임베디드 HW 1년 / 임베디드 SW 2년 2개월** 의 실무 경험과 엣지 AI 프로젝트 경험이 있습니다.
 
 <div class="cta-box">
-  <a href="/portfolio" class="cta-btn cta-primary">
+  <a href="/portfolio/" class="cta-btn cta-primary">
     <span class="cta-icon">📁</span>
     <span>포트폴리오 보기</span>
   </a>

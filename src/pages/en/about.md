@@ -8,7 +8,7 @@ title: "About"
 **1 year of embedded HW and 2 years 2 months of embedded SW** experience, plus edge AI project work.
 
 <div class="cta-box">
-  <a href="/portfolio" class="cta-btn cta-primary">
+  <a href="/portfolio/" class="cta-btn cta-primary">
     <span class="cta-icon">📁</span>
     <span>Portfolio</span>
   </a>

@@ -48,10 +48,10 @@ const isActive = (path: string) => {
 };
 
 const NAV_ITEMS = [
-  { href: "/posts", label: "포스트" },
-  { href: "/series", label: "시리즈" },
-  { href: "/playground", label: "플레이그라운드" },
-  { href: "/tags", label: "태그" },
+  { href: "/posts/", label: "포스트" },
+  { href: "/series/", label: "시리즈" },
+  { href: "/playground/", label: "플레이그라운드" },
+  { href: "/tags/", label: "태그" },
 ];
 ---
 
@@ -135,7 +135,7 @@ const NAV_ITEMS = [
 
         <li class="col-span-1 flex items-center justify-center">
           <LinkButton
-            href="/search"
+            href="/search/"
             class:list={[
               "focus-outline flex p-3 text-muted sm:p-1",
               "[&>svg]:size-[17px]",

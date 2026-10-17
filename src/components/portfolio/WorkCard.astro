@@ -121,7 +121,7 @@ const titleOf = (slug: string) =>
             </button>
           )}
           {relatedPosts.map(slug => (
-            <a class="arw-link" href={`/posts/${slug}`}>
+            <a class="arw-link" href={`/posts/${slug}/`}>
               {titleOf(slug)} <span class="arw">→</span>
             </a>
           ))}

@@ -4,6 +4,7 @@ import sitemap from "@astrojs/sitemap";
 import remarkToc from "remark-toc";
 import remarkCollapse from "remark-collapse";
 import { rehypeImagePerf } from "./src/plugins/rehype-image-perf.mjs";
+import { rehypeTrailingSlash } from "./src/plugins/rehype-trailing-slash.mjs";
 import {
   transformerNotationDiff,
   transformerNotationHighlight,
@@ -61,6 +62,8 @@ export default defineConfig({
     rehypePlugins: [
       // Auto lazy-load images beyond the first (LCP-safe).
       rehypeImagePerf,
+      // 본문의 내부 링크 끝에 / — 서버의 301 왕복을 없앤다. 원문은 그대로 둔다.
+      rehypeTrailingSlash,
     ],
     shikiConfig: {
       // For more themes, visit https://shiki.style/themes

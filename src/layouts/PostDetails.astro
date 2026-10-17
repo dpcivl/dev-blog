@@ -10,7 +10,7 @@ import ShareLinks from "@/components/ShareLinks.astro";
 import Feedback from "@/components/Feedback.astro";
 import BackButton from "@/components/BackButton.astro";
 import ScrollButtons from "@/components/ScrollButtons.astro";
-import { getPath } from "@/utils/getPath";
+import { getPath, getPostHref } from "@/utils/getPath";
 import { getLang, stripLangPrefix } from "@/utils/i18n";
 import { slugifyStr } from "@/utils/slugify";
 import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
@@ -69,8 +69,10 @@ const alternateEntry = allEntries.find(
   p => getLang(p) === otherLang && stripLangPrefix(p.id) === slugKey
 );
 
-const currentSelfHref = new URL(getPath(post.id, post.filePath), SITE.website)
-  .href;
+const currentSelfHref = new URL(
+  getPostHref(post.id, post.filePath),
+  SITE.website
+).href;
 
 const hreflangAlternates: { lang: string; href: string }[] = [
   { lang: currentLang, href: currentSelfHref },
@@ -78,7 +80,7 @@ const hreflangAlternates: { lang: string; href: string }[] = [
 
 if (alternateEntry) {
   const alternateHref = new URL(
-    getPath(alternateEntry.id, alternateEntry.filePath),
+    getPostHref(alternateEntry.id, alternateEntry.filePath),
     SITE.website
   ).href;
   hreflangAlternates.push({ lang: otherLang, href: alternateHref });
@@ -86,7 +88,7 @@ if (alternateEntry) {
   // x-default → Korean (site's default locale)
   const koreanEntry = currentLang === "ko" ? post : alternateEntry;
   const koreanHref = new URL(
-    getPath(koreanEntry.id, koreanEntry.filePath),
+    getPostHref(koreanEntry.id, koreanEntry.filePath),
     SITE.website
   ).href;
   hreflangAlternates.push({ lang: "x-default", href: koreanHref });
@@ -109,15 +111,15 @@ const layoutProps = {
 // KO / EN button points to the counterpart post if it exists; otherwise to /en/ home.
 const koHref =
   currentLang === "ko"
-    ? getPath(post.id, post.filePath)
+    ? getPostHref(post.id, post.filePath)
     : alternateEntry
-      ? getPath(alternateEntry.id, alternateEntry.filePath)
+      ? getPostHref(alternateEntry.id, alternateEntry.filePath)
       : "/";
 const enHref =
   currentLang === "en"
-    ? getPath(post.id, post.filePath)
+    ? getPostHref(post.id, post.filePath)
     : alternateEntry
-      ? getPath(alternateEntry.id, alternateEntry.filePath)
+      ? getPostHref(alternateEntry.id, alternateEntry.filePath)
       : "/en/";
 
 /* ========== Prev/Next Posts ========== */
@@ -187,7 +189,7 @@ const nextPost =
         {
           prevPost && (
             <a
-              href={getPath(prevPost.id, prevPost.filePath)}
+              href={getPostHref(prevPost.id, prevPost.filePath)}
               class="prev-next-card group flex items-center gap-3 rounded-lg border border-border p-4 transition hover:-translate-y-0.5 hover:border-accent"
             >
               <IconChevronLeft class="inline-block flex-none stroke-current opacity-60 group-hover:opacity-100 rtl:rotate-180" />
@@ -205,7 +207,7 @@ const nextPost =
         {
           nextPost && (
             <a
-              href={getPath(nextPost.id, nextPost.filePath)}
+              href={getPostHref(nextPost.id, nextPost.filePath)}
               class="prev-next-card group flex items-center justify-end gap-3 rounded-lg border border-border p-4 text-end transition hover:-translate-y-0.5 hover:border-accent sm:col-start-2"
             >
               <div class="min-w-0">

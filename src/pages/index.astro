@@ -69,7 +69,7 @@ const pageDesc =
           </p>
 
           <div class="mt-7 flex flex-wrap gap-3">
-            <a href="/portfolio" class="hero-btn hero-btn-primary">
+            <a href="/portfolio/" class="hero-btn hero-btn-primary">
               프로젝트 보기 <span class="arw">→</span>
             </a>
             <a
@@ -126,7 +126,7 @@ const pageDesc =
           <section class="rise-init pt-12" data-rise>
             <div class="mb-2 flex items-baseline justify-between gap-4">
               <h2 class="text-[0.95rem] font-semibold">최근 기록</h2>
-              <a href="/posts" class="arw-link text-[0.8rem]">
+              <a href="/posts/" class="arw-link text-[0.8rem]">
                 전체 {sortedPosts.length}편 <span class="arw">→</span>
               </a>
             </div>
@@ -145,14 +145,14 @@ const pageDesc =
           <section class="rise-init pt-12 pb-16" data-rise>
             <div class="mb-4 flex items-baseline justify-between gap-4">
               <h2 class="text-[0.95rem] font-semibold">진행 중인 시리즈</h2>
-              <a href="/series" class="arw-link text-[0.8rem]">
+              <a href="/series/" class="arw-link text-[0.8rem]">
                 시리즈 전체 <span class="arw">→</span>
               </a>
             </div>
             <div class="grid gap-4 sm:grid-cols-3">
               {series.map(s => (
                 <a
-                  href={`/series#${s.id}`}
+                  href={`/series/#${s.id}`}
                   class="tile rounded-xl border border-border p-5"
                 >
                   <div class="text-[0.92rem] font-semibold">{s.title}</div>

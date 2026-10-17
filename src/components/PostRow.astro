@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import { getPath } from "@/utils/getPath";
+import { getPostHref } from "@/utils/getPath";
 import { findSeriesOf } from "@/data/series";
 import { SITE } from "@/config";
 
@@ -26,7 +26,7 @@ const series = findSeriesOf(post);
 const label = series?.title ?? tags?.[0] ?? "";
 ---
 
-<a href={getPath(post.id, post.filePath)} class="post-row">
+<a href={getPostHref(post.id, post.filePath)} class="post-row">
   <span class="post-row-date">{formatted}</span>
   <span class="post-row-title">
     {featured && <span aria-label="featured">★ </span>}{title}

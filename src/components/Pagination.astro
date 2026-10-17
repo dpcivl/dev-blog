@@ -20,6 +20,8 @@ const basePath =
     ? currentPathname
     : currentPathname.replace(new RegExp(`/${currentPage}$`), "");
 
+// 이전/다음도 이걸 쓴다 — Astro 가 주는 page.url.prev/next 는 끝에 / 가 없어서
+// 서버가 301 로 한 번 더 넘겼다 (2026-10-18)
 function pageHref(n: number): string {
   return n === 1 ? `${basePath}/` : `${basePath}/${n}/`;
 }
@@ -59,7 +61,7 @@ const pageList = buildPageList(currentPage, lastPage);
       aria-label="Pagination Navigation"
     >
       <a
-        href={page.url.prev || "#"}
+        href={page.url.prev ? pageHref(currentPage - 1) : "#"}
         class:list={["page-nav", { "is-disabled": !page.url.prev }]}
         aria-label="이전 페이지"
         aria-disabled={!page.url.prev}
@@ -89,7 +91,7 @@ const pageList = buildPageList(currentPage, lastPage);
       )}
 
       <a
-        href={page.url.next || "#"}
+        href={page.url.next ? pageHref(currentPage + 1) : "#"}
         class:list={["page-nav", { "is-disabled": !page.url.next }]}
         aria-label="다음 페이지"
         aria-disabled={!page.url.next}
