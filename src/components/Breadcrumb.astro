@@ -1,24 +1,48 @@
 ---
-// Remove current url path and remove trailing slash if exists
-const currentUrlPath = Astro.url.pathname.replace(/\/+$/, "");
+// 경로 표시. 링크는 앞 조각을 이어붙여 만든다 (2026-10-18~).
+//
+// 전에는 조각마다 `/${조각}/` 로 걸어서, 영어 태그 목록 2쪽 이후
+// (/en/tags/rag/2/) 에서 태그 링크가 /rag/ 로 떨어져 나갔다 — 없는 주소 40개.
+// /en 은 단계가 아니라 언어라서 조각으로 보이지 않고, Home · 링크의 앞에 붙는다.
 
-// Get url array from path
-// eg: /tags/tailwindcss => ['tags', 'tailwindcss']
-const breadcrumbList = currentUrlPath.split("/").slice(1);
+type Crumb = { label: string; href?: string };
 
-// if breadcrumb is Home > Posts > 1 <etc>
-// replace Posts with Posts (page number)
-if (breadcrumbList[0] === "posts") {
-  breadcrumbList.splice(0, 2, `Posts (page ${breadcrumbList[1] || 1})`);
-}
+const decode = (s: string) => {
+  try {
+    return decodeURIComponent(s);
+  } catch {
+    return s;
+  }
+};
 
-// if breadcrumb is Home > Tags > [tag] > [page] <etc>
-// replace [tag] > [page] with [tag] (page number)
-if (breadcrumbList[0] === "tags" && !isNaN(Number(breadcrumbList[2]))) {
-  breadcrumbList.splice(
-    1,
-    3,
-    `${breadcrumbList[1]} ${Number(breadcrumbList[2]) === 1 ? "" : "(page " + breadcrumbList[2] + ")"}`
+const segments = Astro.url.pathname.replace(/\/+$/, "").split("/").slice(1);
+const isEnglish = segments[0] === "en";
+const base = isEnglish ? "/en" : "";
+const parts = isEnglish ? segments.slice(1) : segments;
+const isPage = (s?: string) => s !== undefined && /^\d+$/.test(s);
+
+const crumbs: Crumb[] = [];
+if (parts[0] === "posts" && (parts.length === 1 || isPage(parts[1]))) {
+  // Home > Posts (page n)
+  crumbs.push({ label: `Posts (page ${parts[1] ?? 1})` });
+} else if (
+  parts[0] === "tags" &&
+  parts.length >= 2 &&
+  (parts.length === 2 || isPage(parts[2]))
+) {
+  // Home > Tags > [tag] (page n)
+  const n = Number(parts[2] ?? 1);
+  crumbs.push({ label: "tags", href: `${base}/tags/` });
+  crumbs.push({ label: `${decode(parts[1])}${n === 1 ? "" : ` (page ${n})`}` });
+} else {
+  parts.forEach((part, i) =>
+    crumbs.push({
+      label: decode(part),
+      href:
+        i < parts.length - 1
+          ? `${base}/${parts.slice(0, i + 1).join("/")}/`
+          : undefined,
+    })
   );
 }
 ---
@@ -28,27 +52,27 @@ if (breadcrumbList[0] === "tags" && !isNaN(Number(breadcrumbList[2]))) {
     class="font-light [&>li]:inline [&>li:not(:last-child)>a]:hover:opacity-100"
   >
     <li>
-      <a href="/" class="opacity-80">Home</a>
+      <a href={`${base}/`} class="opacity-80">Home</a>
       <span aria-hidden="true" class="opacity-80">&raquo;</span>
     </li>
     {
-      breadcrumbList.map((breadcrumb, index) =>
-        index + 1 === breadcrumbList.length ? (
+      crumbs.map((crumb, index) =>
+        crumb.href ? (
+          <li>
+            <a href={crumb.href} class="capitalize opacity-70">
+              {crumb.label}
+            </a>
+            <span aria-hidden="true">&raquo;</span>
+          </li>
+        ) : (
           <li>
             <span
               class:list={["capitalize opacity-75", { lowercase: index > 0 }]}
               aria-current="page"
             >
               {/* make the last part lowercase in Home > Tags > some-tag */}
-              {decodeURIComponent(breadcrumb)}
+              {crumb.label}
             </span>
-          </li>
-        ) : (
-          <li>
-            <a href={`/${breadcrumb}/`} class="capitalize opacity-70">
-              {breadcrumb}
-            </a>
-            <span aria-hidden="true">&raquo;</span>
           </li>
         )
       )

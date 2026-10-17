@@ -1,4 +1,5 @@
 ---
+import { enCounterpart } from "@/utils/enCounterpart";
 import IconX from "@/assets/icons/IconX.svg";
 import IconMoon from "@/assets/icons/IconMoon.svg";
 import IconSearch from "@/assets/icons/IconSearch.svg";
@@ -30,14 +31,12 @@ const isEnglishPage =
 const defaultKoHref = isEnglishPage
   ? pathname.replace(/^\/en(\/|$)/, "/") || "/"
   : pathname;
-const defaultEnHref = isEnglishPage
-  ? pathname
-  : pathname === "/"
-    ? "/en/"
-    : `/en${pathname}`;
 
 const koHref = koHrefProp ?? defaultKoHref;
-const enHref = enHrefProp ?? defaultEnHref;
+// 영어판이 없는 페이지에서 /en 만 붙이면 없는 주소가 된다 — enCounterpart 가
+// 영어 페이지들과 같은 기준으로 있는지 보고, 없으면 가장 가까운 영어 페이지로 보낸다
+const enHref =
+  enHrefProp ?? (isEnglishPage ? pathname : await enCounterpart(pathname));
 const currentLang: "ko" | "en" = isEnglishPage ? "en" : "ko";
 
 const isActive = (path: string) => {
