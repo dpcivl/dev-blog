@@ -254,6 +254,51 @@ const structuredData = pubDatetime
       (function () {
         let last = null;
 
+        // 이 탭이 어디서 왔나 (2026-10-18~). 비콘 요청의 Referer 는 페이지
+        // 자신(parkhyo.in)이라 그것만 적던 때는 유입 경로가 전부 parkhyo.in 이었다.
+        // 그래서 페이지가 아는 출처를 따로 실어 보낸다.
+        //
+        // 탭을 처음 열 때 한 번만 정한다. ClientRouter 로 이동하면
+        // document.referrer 가 첫 값 그대로 남고, 블로그 안에서 새로고침하면
+        // parkhyo.in 이 된다 — 둘 다 「어디서 왔나」가 아니다. 그래서 X 에서 와서
+        // 글 세 편을 읽으면 세 편 다 X 로 센다. 쿠키가 아니라 탭이 닫히면
+        // 사라지는 sessionStorage 다.
+        function entryRef() {
+          try {
+            let r = sessionStorage.getItem("b:ref");
+            if (r === null) {
+              const d = document.referrer;
+              const inside =
+                d && /(^|\.)parkhyo\.in$/.test(new URL(d).hostname);
+              // 헤더에는 ASCII 만 실을 수 있다. URL 은 원래 인코딩돼 있지만 혹시
+              // 모를 글자 하나 때문에 비콘 전체가 죽지 않게 걸러둔다
+              r =
+                d && !inside
+                  ? d.replace(/[^\x20-\x7e]/g, "").slice(0, 300)
+                  : "";
+              sessionStorage.setItem("b:ref", r);
+            }
+            return r;
+          } catch {
+            return "";
+          }
+        }
+
+        function send(url) {
+          const ref = entryRef();
+          // 출처는 헤더로 보낸다. sendBeacon 은 헤더를 못 단다.
+          // 같은 출처 요청이라 사전 요청(CORS)도 없다.
+          if (window.fetch) {
+            fetch(url, {
+              method: "POST",
+              keepalive: true,
+              credentials: "omit",
+              headers: ref ? { "X-Ref": ref } : {},
+            }).catch(() => {});
+          } else if (navigator.sendBeacon) navigator.sendBeacon(url);
+          else new Image().src = url;
+        }
+
         function ping() {
           try {
             const p = location.pathname;
@@ -272,9 +317,7 @@ const structuredData = pubDatetime
 
             // 경로를 쿼리가 아니라 URL 경로에 붙인다. 쿼리로 보내면 nginx
             // 쪽에서 디코딩이 안 된 날값($arg_p)을 받게 돼 검증이 안 된다.
-            const url = "/b" + p;
-            if (navigator.sendBeacon) navigator.sendBeacon(url);
-            else new Image().src = url;
+            send("/b" + p);
           } catch {
             /* 통계가 페이지를 망가뜨리면 안 된다 */
           }

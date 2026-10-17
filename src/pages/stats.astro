@@ -83,6 +83,10 @@ import Footer from "@/components/Footer.astro";
         폰트까지 받아가며 비콘을 쏘는 봇이 실제로 있었고, 그것들은 목록 페이지를 한
         장 보고 사라졌다. 대신 JS 를 끈 방문자와 홈만 보고 간 방문자는 안 세어진다.<br
         />
+        <strong>유입 경로</strong> — 그 탭을 처음 열었을 때 어디서 왔는지다. 거기서
+        글을 여러 편 읽으면 전부 같은 출처로 센다. 대부분의 사이트는 주소 전체가 아니라
+        도메인만 알려준다(구글은 검색어를 넘기지 않는다). 10월 18일 이전 기록은 출처를
+        모아두지 않아서 「출처 없음」에 들어 있다.<br />
         같은 기간의 <a href="/stats/raw/">접근 로그 기반 수치</a>와 비교하면
         차이가 곧 걸러낸 양이다. · <a href="/stats/password/">비밀번호 변경</a
         ><br />
@@ -329,6 +333,10 @@ import Footer from "@/components/Footer.astro";
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  /* 「출처 없음」 은 출처가 아니라 나머지라서 흐리게 둔다 */
+  :global(.stats .mini.quiet) {
+    opacity: 0.55;
+  }
   /* 국가 코드 배지. 국기 이모지는 윈도우에서 글자쌍으로 떨어져서 안 쓴다. */
   :global(.stats .cc) {
     display: inline-block;
@@ -478,18 +486,37 @@ import Footer from "@/components/Footer.astro";
     AU: "호주",
   };
 
-  const REFERRER_NAMES: Record<string, string> = {
-    "google.com": "구글",
-    "www.google.com": "구글",
-    "search.naver.com": "네이버",
-    "m.search.naver.com": "네이버",
-    "naver.com": "네이버",
-    "bing.com": "빙",
-    "duckduckgo.com": "덕덕고",
-    "search.daum.net": "다음",
-    "t.co": "X",
-    "github.com": "GitHub",
-  };
+  // 출처 주소 → 사람이 읽는 이름. 정확히 같은 주소가 아니라 도메인 끝으로
+  // 묶는다 — google.com.hk · m.search.naver.com 같은 갈래가 따로 세어지지 않게.
+  const SOURCES: [RegExp, string][] = [
+    [/(^|\.)google\.[a-z.]+$/, "구글"],
+    [/(^|\.)naver\.com$/, "네이버"],
+    [/(^|\.)daum\.net$/, "다음"],
+    [/(^|\.)bing\.com$/, "빙"],
+    [/(^|\.)duckduckgo\.com$/, "덕덕고"],
+    [/^t\.co$|(^|\.)(x|twitter)\.com$/, "X"],
+    [/(^|\.)linkedin\.com$|^lnkd\.in$/, "링크드인"],
+    [/(^|\.)github\.com$/, "GitHub"],
+    [/(^|\.)(facebook\.com|fb\.me)$/, "페이스북"],
+    [/(^|\.)instagram\.com$/, "인스타그램"],
+    [/(^|\.)threads\.(net|com)$/, "스레드"],
+    [/(^|\.)(chatgpt\.com|openai\.com)$/, "ChatGPT"],
+    [/(^|\.)perplexity\.ai$/, "Perplexity"],
+    [/(^|\.)claude\.ai$/, "Claude"],
+    [/(^|\.)youtube\.com$|^youtu\.be$/, "유튜브"],
+    [/(^|\.)velog\.io$/, "velog"],
+    [/(^|\.)tistory\.com$/, "티스토리"],
+    [/(^|\.)kakao\.com$/, "카카오"],
+  ];
+
+  /** 출처가 아닌 것 — 블로그 자신과 IP 주소(서버를 직접 두드린 것) */
+  const isInternal = (host: string) =>
+    /(^|\.)parkhyo\.in$/.test(host) ||
+    /^\d{1,3}(\.\d{1,3}){3}$/.test(host) ||
+    host === "";
+
+  const sourceName = (host: string) =>
+    SOURCES.find(([re]) => re.test(host))?.[1] ?? host;
 
   const $ = (sel: string) => document.querySelector(sel) as HTMLElement | null;
   const num = (n: unknown) => (typeof n === "number" && isFinite(n) ? n : 0);
@@ -681,26 +708,39 @@ import Footer from "@/components/Footer.astro";
       : `<p class="empty">아직 기록이 없습니다</p>`;
 
     // ── 유입 경로 ──
-    const refs = rows(rep.referring_sites)
-      .map(r => {
-        const host = String(r.data ?? "")
-          .replace(/^https?:\/\//, "")
-          .split("/")[0];
-        return { name: REFERRER_NAMES[host] ?? host, hits: num(r.hits?.count) };
-      })
+    // 같은 곳을 하나로 묶고(구글 · 네이버 · X …), 블로그 자신과 IP 는 뺀다.
+    // 출처를 못 아는 방문은 따로 센다 — 북마크 · 주소 직접 입력 · 카카오톡 같은
+    // 앱 안 브라우저는 출처를 안 보낸다.
+    const bySource = new Map<string, number>();
+    for (const r of rows(rep.referring_sites)) {
+      const host = String(r.data ?? "")
+        .replace(/^https?:\/\//, "")
+        .split(/[/:]/)[0]
+        .toLowerCase();
+      if (isInternal(host)) continue;
+      const name = sourceName(host);
+      bySource.set(name, (bySource.get(name) ?? 0) + num(r.hits?.count));
+    }
+    const refs = [...bySource]
+      .map(([name, hits]) => ({ name, hits }))
+      .sort((a, b) => b.hits - a.hits)
       .slice(0, 8);
-    const maxRef = Math.max(1, ...refs.map(r => r.hits));
-    $("[data-referrers]")!.innerHTML = refs.length
-      ? refs
-          .map(
-            r => `<div class="mini">
-              <span class="mini-name">${esc(r.name)}</span>
-              <span class="mini-track"><span style="width:${(r.hits / maxRef) * 100}%"></span></span>
-              <span class="mini-num">${r.hits}</span>
-            </div>`
-          )
-          .join("")
-      : `<p class="empty">직접 유입만 있습니다</p>`;
+    const referred = [...bySource.values()].reduce((a, b) => a + b, 0);
+    const unknown = Math.max(0, num(rep.general?.total_requests) - referred);
+    const maxRef = Math.max(1, unknown, ...refs.map(r => r.hits));
+    const refRow = (
+      name: string,
+      hits: number,
+      quiet = false
+    ) => `<div class="mini${quiet ? " quiet" : ""}">
+              <span class="mini-name">${esc(name)}</span>
+              <span class="mini-track"><span style="width:${(hits / maxRef) * 100}%"></span></span>
+              <span class="mini-num">${hits.toLocaleString()}</span>
+            </div>`;
+    $("[data-referrers]")!.innerHTML =
+      refs.map(r => refRow(r.name, r.hits)).join("") +
+        (unknown > 0 ? refRow("출처 없음 · 직접", unknown, true) : "") ||
+      `<p class="empty">아직 기록이 없습니다</p>`;
 
     // ── 응답 상태 ──
     const LABEL: Record<string, string> = {

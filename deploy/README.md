@@ -689,6 +689,44 @@ access_log /var/log/nginx/beacon-all.log beacon if=$log_beacon;
 누르면 301 을 한 번 거치므로 어차피 고쳐야 한다. `/series` 71건 ·
 `/playground` 54건 · `/posts` 48건 · `/portfolio` 28건도 같은 경로다.
 
+#### 유입 경로 — 출처는 페이지가 따로 실어 보낸다 (2026-10-18)
+
+비콘으로 바꾼 뒤 **유입 경로가 전부 `parkhyo.in` 으로만 나왔다.** 비콘은 글 페이지가 스스로
+보내는 요청이라, 그 요청의 Referer 는 언제나 페이지 자신이다. 같은 기간 실제 페이지 요청에는
+Google 42 · X(`t.co`) 1 · 네이버 검색 1 · Bing 1 이 찍혀 있었다 — 진짜 출처는 들어오는데
+비콘을 거치며 사라지고 있었다.
+
+```
+페이지 ──(X-Ref: document.referrer)──▶ /b/<경로> ──▶ nginx 가 출처 칸에 적는다
+```
+
+- **탭을 처음 열 때 한 번만 정한다** (`sessionStorage`). ClientRouter 로 이동하면
+  `document.referrer` 가 첫 값 그대로 남고, 블로그 안에서 새로고침하면 `parkhyo.in` 이 된다.
+  그래서 X 에서 와서 글 세 편을 읽으면 세 편 다 X 로 센다
+- **헤더로 보낸다.** `sendBeacon` 은 헤더를 못 달아서 `fetch(…, { keepalive: true })` 로 바꿨다.
+  같은 출처 요청이라 사전 요청(CORS)이 없다
+- **nginx 는 모양을 확인한다** — `http(s)://` 로 시작하고 공백 없이 300자 이하만. 아니면 `-`
+
+```nginx
+map $http_x_ref $beacon_ref {
+    default                     "-";
+    "~^(https?://\S{1,300})$"   $1;
+}
+```
+
+**대시보드는 같은 곳을 묶는다** — `t.co`·`x.com` → X, `search.naver.com`·`m.search.naver.com`
+→ 네이버, `google.com.hk` 도 구글. 블로그 자신과 IP 주소는 뺀다. 출처를 못 아는 방문은
+「출처 없음 · 직접」으로 따로 센다 (북마크 · 주소 직접 입력 · 카카오톡 같은 앱 안 브라우저).
+
+**대부분의 사이트는 도메인만 알려준다.** 브라우저 기본 정책이 다른 사이트로 갈 때 주소 전체가
+아니라 `https://www.google.com/` 까지만 보내기 때문이다. 구글은 검색어를 넘기지 않는다.
+
+> 시험하다가 하나 더 봤다 — 블로그 안의 글 링크가 `/` 없이 걸려 있어서, 로컬 미리보기에서는
+> 두 번째 글의 비콘이 `/posts/<글>` (끝 `/` 없음)로 나가 **글로 안 세어졌다.** 운영에서는
+> nginx 가 301 로 `/` 붙은 주소로 넘기고, ClientRouter 가 넘긴 주소로 주소창을 바꿔서
+> (`astro/dist/transitions/router.js` 의 `response.redirected`) 제대로 센다. 다만 이 동작에
+> 기대고 있다는 건 알아둔다. 내부 링크에 `/` 를 붙이면 이 의존이 없어진다.
+
 #### 로그 위조를 막는다
 
 `$beacon_path` 는 **요청자가 적어 보내는 값**이라 그대로 로그에 들어간다.
