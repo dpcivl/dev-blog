@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>scratch · parkhyo.in</title>
+    <link rel="stylesheet" href="/app.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="side" aria-label="메모 목록">
+        <div class="side-head">
+          <span class="brand">scratch</span>
+          <button type="button" class="btn btn-quiet" id="new">새 메모</button>
+        </div>
+
+        <form class="new-form" id="new-form" hidden>
+          <label class="sr" for="new-input">새 메모 이름</label>
+          <input
+            id="new-input"
+            type="text"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="이름 (공백은 - 로 바뀝니다)"
+            maxlength="117"
+          />
+          <div class="new-actions">
+            <button type="submit" class="btn btn-primary">만들기</button>
+            <button type="button" class="btn btn-quiet" id="new-cancel">취소</button>
+          </div>
+        </form>
+
+        <ul class="list" id="list"></ul>
+      </aside>
+
+      <main class="main">
+        <div class="bar">
+          <div class="title">
+            <h1 id="name">메모를 고르세요</h1>
+            <span class="badge" id="badge" hidden>준비됨</span>
+          </div>
+          <div class="actions">
+            <span class="status" id="status" aria-live="polite"></span>
+            <button type="button" class="btn btn-quiet" id="save" disabled>
+              저장 <kbd>⌘S</kbd>
+            </button>
+            <button type="button" class="btn btn-primary" id="ready" disabled>완성</button>
+          </div>
+        </div>
+
+        <label class="sr" for="editor">메모 본문</label>
+        <textarea
+          id="editor"
+          spellcheck="false"
+          disabled
+          placeholder="왼쪽에서 메모를 고르거나 새로 만드세요."
+        ></textarea>
+
+        <p class="hint">
+          이미지는 붙여넣거나 끌어다 놓으면 올라갑니다 · 다 쓰면 「완성」 — 다음 세션에서
+          Claude 가 초안으로 만듭니다
+        </p>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  </body>
+</html>

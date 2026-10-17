@@ -1,0 +1,20 @@
+# scratch.parkhyo.in 메모 API — 소켓만 상시, 프로세스는 요청 올 때만.
+#
+#   sudo cp deploy/systemd/parkhyo-scratch.* /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now parkhyo-scratch.socket
+#
+# 서비스가 아니라 소켓을 enable 한다. 메모는 하루에 몇 번 쓰는 것이라
+# 프로세스를 상시로 물고 있을 이유가 없다 — 이 인스턴스는 램이 412MB 다.
+
+[Unit]
+Description=scratch.parkhyo.in 메모 API (소켓)
+
+[Socket]
+ListenStream=/run/parkhyo-scratch.sock
+SocketUser=root
+SocketGroup=www-data
+SocketMode=0660
+
+[Install]
+WantedBy=sockets.target

@@ -1,0 +1,47 @@
+# 소켓이 깨우면 뜨고, 5분 조용하면 스스로 내려간다.
+#
+# 비공개 scratch 저장소(dpcivl/dev-blog-scratch)에 GitHub API 로 커밋한다.
+# 토큰은 /etc/parkhyo/scratch.env 에 둔다 (root 600). systemd 가 root 로 읽어
+# 환경 변수로만 넘기므로, 이 서비스 계정조차 파일을 직접 못 연다.
+#
+#   GITHUB_TOKEN=github_pat_…     ← scratch 저장소 하나 · Contents 읽기/쓰기만
+#
+# 파일이 없어도 뜬다(앞의 -). 그때는 "토큰이 없다" 는 503 을 돌려준다 —
+# 502 보다 원인이 바로 보인다.
+#
+# 비밀번호 서비스와 다른 점: GitHub 에 나가야 하므로 네트워크를 연다
+# (PrivateNetwork 를 못 쓴다). 대신 쓰기 권한이 필요한 경로는 하나도 없다 —
+# 이 서비스는 서버 디스크에 아무것도 쓰지 않는다.
+
+[Unit]
+Description=scratch.parkhyo.in 메모 API
+Requires=parkhyo-scratch.socket
+After=parkhyo-scratch.socket network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=scratchsvc
+Group=scratchsvc
+EnvironmentFile=-/etc/parkhyo/scratch.env
+Environment=IDLE_SEC=300
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 /opt/parkhyo/server/scratch_service.py
+
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictNamespaces=true
+RestrictSUIDSGID=true
+LockPersonality=true
+CapabilityBoundingSet=
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+MemoryMax=128M
+
+[Install]
+WantedBy=multi-user.target

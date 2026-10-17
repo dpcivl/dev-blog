@@ -1,0 +1,365 @@
+/* scratch.parkhyo.in — 메모를 쓰는 화면 하나.
+   외부 글꼴을 안 쓴다. CSP 가 'self' 뿐이고, 맥에서는 시스템 글꼴이 제일 빠르다. */
+
+:root {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --text: #1c232c;
+  --muted: #677180;
+  --border: #dfe4ea;
+  --accent: #2c64c9;
+  --accent-ink: #ffffff;
+  --ready: #1d7f48;
+  --ready-bg: #e3f3e9;
+  --danger: #b4322b;
+  --focus: #2c64c9;
+  --active: #e8eef9;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14171b;
+    --surface: #1b1f25;
+    --text: #e4e8ee;
+    --muted: #96a0ad;
+    --border: #2a3039;
+    --accent: #6c9cff;
+    --accent-ink: #0f1520;
+    --ready: #4fc681;
+    --ready-bg: #18311f;
+    --danger: #ff8178;
+    --focus: #6c9cff;
+    --active: #222b3a;
+    color-scheme: dark;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* display 를 지정한 요소(.btn · .new-form 등)는 hidden 속성을 이겨버린다.
+   처음엔 이게 없어서 새 메모 입력칸이 닫히지 않았다 */
+[hidden] {
+  display: none !important;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR",
+    "Malgun Gothic", sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  height: 100%;
+}
+
+/* ── 목록 ── */
+.side {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.side-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 14px 14px 10px;
+}
+
+.brand {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.new-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 14px 12px;
+}
+
+.new-form input {
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+}
+
+.new-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.list {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 0 8px 12px;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.list .empty {
+  padding: 10px 6px;
+  color: var(--muted);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.item:hover {
+  background: var(--bg);
+}
+
+.item[aria-current="true"] {
+  background: var(--active);
+  font-weight: 600;
+}
+
+.item-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-ready {
+  flex: none;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--ready-bg);
+  color: var(--ready);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ── 편집 ── */
+.main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.title h1 {
+  margin: 0;
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badge {
+  flex: none;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--ready-bg);
+  color: var(--ready);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status {
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+textarea {
+  flex: 1;
+  width: 100%;
+  max-width: 52rem;
+  min-height: 0;
+  margin: 0 auto;
+  padding: 24px 28px;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.75;
+  resize: none;
+  tab-size: 4;
+}
+
+textarea:disabled {
+  color: var(--muted);
+}
+
+/* 글 쓰는 판 전체를 테두리로 두르면 방해가 된다. 커서가 이미 포커스를 보여준다 */
+textarea:focus-visible {
+  outline: none;
+}
+
+.hint {
+  margin: 0;
+  padding: 8px 20px 12px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+/* ── 버튼 ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.btn-primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.btn-quiet {
+  background: transparent;
+}
+
+kbd {
+  color: var(--muted);
+  font: inherit;
+  font-size: 11px;
+}
+
+.btn-primary kbd {
+  color: inherit;
+  opacity: 0.8;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ── 알림 ── */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  max-width: min(560px, calc(100vw - 32px));
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: var(--text);
+  color: var(--bg);
+  font-size: 14px;
+  transform: translateX(-50%);
+  box-shadow: 0 6px 24px rgb(0 0 0 / 18%);
+}
+
+.toast.error {
+  background: var(--danger);
+  color: #fff;
+}
+
+/* ── 좁은 화면 ── */
+@media (max-width: 720px) {
+  .app {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .side {
+    max-height: 34vh;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .bar {
+    padding: 10px 16px;
+  }
+
+  textarea {
+    padding: 16px;
+  }
+
+  kbd {
+    display: none;
+  }
+}

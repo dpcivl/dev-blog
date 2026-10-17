@@ -16,12 +16,15 @@ git status --short
 git pull --rebase
 # 2. scratch repo pull
 git -C src/scratch pull --rebase
+# 3. 준비된 메모 — 첫 줄이 「준비됨」 표시인 것 (웹 에디터의 「완성」, 아래 스크래치 절)
+for f in src/scratch/*.md; do head -1 "$f" | grep -q '^<!-- ✅ 준비됨' && echo "$f"; done
 ```
 
 **한 줄 보고 형식 (사용자 응답 앞에 붙임):**
 
 - ✓ 정상: `루틴 ✓ (main: up-to-date / scratch: up-to-date)`
 - ✓ 새 커밋 가져옴: `루틴 ✓ (main: +N커밋 pull / scratch: +M커밋 pull)`
+- ✓ 준비된 메모 있음: `루틴 ✓ (… / scratch: +M커밋 pull · 준비됨 2개: 메모A, 메모B)` — 그다음 **처리할지 묻는다.** 자동으로 발행하지 않는다
 - ⚠ 실패: `루틴 ⚠ (main pull 실패 — <원인>, 사용자 개입 필요)`
 - skip: `루틴 skip (사용자 요청)`
 
@@ -54,6 +57,7 @@ git -C src/scratch pull --rebase
 
 1. **이미지 / 영상 자산 정리**
    - inbox 나 scratch 에 첨부된 이미지(보통 `image*.png`) / 영상(`*.mp4`) 을 찾는다.
+     웹 에디터에서 붙여넣은 이미지는 `src/scratch/assets/<메모이름>/` 아래에 있고 본문에 `![](assets/…)` 로 걸려 있다.
    - 포스트 슬러그(slug) 폴더로 이동: `public/assets/posts/<slug>/`
    - 파일명을 내용을 알 수 있게 변경: 예) `01-screenshot-before.png`, `05-demo.mp4`
    - 마크다운에서는 절대 경로로 참조: `/assets/posts/<slug>/<filename>.png`
@@ -274,6 +278,22 @@ grep -nE '^\s*[+?]|^\s*![^[]' <메모파일>
   ```
 - 사용자가 두 기기 사용 중이라 다른 기기 시작 시 `git -C src/scratch pull` 필요함을 종종 상기
 - Main repo commit 은 scratch 변경과 무관 (scratch 는 여전히 `.gitignore` 대상, `!src/scratch/README.md` 예외 하나만 추적)
+
+### 웹 에디터 — scratch.parkhyo.in (2026-10-17~)
+
+작성자는 브라우저에서도 메모를 쓴다. 저장하면 **scratch 저장소 `main` 에 바로 커밋**된다
+(GitHub API). 로컬 `src/scratch/` 에는 `git pull` 해야 보인다 — 세션 시작 루틴이 한다.
+
+- **「완성」 = 메모 첫 줄에 `<!-- ✅ 준비됨 (YYYY-MM-DD) -->`.** 작성자가 "이 메모 글로 만들어도
+  된다" 고 표시한 것이다. 세션 시작 루틴이 찾아서 보고하고, **처리할지 물은 뒤** 발행 절차를 탄다.
+  맥북에서 VS Code 로 이 줄을 직접 붙여도 똑같이 동작한다
+- **이미지**는 `assets/<메모이름>/<시각>-<난수>.<확장자>` 에 있다. 발행할 때 `image*.png` 와
+  똑같이 `public/assets/posts/<slug>/` 로 옮기고 내용을 알 수 있는 이름으로 바꾼다.
+  다 옮긴 뒤 `assets/<메모이름>/` 은 지운다
+- **발행본에는 준비됨 줄을 넣지 않는다.** 메모 쪽은 기존대로 맨 위에 발행됨 주석을 달고
+  `published/` 로 옮기는데, 이때 준비됨 줄은 발행됨 줄로 **바꾼다** (둘 다 남기지 않는다)
+- 웹 에디터는 **발행 권한이 없다** — 일부러 그렇다. 서버의 토큰은 scratch 저장소에만 닿는다.
+  구조와 이유는 [deploy/README.md](deploy/README.md) 「scratch.parkhyo.in」 절
 
 ## 🖋 발행 어투 · 컨벤션 (반드시 준수)
 
@@ -552,6 +572,7 @@ main 푸시 → GitHub Actions 빌드 → rsync → releases/<시각>-<sha>/ →
 
 - 워크플로: [.github/workflows/deploy.yml](.github/workflows/deploy.yml) · 서버 설정: [deploy/](deploy/)
 - **빌드와 배포는 다른 job 이다** (2026-10-09~). 빌드 job 에는 시크릿이 없고, 배포 job 은 산출물만 받아 rsync 한다. **CI 의 deploy 키는 셸이 아니다** — `deploy/bin/deploy-gate` 가 releases/ 업로드와 `activate-release` 만 허용한다. 서버에서 deploy 로 작업할 일이 있으면 `ubuntu` 로 들어가 `sudo -u deploy` 로 한다. Action 은 커밋 SHA 로 고정돼 있다 (`deploy/README.md` "배포 키 제약")
+- **scratch.parkhyo.in 은 CI 배포에 안 실린다.** 화면(`server/scratch-ui/`)과 API(`server/scratch_service.py`)를 고치면 서버에 손으로 올린다 — `/stats` 비밀번호 서비스와 같다. 절차는 `deploy/README.md` 「scratch.parkhyo.in」
 - 빌드는 **CI 에서** 한다. 서버(512MB)는 정적 파일만 서빙한다 — 빌드 중 OG 이미지 150여 장을 resvg 로 렌더하고 Pagefind 색인을 만들어서 작은 인스턴스로는 감당이 안 된다
 - 배포 실패해도 **직전 릴리스가 그대로 서빙**된다 (심볼릭 링크를 안 바꾸므로). 롤백은 서버에서 `activate-release <이전-id>`
 - 인증서는 Let's Encrypt · webroot 방식 자동 갱신. `certbot renew --dry-run` 으로 확인

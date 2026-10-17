@@ -294,6 +294,129 @@ sudo fail2ban-client set sshd unban --all          # 테스트 기록 정리
 키로는 못 들어간다. `ubuntu` 로 들어가서 `sudo -u deploy …` 로 한다.
 아래 롤백도 그렇게 한다.
 
+## scratch.parkhyo.in — 메모 웹 에디터 (2026-10-17)
+
+브라우저에서 메모를 쓰면 **비공개 scratch 저장소(`dpcivl/dev-blog-scratch`)에 바로
+커밋**된다. 맥북에서 VS Code 로 쓰던 것과 같은 저장소다.
+
+**발행은 하지 않는다.** 다 쓰면 「완성」을 눌러 메모 첫 줄에
+`<!-- ✅ 준비됨 (YYYY-MM-DD) -->` 를 붙이는 데서 끝난다. 글로 만드는 건 Claude Code
+세션에서 작성자가 검토하며 한다 (CLAUDE.md 11번 · 세션 시작 루틴).
+
+```
+브라우저 ──▶ nginx (basic auth · CSP) ──▶ 유닉스 소켓 ──▶ scratch_service.py ──▶ GitHub API
+             /opt/parkhyo/scratch/ui                       (요청 올 때만 뜸)       scratch 저장소 main
+```
+
+### 왜 이렇게 좁게 만들었나
+
+**이 서비스 전에는 서버가 GitHub 에 쓸 수 있는 자격 증명이 하나도 없었다.** 처음으로
+하나 생기므로 범위를 묶었다.
+
+| 묶은 것 | 어떻게 |
+| --- | --- |
+| 토큰이 닿는 곳 | fine-grained 토큰 — **scratch 저장소 하나 · Contents 읽기/쓰기만** |
+| 공개 블로그 | 토큰이 닿지 않는다. 서버가 뚫려도 블로그에 글이 올라가지 않는다 |
+| 다루는 파일 | 저장소 루트의 `.md` 와, 서버가 이름을 정한 `assets/<메모>/…` 이미지뿐. `published/` · `README.md` · `..` 는 거부 |
+| 로그인 | `/stats` 와 **다른** 비밀번호 (`.htpasswd-scratch`) |
+| 다른 사이트의 요청 | 쓰기는 `Content-Type: application/json` + `Origin` 이 이 사이트일 때만 (통계 비밀번호 CSRF 와 같은 이유) |
+| 남의 코드 | CSP `script-src 'self'` — 에디터는 외부 스크립트 · 글꼴 · 인라인 코드를 하나도 안 쓴다 |
+| 토큰 파일 | `/etc/parkhyo/scratch.env` root `600`. systemd 가 root 로 읽어 환경 변수로만 넘긴다 — 서비스 계정도 파일을 못 연다 |
+| 이미지 | png · jpg · gif · webp 만, 8MB 까지, **파일 앞머리가 형식과 맞아야** 받는다. SVG 는 안 받는다 (스크립트를 담을 수 있다) |
+
+**같은 메모를 두 곳에서 고쳐도 조용히 덮어쓰지 않는다.** 저장할 때 마지막으로 읽은
+blob sha 를 같이 보내고, 그 사이 맥북 로컬 등에서 바뀌었으면 GitHub 가 거부한다(409).
+화면은 「다른 곳에서 바뀌었다」고 알리고, 쓰던 글은 브라우저(localStorage)에 보관한다.
+
+**자동 저장은 하지 않는다.** 저장이 곧 커밋이라 글자마다 커밋이 쌓인다. 대신 저장 안 한
+글은 브라우저에 보관해서 창을 닫아도 다시 열면 불러올지 묻는다.
+
+### 설치
+
+```bash
+# 서비스 계정 · 코드 · 화면 (CI 배포에 안 실린다 — 서버 코드처럼 손으로 올린다)
+sudo useradd --system --no-create-home --shell /usr/sbin/nologin scratchsvc
+sudo install -d -m 755 /etc/parkhyo /opt/parkhyo/scratch/ui
+sudo install -m 644 server/scratch_service.py /opt/parkhyo/server/
+sudo install -m 644 server/scratch-ui/{index.html,app.js,app.css} /opt/parkhyo/scratch/ui/
+
+# 소켓만 켠다 (.service 가 아니라 .socket)
+sudo cp deploy/systemd/parkhyo-scratch.* /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now parkhyo-scratch.socket
+```
+
+**인증서 → nginx 순서가 중요하다.** HTTPS 블록이 없는 인증서 파일을 가리키면 `nginx -t`
+가 실패해서 블로그까지 reload 가 막힌다. 그래서 설정 파일에 `# @scratch-https` 표시를
+달아뒀다.
+
+```bash
+# 1. DNS (Namecheap) — scratch A 레코드, 값은 @ 와 같은 IP
+# 2. HTTPS 블록을 뺀 설정으로 먼저 올린다 (80 의 ACME 경로만 필요)
+sed '/# @scratch-https 시작/,/# @scratch-https 끝/d' deploy/nginx/parkhyo.in.conf > /tmp/stage1.conf
+# → nginx -t · reload
+# 3. 블로그와 따로 인증서를 받는다 — 섞으면 문제가 생겼을 때 블로그 인증서까지 흔들린다
+sudo certbot certonly --webroot -w /var/www/certbot -d scratch.parkhyo.in \
+  --cert-name scratch.parkhyo.in --deploy-hook "systemctl reload nginx"
+# 4. 전체 설정으로 다시 올린다 → nginx -t · reload
+```
+
+### 비밀번호 · 토큰 — 작성자가 직접 넣는다
+
+둘 다 **대화창에 붙여넣지 않는다.** 별도 터미널에서 명령 한 줄로 서버에 바로 넣는다.
+
+```bash
+# 비밀번호 — 처음 한 번만 -c (파일을 새로 만든다. 두 번째부터 -c 를 쓰면 기존 사용자가 날아간다)
+ssh -t -i ~/.ssh/blog-prod-key.pem ubuntu@parkhyo.in \
+  'sudo htpasswd -c -B /etc/nginx/.htpasswd-scratch <아이디> \
+   && sudo chown root:www-data /etc/nginx/.htpasswd-scratch \
+   && sudo chmod 640 /etc/nginx/.htpasswd-scratch'
+
+# 토큰 — 클립보드에 복사해둔 상태에서. umask 077 로 처음부터 600 으로 만든다
+{ printf 'GITHUB_TOKEN='; pbpaste; echo; } | ssh -i ~/.ssh/blog-prod-key.pem ubuntu@parkhyo.in \
+  'sudo sh -c "umask 077; cat > /etc/parkhyo/scratch.env" && sudo systemctl stop parkhyo-scratch.service'
+```
+
+마지막의 `stop` 은 떠 있던 프로세스를 내려서, 다음 요청이 새 토큰으로 뜨게 한다
+(소켓은 그대로 살아 있다).
+
+### 토큰이 만료되면
+
+fine-grained 토큰은 기한이 있다. 만료되면 저장할 때 **「GitHub 토큰이 만료됐거나
+잘못됐습니다」**가 뜬다. 새 토큰을 받아 위 명령으로 다시 넣으면 된다.
+
+### 확인
+
+```bash
+# 토큰 없이 · 인증 없이 서비스만 (서버에서)
+sudo curl -s --unix-socket /run/parkhyo-scratch.sock http://localhost/api/memos
+#   토큰 없음 → 503 "서버에 GitHub 토큰이 없습니다"
+
+# 같은 샌드박스에서 GitHub 까지 나가지나 — 유닛과 같은 제약으로 한 번 띄워본다
+sudo systemd-run --wait --pipe --collect -p User=scratchsvc -p ProtectSystem=strict \
+  -p "RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6" \
+  /usr/bin/python3 -c "import urllib.request as u; print(u.urlopen('https://api.github.com/zen').status)"
+
+sudo journalctl -u parkhyo-scratch.service -f      # 거부 사유가 여기 남는다. 본문 · 토큰은 안 남긴다
+```
+
+### 시험한 것 (2026-10-17, 실제 GitHub API · 시험 브랜치)
+
+```
+통과  목록 · 열기 · 새로 만들기 · 저장 · 준비됨/취소 · 이미지 붙여넣기 · CRLF → LF
+거부  옛 sha 로 저장 (다른 곳에서 바뀜) → 409 · 같은 이름 새로 만들기 → 409
+거부  ../ · published/ · README.md · .숨김 · 공백 · %2F → 400
+거부  text/plain → 415 · 남의 Origin · Origin 없음 → 403
+거부  가짜 png(HTML) · svg → 415 · 8MB 초과 → 413
+화면  헤드리스 Chromium 20항목 — 저장 안 한 글 복구 · 좁은 화면 · 콘솔 오류 0
+```
+
+시험 커밋 10개는 시험 브랜치에만 쌓였고, 끝난 뒤 브랜치를 지웠다. `main` 에는 안 들어갔다.
+
+> 화면을 눈으로 보고 버그 하나를 잡았다 — `.btn { display: inline-flex }` 가 `hidden`
+> 속성을 이겨서 새 메모 입력칸이 닫히지 않았다. 자동 시험은 메모 이름만 확인해서 통과했었다.
+> `[hidden] { display: none !important }` 로 고쳤다.
+
 ## 방문 통계 (GoAccess)
 
 Vercel Analytics 를 걷어낸 자리를 nginx 로그 분석으로 대신한다.
