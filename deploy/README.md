@@ -318,7 +318,7 @@ sudo fail2ban-client set sshd unban --all          # 테스트 기록 정리
 | 토큰이 닿는 곳 | fine-grained 토큰 — **scratch 저장소 하나 · Contents 읽기/쓰기만** |
 | 공개 블로그 | 토큰이 닿지 않는다. 서버가 뚫려도 블로그에 글이 올라가지 않는다 |
 | 다루는 파일 | 저장소 루트의 `.md` 와, 서버가 이름을 정한 `assets/<메모>/…` 이미지뿐. `published/` · `README.md` · `..` 는 거부 |
-| 로그인 | 아이디 `dpcivl` · `/stats` 와 **다른** 비밀번호 (`.htpasswd-scratch`). `admin` 은 쓰지 않는다 — 봇이 가장 먼저 넣어보는 이름이다 |
+| 로그인 | `/stats` 와 **다른** 비밀번호 (`.htpasswd-scratch`). 아이디는 `admin` 이 아니고, 여기 적지 않는다 (아래 「아이디는 저장소에 적지 않는다」) |
 | 다른 사이트의 요청 | 쓰기는 `Content-Type: application/json` + `Origin` 이 이 사이트일 때만 (통계 비밀번호 CSRF 와 같은 이유) |
 | 남의 코드 | CSP `script-src 'self'` — 에디터는 외부 스크립트 · 글꼴 · 인라인 코드를 하나도 안 쓴다 |
 | 토큰 파일 | `/etc/parkhyo/scratch.env` root `600`. systemd 가 root 로 읽어 환경 변수로만 넘긴다 — 서비스 계정도 파일을 못 연다 |
@@ -368,7 +368,7 @@ sudo certbot certonly --webroot -w /var/www/certbot -d scratch.parkhyo.in \
 ```bash
 # 비밀번호 — 처음 한 번만 -c (파일을 새로 만든다. 두 번째부터 -c 를 쓰면 기존 사용자가 날아간다)
 ssh -t -i ~/.ssh/blog-prod-key.pem ubuntu@parkhyo.in \
-  'sudo htpasswd -c -B /etc/nginx/.htpasswd-scratch dpcivl \
+  'sudo htpasswd -c -B /etc/nginx/.htpasswd-scratch <아이디> \
    && sudo chown root:www-data /etc/nginx/.htpasswd-scratch \
    && sudo chmod 640 /etc/nginx/.htpasswd-scratch'
 
@@ -386,7 +386,7 @@ printf '토큰 붙여넣기: '; read -rs T; echo; printf 'GITHUB_TOKEN=%s\n' "$T
 
 **아이디만 바꿀 때는 비밀번호를 다시 넣을 필요가 없다.** bcrypt 해시는 비밀번호만으로
 만들어지고 아이디는 앞에 붙은 이름표라서, 줄 앞부분만 고치면 같은 비밀번호가 그대로 통한다
-(2026-10-18 `admin` → `dpcivl` 을 이렇게 바꿨다).
+(2026-10-18 `admin` 에서 다른 아이디로 이렇게 바꿨다).
 
 ```bash
 sudo sed -i 's/^옛아이디:/새아이디:/' /etc/nginx/.htpasswd-scratch   # nginx reload 도 필요 없다
@@ -432,6 +432,24 @@ sudo journalctl -u parkhyo-scratch.service -f      # 거부 사유가 여기 남
 > 속성을 이겨서 새 메모 입력칸이 닫히지 않았다. 자동 시험은 메모 이름만 확인해서 통과했었다.
 > `[hidden] { display: none !important }` 로 고쳤다.
 
+## 아이디는 저장소에 적지 않는다 (2026-10-18)
+
+`/stats` 와 scratch 둘 다 처음엔 아이디가 `admin` 이었다. `admin` 은 봇이 가장 먼저 넣어보는
+이름이라 바꿨는데, **바꾼 아이디를 이 문서 · 화면 · 서비스 설정에 적으면 공개 저장소라 누구나
+읽는다.** 그래서 아이디는 서버의 비밀번호 파일에만 있다. 커밋 메시지에도 쓰지 않는다.
+
+```bash
+# 아이디를 잊었으면 서버에서 본다
+sudo cut -d: -f1 /etc/nginx/.htpasswd-stats
+sudo cut -d: -f1 /etc/nginx/.htpasswd-scratch
+```
+
+`/stats` 비밀번호 변경 서비스는 설정에서 아이디를 읽지 않고 **파일에 있는 유일한 사용자**를
+대상으로 삼는다. 사용자가 둘 이상이면 누구 것을 바꿀지 모르므로 거부한다(500).
+
+> scratch 아이디는 한 번 커밋 메시지(`ae5d27a`)에 들어갔다. 작성자의 GitHub 이름이라 원래
+> 공개된 값이어서 히스토리를 고치지는 않았다.
+
 ## 방문 통계 (GoAccess)
 
 Vercel Analytics 를 걷어낸 자리를 nginx 로그 분석으로 대신한다.
@@ -445,7 +463,7 @@ sudo install -m 755 deploy/bin/generate-stats /usr/local/bin/generate-stats
 sudo mkdir -p /var/www/stats /var/lib/goaccess
 
 # 대시보드 접근용 비밀번호 (사용자 이름은 원하는 대로)
-sudo htpasswd -c /etc/nginx/.htpasswd-stats admin
+sudo htpasswd -c /etc/nginx/.htpasswd-stats <아이디>
 # 비밀번호 변경 서비스를 붙인 뒤로는 소유자가 statspw 다 (아래 참고)
 sudo chown statspw:www-data /etc/nginx/.htpasswd-stats
 sudo chmod 640 /etc/nginx/.htpasswd-stats
@@ -462,7 +480,7 @@ sudo nginx -t && sudo systemctl reload nginx
 
 #### 대시보드 로그인
 
-**아이디는 `admin`** 이다. 비밀번호는 `/etc/nginx/.htpasswd-stats` 에 **단방향 해시**로
+**아이디는 저장소에 적지 않는다** (아래 참고). 비밀번호는 `/etc/nginx/.htpasswd-stats` 에 **단방향 해시**로
 저장돼 있어서 **꺼내볼 수 없다. 잊었으면 재설정한다.**
 
 **들어갈 수는 있는데 바꾸고 싶은 거라면** `/stats/password/` 에서 하면 된다
@@ -470,7 +488,7 @@ sudo nginx -t && sudo systemctl reload nginx
 때** 쓰는 길이다.
 
 ```bash
-printf '%s' '새비밀번호' | sudo htpasswd -i -B /etc/nginx/.htpasswd-stats admin
+printf '%s' '새비밀번호' | sudo htpasswd -i -B /etc/nginx/.htpasswd-stats <아이디>
 ```
 
 - **바꾼 뒤 파일이 실제로 바뀌었는지 확인할 것.** 2026-10-02 에 `htpasswd` 가
@@ -493,7 +511,7 @@ printf '%s' '새비밀번호' | sudo htpasswd -i -B /etc/nginx/.htpasswd-stats a
 
 ```bash
 sudo htpasswd -B /etc/nginx/.htpasswd-stats <새아이디>
-sudo htpasswd -D /etc/nginx/.htpasswd-stats admin
+sudo htpasswd -D /etc/nginx/.htpasswd-stats <아이디>
 ```
 
 시간마다 갱신되도록 cron 을 건다.
@@ -783,7 +801,7 @@ sudo /usr/local/bin/generate-stats
 
 ### 통계 비밀번호를 브라우저에서 바꾸기
 
-`/stats/password/` 에서 바꾼다. 아이디는 `admin` 고정이다.
+`/stats/password/` 에서 바꾼다. 아이디는 그대로이고 비밀번호만 바뀐다 — 서비스가 파일의 유일한 사용자를 대상으로 삼는다.
 
 **현재 비밀번호를 다시 묻는다 (2026-10-09~).** 처음엔 "basic auth 를
 통과했으니 이미 아는 사람" 이라고 보고 묻지 않았다. **틀렸다.**
@@ -852,7 +870,7 @@ sudo systemctl enable --now parkhyo-stats-password.socket   # .service 가 아�
 
 ```bash
 ssh -i ~/.ssh/blog-prod-key.pem ubuntu@parkhyo.in
-printf '%s' '새비밀번호' | sudo htpasswd -i -B /etc/nginx/.htpasswd-stats admin
+printf '%s' '새비밀번호' | sudo htpasswd -i -B /etc/nginx/.htpasswd-stats <아이디>
 ```
 
 - **`-b` 를 쓰지 말 것.** 비밀번호가 명령줄에 실려 `ps` 출력과 셸 히스토리에

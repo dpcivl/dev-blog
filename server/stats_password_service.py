@@ -33,7 +33,13 @@ nginx 의 basic auth 만으로는 부족하다 (2026-10-09 정정).
    복구 경로를 반드시 남긴다 (deploy/README.md 참고):
 
      ssh -i ~/.ssh/blog-prod-key.pem ubuntu@parkhyo.in
-     printf '%s' '<새비밀번호>' | sudo htpasswd -i -B /etc/nginx/.htpasswd-stats admin
+     printf '%s' '<새비밀번호>' | sudo htpasswd -i -B /etc/nginx/.htpasswd-stats <아이디>
+
+아이디는 저장소에 적지 않는다 (2026-10-18~). 공개 저장소에 적으면 누구나 읽어서
+추측하기 어려운 아이디로 바꾼 의미가 없다. 서비스는 비밀번호 파일에 있는 유일한
+사용자를 대상으로 삼는다. 아이디를 잊으면 서버에서 확인한다:
+
+     sudo cut -d: -f1 /etc/nginx/.htpasswd-stats
 """
 
 import json
@@ -45,7 +51,9 @@ import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 FILE = os.environ.get("HTPASSWD_FILE", "/etc/nginx/.htpasswd-stats")
-USER = os.environ.get("HTPASSWD_USER", "admin")
+# 비워두면 파일의 유일한 사용자를 쓴다 — 아이디를 설정 파일에도 적지 않으려고.
+# 여러 명이 들어 있으면 누구 것을 바꿀지 모르므로 거부한다.
+USER = os.environ.get("HTPASSWD_USER", "")
 IDLE_SEC = float(os.environ.get("IDLE_SEC", "60"))
 ALLOWED_ORIGIN = os.environ.get("ALLOWED_ORIGIN", "https://parkhyo.in")
 
@@ -71,6 +79,17 @@ def touch():
     _timer.start()
 
 
+def target_user() -> str:
+    """비밀번호를 바꿀 아이디. 설정이 없으면 파일의 유일한 사용자다."""
+    if USER:
+        return USER
+    with open(FILE, encoding="utf-8") as f:
+        names = [line.split(":", 1)[0] for line in f if ":" in line]
+    if len(names) != 1:
+        raise RuntimeError(f"htpasswd 사용자가 {len(names)}명이다 — 한 명일 때만 고를 수 있다")
+    return names[0]
+
+
 def check_password(pw: str) -> bool:
     """현재 비밀번호가 맞는지 본다. 파일은 건드리지 않는다.
 
@@ -78,7 +97,7 @@ def check_password(pw: str) -> bool:
     명령줄이 아니라 표준 입력으로 넘긴다.
     """
     r = subprocess.run(
-        ["htpasswd", "-v", "-i", FILE, USER],
+        ["htpasswd", "-v", "-i", FILE, target_user()],
         input=pw.encode(),
         capture_output=True,
         timeout=15,
@@ -93,7 +112,7 @@ def set_password(pw: str):
     셸 히스토리에 평문이 남는다.
     """
     r = subprocess.run(
-        ["htpasswd", "-i", "-B", FILE, USER],
+        ["htpasswd", "-i", "-B", FILE, target_user()],
         input=pw.encode(),
         capture_output=True,
         timeout=15,
@@ -178,7 +197,7 @@ class Handler(BaseHTTPRequestHandler):
             sys.stderr.write(f"[stats-pw] 실패: {e}\n")
             return self._json(500, {"error": "서버에서 바꾸지 못했습니다"})
 
-        sys.stderr.write(f"[stats-pw] {USER} 비밀번호 변경됨\n")
+        sys.stderr.write("[stats-pw] 비밀번호 변경됨\n")  # 아이디는 로그에도 안 남긴다
         self._json(200, {"ok": True})
 
     def do_GET(self):
