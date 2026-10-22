@@ -306,20 +306,27 @@ function readAsBase64(file) {
   });
 }
 
-/** 지금 커서 자리에 넣는다. 사용자가 쓰고 있던 위치를 건드리지 않는다 */
-function insertAtCursor(text) {
-  editor.setRangeText(text, editor.selectionStart, editor.selectionEnd, "end");
+/**
+ * 브라우저의 되돌리기(⌘Z) 기록에 남게 넣는다 (2026-10-22~).
+ *
+ * 전에는 setRangeText 로 넣었는데, 스크립트로 바꾼 글자는 되돌리기 기록에
+ * 안 남는다. 그래서 붙여넣은 이미지를 ⌘Z 로 지울 수 없었고, 대신 그 전에 쓴
+ * 글자가 되돌려졌다. execCommand 는 낡은 API 지만 textarea 의 되돌리기 기록에
+ * 넣는 방법이 이것뿐이다. 안 되는 브라우저에서는 예전 방식으로 넣는다.
+ */
+function insertUndoable(text) {
+  editor.focus();
+  // 커서를 같은 자리에 다시 지정한다. 이게 없으면 Chrome 이 바로 앞에 친 글자와
+  // 이 삽입을 한 덩어리로 묶어서, ⌘Z 한 번에 둘 다 사라진다 (헤드리스 Chromium 으로 확인)
+  editor.setSelectionRange(editor.selectionStart, editor.selectionEnd);
+  const ok = document.execCommand && document.execCommand("insertText", false, text);
+  if (!ok) {
+    editor.setRangeText(text, editor.selectionStart, editor.selectionEnd, "end");
+  }
   onInput();
 }
 
-function replaceOnce(from, to) {
-  const i = editor.value.indexOf(from);
-  if (i < 0) return;
-  editor.setRangeText(to, i, i + from.length, "preserve");
-  onInput();
-}
-
-let uploads = 0;
+let uploading = 0;
 async function uploadImage(file) {
   if (!current) {
     toast("메모를 먼저 여세요", true);
@@ -329,17 +336,28 @@ async function uploadImage(file) {
     toast("이미지가 너무 큽니다 (8MB 까지)", true);
     return;
   }
+  // 올리는 동안 본문에 자리표시를 넣지 않는다 — 자리표시를 나중에 링크로 바꾸면
+  // 되돌리기가 두 단계로 갈라진다. 대신 상태줄에 띄우고, 다 올린 뒤 한 번에 넣는다.
   const memo = current.name;
-  const placeholder = `![올리는 중… ${++uploads}]()`;
-  insertAtCursor(`${placeholder}\n`);
+  uploading++;
+  statusEl.textContent = "이미지 올리는 중…";
   try {
     const data = await readAsBase64(file);
     const r = await api("POST", "/api/image", { memo, mime: file.type, data });
-    replaceOnce(placeholder, r.markdown);
-    toast("이미지를 올렸습니다 — 메모도 저장해야 남습니다");
+    if (!current || current.name !== memo) {
+      toast(`이미지는 올렸지만 그사이 다른 메모를 열어서 넣지 않았습니다 — ${r.markdown}`, true);
+      return;
+    }
+    insertUndoable(`${r.markdown}\n`);
+    toast("이미지를 올렸습니다 · ⌘Z 로 되돌릴 수 있고, 메모도 저장해야 남습니다");
   } catch (e) {
-    replaceOnce(`${placeholder}\n`, "");
     toast(e.message, true);
+  } finally {
+    uploading--;
+    if (!uploading && statusEl.textContent === "이미지 올리는 중…") {
+      statusEl.textContent = isDirty() ? "저장 안 됨" : "";
+    }
+    render();
   }
 }
 
