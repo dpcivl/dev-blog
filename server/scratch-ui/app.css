@@ -232,31 +232,191 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-textarea {
+/* ── 편집 칸 (CodeMirror) ──
+   CodeMirror 는 .cm-editor · .cm-scroller · .cm-content 를 만든다. 배치에 필요한 최소한은
+   CodeMirror 가 스스로 넣고, 모양은 여기서 정한다. 강조 색(md-*)과 서식(cm-md-*)은
+   editor.js · live-preview.js 가 붙이는 고정 클래스다 — 런타임에 스타일을 만들지 않는다 */
+.editor {
   flex: 1;
-  width: 100%;
-  max-width: 52rem;
   min-height: 0;
-  margin: 0 auto;
-  padding: 24px 28px;
-  border: 0;
-  outline: none;
-  background: transparent;
-  color: var(--text);
-  font: inherit;
-  font-size: 16px;
-  line-height: 1.75;
-  resize: none;
-  tab-size: 4;
+  display: flex;
 }
 
-textarea:disabled {
+.editor .cm-editor {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  background: transparent;
+  color: var(--text);
+}
+
+.editor .cm-editor.cm-focused {
+  outline: none;
+}
+
+.editor .cm-scroller {
+  overflow: auto;
+  font-family: inherit;
+  line-height: 1.75;
+}
+
+.editor .cm-content {
+  width: 100%;
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 24px 28px 40vh;
+  font-size: 16px;
+  caret-color: var(--text);
+}
+
+.editor .cm-line {
+  padding: 0;
+}
+
+.editor .cm-placeholder {
   color: var(--muted);
 }
 
-/* 글 쓰는 판 전체를 테두리로 두르면 방해가 된다. 커서가 이미 포커스를 보여준다 */
-textarea:focus-visible {
-  outline: none;
+.editor .cm-cursor {
+  border-left-color: var(--text);
+}
+
+.editor .cm-selectionBackground,
+.editor .cm-focused .cm-selectionBackground {
+  background: var(--active) !important;
+}
+
+/* 강조 */
+.md-strong {
+  font-weight: 700;
+}
+.md-em {
+  font-style: italic;
+}
+.md-strike {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+.md-link,
+.cm-md-link {
+  color: var(--accent);
+}
+.cm-md-link {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.md-url,
+.md-mark,
+.md-comment {
+  color: var(--muted);
+}
+.md-comment {
+  font-size: 0.9em;
+}
+.md-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.92em;
+}
+.cm-md-inline-code {
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: var(--active);
+}
+
+/* 제목 — 줄 단위로 키운다 */
+.cm-md-h {
+  font-weight: 700;
+  line-height: 1.4;
+}
+.cm-md-h1 {
+  padding-top: 0.6em !important;
+  font-size: 1.7em;
+}
+.cm-md-h2 {
+  padding-top: 0.5em !important;
+  font-size: 1.4em;
+}
+.cm-md-h3 {
+  padding-top: 0.4em !important;
+  font-size: 1.2em;
+}
+.cm-md-h4,
+.cm-md-h5,
+.cm-md-h6 {
+  font-size: 1.05em;
+}
+/* 제목 줄의 # 이 보일 때(커서가 그 줄에 있을 때)는 흐리게 */
+.cm-md-h .md-mark {
+  font-weight: 400;
+  opacity: 0.6;
+}
+
+/* 목록 점 */
+.cm-md-bullet {
+  display: inline-block;
+  width: 0.8em;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* 인용 · 코드 블록 · 가로줄 */
+.cm-md-quote {
+  border-left: 3px solid var(--border);
+  padding-left: 14px !important;
+  color: var(--muted);
+}
+.cm-md-codeblock {
+  padding: 0 12px !important;
+  background: var(--active);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.92em;
+}
+.cm-md-hr {
+  display: inline-block;
+  width: 100%;
+  height: 0;
+  border-top: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+/* 이미지
+   block 으로 두면 CodeMirror 가 위젯 앞뒤에 끼우는 커서용 조각(.cm-widgetBuffer)이
+   블록 밖으로 밀려나 그림마다 빈 줄 두 개만큼 틈이 생겼다. 줄 안의 덩어리로 둔다 */
+.cm-md-img {
+  display: inline-block;
+  max-width: 100%;
+  margin: 6px 0;
+  vertical-align: top;
+}
+.cm-md-img img {
+  display: block;
+  max-width: 100%;
+  max-height: 70vh;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.cm-md-img.is-loading img {
+  display: none;
+}
+.cm-md-img-note,
+.cm-md-img.is-note {
+  display: inline-block;
+  padding: 8px 10px;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* 맨 윗줄의 「준비됨」 */
+.cm-md-ready {
+  display: inline-block;
+  padding: 1px 10px;
+  border-radius: 999px;
+  background: var(--ready-bg);
+  color: var(--ready);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .hint {
@@ -355,8 +515,8 @@ kbd {
     padding: 10px 16px;
   }
 
-  textarea {
-    padding: 16px;
+  .editor .cm-content {
+    padding: 16px 16px 40vh;
   }
 
   kbd {

@@ -26,5 +26,13 @@ export default [
     files: ["server/**/*.{js,mjs,ts}"],
     rules: { "no-console": "off" },
   },
-  { ignores: ["dist/**", ".astro", "public/pagefind/**"] },
+  {
+    // scratch 에디터의 묶은 결과물(생성 파일) — 원본은 server/scratch-ui/src/
+    ignores: [
+      "dist/**",
+      ".astro",
+      "public/pagefind/**",
+      "server/scratch-ui/app.js",
+    ],
+  },
 ];

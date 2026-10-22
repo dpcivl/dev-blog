@@ -26,7 +26,8 @@
     "mermaid:dry": "node scripts/render-mermaid.mjs --dry",
     "mermaid:gc": "node scripts/render-mermaid.mjs --gc",
     "images:webp": "node scripts/convert-images-to-webp.mjs",
-    "images:webp:dry": "node scripts/convert-images-to-webp.mjs --dry"
+    "images:webp:dry": "node scripts/convert-images-to-webp.mjs --dry",
+    "scratch:build": "esbuild server/scratch-ui/src/app.js --bundle --minify --format=iife --target=es2020 --charset=utf8 --legal-comments=none --banner:js=\"// 생성 파일 — server/scratch-ui/src/ 를 고치고 pnpm scratch:build 로 다시 만든다\" --outfile=server/scratch-ui/app.js"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.14",
@@ -46,12 +47,20 @@
   "devDependencies": {
     "@anthropic-ai/sdk": "^0.109.1",
     "@astrojs/check": "^0.9.6",
+    "@codemirror/commands": "^6.11.1",
+    "@codemirror/lang-markdown": "^6.5.2",
+    "@codemirror/language": "^6.13.1",
+    "@codemirror/state": "^6.7.6",
+    "@codemirror/view": "^6.43.15",
+    "@lezer/highlight": "^1.2.5",
+    "@lezer/markdown": "^1.8.1",
     "@pagefind/default-ui": "^1.4.0",
     "@shikijs/transformers": "^3.20.0",
     "@tailwindcss/typography": "^0.5.19",
     "@types/lodash.kebabcase": "^4.1.9",
     "@typescript-eslint/parser": "^8.51.0",
     "dotenv": "^17.4.2",
+    "esbuild": "^0.28.2",
     "eslint": "^9.39.2",
     "eslint-plugin-astro": "^1.5.0",
     "github-slugger": "^2.0.0",

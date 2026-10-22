@@ -415,6 +415,80 @@ sudo systemd-run --wait --pipe --collect -p User=scratchsvc -p ProtectSystem=str
 sudo journalctl -u parkhyo-scratch.service -f      # 거부 사유가 여기 남는다. 본문 · 토큰은 안 남긴다
 ```
 
+### 쓰는 칸에서 바로 서식이 보인다 (2026-10-23)
+
+작성자가 velog 처럼 마크다운 서식이 바로 보이기를 원했고, 나란히 보기가 아니라 **쓰는 칸 자체에서**
+(Typora · Obsidian 식) 보이는 쪽을 골랐다. 편집 칸을 textarea 에서 **CodeMirror 6** 로 바꿨다.
+
+**문서의 글자는 절대 바꾸지 않는다.** 이런 에디터는 보통 마크다운을 내부 구조로 바꿨다가 저장할 때
+다시 써내서 목록 기호 · 줄바꿈이 바뀐다. 여기서는 커서가 없는 줄에서만 기호(`#` `**` `>` 등)를 숨기고
+제목을 키우고 이미지를 그려서 **겉모습만** 덧씌운다. 커서를 그 줄에 두면 원문이 보인다. 시험에서 메모를
+전부 열어 「저장」 이 꺼져 있는 것(= 글자가 안 바뀜)을 확인했다.
+
+```
+server/scratch-ui/src/app.js           화면 (목록 · 저장 · 완성 · 이미지 올리기)
+server/scratch-ui/src/editor.js        CodeMirror 조립
+server/scratch-ui/src/live-preview.js  커서 없는 줄의 겉모습
+        │  pnpm scratch:build (esbuild)
+        ▼
+server/scratch-ui/app.js               묶은 결과물 (생성 파일 · 512KB, gzip 177KB)
+```
+
+**CI 배포에 안 실린다.** 원본을 고치면 `pnpm scratch:build` 로 다시 묶고 서버에 손으로 올린다.
+
+#### CSP 와 CodeMirror — nonce
+
+CodeMirror 는 기본 배치 스타일을 `<style>` 로 끼워 넣는다. 이 사이트의 CSP(`style-src 'self'`)가 그걸
+막아서 **처음엔 편집 칸이 통째로 깨졌다** (`white-space: normal`). `'unsafe-inline'` 을 여는 대신
+요청마다 바뀌는 nonce 를 쓴다.
+
+```nginx
+add_header Content-Security-Policy "… style-src 'self' 'nonce-$request_id'; …" always;
+location / {
+    try_files $uri /index.html;
+    sub_filter "__CSP_NONCE__" "$request_id";   # index.html 의 <meta name="csp-nonce">
+    sub_filter_once on;
+}
+```
+
+`editor.js` 가 그 meta 를 읽어 `EditorView.cspNonce` 로 넘긴다. 강조 색은 런타임 스타일 대신
+`tagHighlighter` 로 **고정 클래스 이름**만 붙이고 모양은 `app.css` 에 쓴다.
+
+> **HTML 은 캐시하면 안 된다.** 캐시된 HTML 의 옛 nonce 와 새 응답 헤더의 nonce 가 어긋나면 스타일이
+> 다시 막힌다. 그래서 캐시는 응답 코드 · 주소별로 가른다.
+
+| 무엇 | 캐시 |
+| --- | --- |
+| HTML · API · 메모 | `no-store` |
+| `app.js` · `app.css` | `no-cache` — 바뀌었을 때만 다시 받는다 (304). gzip |
+| `/api/asset?path=assets/…` **200 응답만** | 1년 · immutable — 이름이 시각+난수라 안 바뀐다. 401 · 오류까지 기억하면 그림이 안 나온다 |
+
+#### 이미지 미리보기 — `/api/asset`
+
+이미지는 비공개 저장소에 있어서 브라우저가 바로 못 읽는다. 서비스가 꺼내 준다 (`gh_raw` →
+contents API 의 raw 형식). 허용하는 경로는 둘뿐이다.
+
+```
+assets/<메모>/<파일>.(png|jpg|jpeg|gif|webp)   웹 에디터가 올린 것
+<파일>.(png|…)                                 저장소 루트 (VS Code 로 붙인 image.png 등)
+```
+
+`..` · 하위 폴더 · `published/` · `README.md` · SVG 는 400. 처음 보는 이미지는 GitHub 에서 받아오느라
+장당 1~2초 걸려서 그동안 「이미지 불러오는 중…」 을 띄운다.
+
+#### 화면을 보고 잡은 것
+
+자동 시험만으로는 안 보였다.
+
+- 그림 상자를 `display: block` 으로 두면 CodeMirror 가 커서용으로 위젯 앞뒤에 끼우는 조각
+  (`.cm-widgetBuffer`) 이 블록 밖으로 밀려나 그림마다 빈 줄 두 개만큼 틈이 생겼다 → `inline-block`
+- 긴 메모를 아래까지 본 뒤 다른 메모를 열면 스크롤이 그대로 남아 중간부터 보였다. `scrollTop` 을
+  직접 바꾸면 CodeMirror 가 다시 재면서 되돌려서, `EditorView.scrollIntoView` 로 맨 위로 보낸다
+
+> 시험하면서 틀린 것도 남긴다 — 메모에 이미 이미지 링크가 있는데 「링크가 생겼나」 로 업로드 완료를
+> 기다려서 시험이 업로드 전에 통과했고, CodeMirror 의 `.cm-widgetBuffer` (보이지 않는 `<img>`) 를
+> 그림으로 착각해 0×0 으로 쟀다. 링크 **개수**가 늘었는지, `img:not(.cm-widgetBuffer)` 로 봐야 한다.
+
 ### 시험한 것 (2026-10-17, 실제 GitHub API · 시험 브랜치)
 
 ```

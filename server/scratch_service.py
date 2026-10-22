@@ -64,6 +64,21 @@ READY_PREFIX = "<!-- ✅ 준비됨"
 NAME_RE = re.compile(r"^[^/\\\s\x00-\x1f<>:\"|?*#%]{1,120}\.md$")
 RESERVED = {"README.md"}
 
+# 미리보기가 읽는 이미지. 저장소 루트의 이미지(VS Code 로 붙인 image.png 등)와
+# 웹 에디터가 올린 assets/<메모>/<파일> 만. 그 밖의 파일은 내주지 않는다.
+ASSET_RE = re.compile(
+    r"^(?:assets/[^/\\\s\x00-\x1f<>:\"|?*#%]{1,120}/)?[^/\\\s\x00-\x1f<>:\"|?*#%]{1,120}\.(png|jpe?g|gif|webp)$",
+    re.IGNORECASE,
+)
+ASSET_TYPES = {"png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg", "gif": "image/gif", "webp": "image/webp"}
+
+# 운영 nginx 와 같은 CSP. 로컬 시험에서도 걸어야 CodeMirror 가 CSP 아래에서
+# 깨지는지 미리 안다.
+DEV_CSP = (
+    "default-src 'none'; script-src 'self'; style-src 'self' 'nonce-{nonce}'; img-src 'self' data: blob:; "
+    "connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+)
+
 IMAGE_TYPES = {
     "image/png": ("png", (b"\x89PNG\r\n\x1a\n",)),
     "image/jpeg": ("jpg", (b"\xff\xd8\xff",)),
@@ -156,6 +171,25 @@ def gh_or_raise(method, path, body=None):
     if status in (409, 422):
         raise GitHubError(409, "conflict")
     raise GitHubError(502, f"GitHub 응답 {status}")
+
+
+def gh_raw(path):
+    """파일 내용을 바이트로 받는다 (contents API 의 raw 형식)."""
+    url = API + repo_path(path) + "?ref=" + urllib.parse.quote(BRANCH)
+    req = urllib.request.Request(url)
+    req.add_header("Authorization", f"Bearer {TOKEN}")
+    req.add_header("Accept", "application/vnd.github.raw")
+    req.add_header("X-GitHub-Api-Version", "2022-11-28")
+    req.add_header("User-Agent", "parkhyo-scratch")
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r:
+            return r.status, r.read(MAX_IMAGE + 1)
+    except urllib.error.HTTPError as e:
+        return e.code, b""
+
+
+def valid_asset(path):
+    return isinstance(path, str) and ".." not in path and ASSET_RE.match(path) is not None
 
 
 def decode_blob(data):
@@ -285,12 +319,37 @@ class Handler(BaseHTTPRequestHandler):
                 if not valid_name(name):
                     return self._fail(400, "메모 이름이 올바르지 않습니다")
                 return self._json(200, read_memo(name))
+            if url.path == "/api/asset":
+                path = urllib.parse.parse_qs(url.query).get("path", [""])[0]
+                if not valid_asset(path):
+                    return self._fail(400, "이미지 경로가 올바르지 않습니다")
+                return self._asset(path)
         except GitHubError as e:
             return self._fail(e.status, str(e))
         except Exception as e:  # noqa: BLE001 — 무엇이 터지든 밖으로는 안 흘린다
             log(f"GET 실패: {type(e).__name__}: {e}")
             return self._fail(500, "서버에서 처리하지 못했습니다")
         return self._fail(404, "not found")
+
+    def _asset(self, path):
+        status, raw = gh_raw(path)
+        if status == 404:
+            return self._fail(404, "이미지가 없습니다")
+        if status != 200:
+            log(f"이미지 읽기 {status}: {path}")
+            return self._fail(502, "이미지를 읽지 못했습니다")
+        if len(raw) > MAX_IMAGE:
+            return self._fail(413, "이미지가 너무 큽니다")
+        ext = path.rsplit(".", 1)[1].lower()
+        self.send_response(200)
+        self.send_header("Content-Type", ASSET_TYPES[ext])
+        self.send_header("Content-Length", str(len(raw)))
+        # 파일 이름이 시각+난수라 내용이 안 바뀐다. (nginx 가 no-store 를 덮어써서
+        # 실제로는 브라우저가 화면 안에서 blob 으로 들고 있는다 — live-preview.js)
+        self.send_header("Cache-Control", "private, max-age=31536000, immutable")
+        self.end_headers()
+        self.wfile.write(raw)
+        return None
 
     # ── PUT /api/memo : 저장 · 새로 만들기 ──
     def do_PUT(self):
@@ -404,7 +463,12 @@ class Handler(BaseHTTPRequestHandler):
             return self._fail(404, "not found")
         with open(os.path.join(DEV_UI_DIR, f), "rb") as fh:
             raw = fh.read()
+        # nginx 의 sub_filter + $request_id 를 흉내 낸다
+        nonce = secrets.token_hex(16)
+        if f == "index.html":
+            raw = raw.replace(b"__CSP_NONCE__", nonce.encode())
         self.send_response(200)
+        self.send_header("Content-Security-Policy", DEV_CSP.format(nonce=nonce))
         self.send_header("Content-Type", types[f.rsplit(".", 1)[1]] + "; charset=utf-8")
         self.send_header("Content-Length", str(len(raw)))
         self.end_headers()

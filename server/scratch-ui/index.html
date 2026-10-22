@@ -4,6 +4,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
+    <!-- nginx 가 요청마다 무작위 값으로 바꾼다 (sub_filter). CodeMirror 가 자기 <style> 에
+         붙여서 CSP 의 style-src 를 통과한다 — 'unsafe-inline' 을 열지 않으려고 -->
+    <meta name="csp-nonce" content="__CSP_NONCE__" />
     <title>scratch · parkhyo.in</title>
     <link rel="stylesheet" href="/app.css" />
     <script src="/app.js" defer></script>
@@ -50,17 +53,11 @@
           </div>
         </div>
 
-        <label class="sr" for="editor">메모 본문</label>
-        <textarea
-          id="editor"
-          spellcheck="false"
-          disabled
-          placeholder="왼쪽에서 메모를 고르거나 새로 만드세요."
-        ></textarea>
+        <div class="editor" id="editor"></div>
 
         <p class="hint">
-          이미지는 붙여넣거나 끌어다 놓으면 올라갑니다 · 다 쓰면 「완성」 — 다음 세션에서
-          Claude 가 초안으로 만듭니다
+          마크다운으로 쓰면 바로 서식이 보이고, 커서를 그 줄에 두면 원문이 보입니다 · 이미지는
+          붙여넣거나 끌어다 놓으면 올라갑니다 · 다 쓰면 「완성」
         </p>
       </main>
     </div>
