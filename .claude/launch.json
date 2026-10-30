@@ -1,0 +1,18 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dev-blog",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["dev"],
+      "port": 4321
+    },
+    {
+      "// ": "scratch 화면·목업을 정적으로 띄운다 (server/scratch-ui). 서버 API 는 안 돈다",
+      "name": "scratch-ui",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "4399", "--directory", "server/scratch-ui"],
+      "port": 4399
+    }
+  ]
+}

@@ -29,8 +29,14 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
-# claude code local settings
-.claude/
+# claude code — 공유할 것만 추적한다. 두 기기에서 같은 파이프라인을 써야 하고,
+# 성격이 CLAUDE.md 와 같은 프로젝트 규칙이다. settings.local.json · 세션 기록은 계속 무시.
+.claude/*
+!.claude/agents/
+!.claude/commands/
+!.claude/orchestration.md
+!.claude/launch.json
+!.claude/settings.json
 
 # scratch notes — main repo 는 완전 무시.
 # 실제 관리는 별도 private repo (dpcivl/dev-blog-scratch) 가 함.
@@ -49,3 +55,7 @@ public/search/
 # 파이썬 바이트코드
 __pycache__/
 *.pyc
+
+# 오케스트레이션 실행 산출물 (리뷰·QA·보안 보고서)
+# 🔴 보안 점검 보고서가 고치기 전의 취약점을 적는다. 이 저장소는 공개다 — 커밋하지 않는다
+.orchestration/
