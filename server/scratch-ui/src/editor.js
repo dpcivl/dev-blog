@@ -7,8 +7,8 @@
 import { history, defaultKeymap, historyKeymap, indentWithTab, isolateHistory } from "@codemirror/commands";
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
 import { syntaxHighlighting } from "@codemirror/language";
-import { Compartment, EditorState } from "@codemirror/state";
-import { drawSelection, EditorView, keymap, placeholder } from "@codemirror/view";
+import { Compartment, EditorState, StateEffect, StateField } from "@codemirror/state";
+import { Decoration, drawSelection, EditorView, keymap, placeholder } from "@codemirror/view";
 import { tagHighlighter, tags as t } from "@lezer/highlight";
 import { livePreview, seedImage } from "./live-preview.js";
 
@@ -26,9 +26,49 @@ const mdClasses = tagHighlighter([
   { tag: t.contentSeparator, class: "md-mark" },
 ]);
 
+// ── 가져온 범위 (초안 결정 화면) ──
+// 오른쪽 초안에서 왼쪽 덩어리로 옮긴 범위를 기억해서 흐리게 칠한다. 문서의 글자는 건드리지
+// 않고 데코레이션만 얹는다. 위치는 문서가 바뀌면 따라 움직인다.
+
+const setPulledRanges = StateEffect.define();
+const pulledMark = Decoration.mark({ class: "cm-md-pulled" });
+
+/** 겹치거나 맞닿은 범위를 하나로 합쳐 정렬한다 */
+function mergeRanges(ranges) {
+  const sorted = ranges
+    .filter(r => r.to > r.from)
+    .map(r => ({ from: r.from, to: r.to }))
+    .sort((a, b) => a.from - b.from);
+  const out = [];
+  for (const r of sorted) {
+    const last = out[out.length - 1];
+    if (last && r.from <= last.to) last.to = Math.max(last.to, r.to);
+    else out.push(r);
+  }
+  return out;
+}
+
+const pulledField = StateField.define({
+  create: () => [],
+  update(ranges, tr) {
+    let next = ranges;
+    if (tr.docChanged) {
+      next = mergeRanges(
+        next.map(r => ({ from: tr.changes.mapPos(r.from, 1), to: tr.changes.mapPos(r.to, -1) }))
+      );
+    }
+    for (const e of tr.effects) if (e.is(setPulledRanges)) next = mergeRanges(e.value);
+    return next;
+  },
+  provide: f =>
+    EditorView.decorations.from(f, ranges =>
+      Decoration.set(ranges.map(r => pulledMark.range(r.from, r.to)))
+    ),
+});
+
 /**
  * @param {HTMLElement} parent
- * @param {{ onChange: () => void, onFiles: (files: File[]) => void }} hooks
+ * @param {{ onChange: () => void, onFiles: (files: File[]) => void, onSelection?: () => void }} hooks
  */
 export function createEditor(parent, hooks) {
   const editable = new Compartment();
@@ -45,12 +85,14 @@ export function createEditor(parent, hooks) {
     markdown({ base: markdownLanguage }),
     syntaxHighlighting(mdClasses),
     livePreview,
+    pulledField,
     keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
     editable.of(EditorView.editable.of(false)),
     placeholder("왼쪽에서 메모를 고르거나 새로 만드세요."),
     EditorView.contentAttributes.of({ "aria-label": "메모 본문", spellcheck: "false" }),
     EditorView.updateListener.of(u => {
       if (u.docChanged) hooks.onChange();
+      if (u.selectionSet && hooks.onSelection) hooks.onSelection();
     }),
     EditorView.domEventHandlers({
       paste(e) {
@@ -123,6 +165,40 @@ export function createEditor(parent, hooks) {
       view.dispatch({ changes: { from: 0, to }, annotations: isolateHistory.of("full") });
       return true;
     },
+
+    /** 고른 글. 고른 게 없으면 빈 문자열 */
+    getSelectionText() {
+      const { from, to } = view.state.selection.main;
+      return from === to ? "" : view.state.sliceDoc(from, to);
+    },
+
+    /**
+     * 가져올 범위. 고른 데가 있으면 그만큼, 없으면 커서가 있는 줄. 빈 줄이면 null
+     * (산문에서 줄 경계는 자의적이라 기본은 고른 만큼이다)
+     */
+    getPullRange() {
+      const { from, to } = view.state.selection.main;
+      if (from !== to) return { from, to, text: view.state.sliceDoc(from, to) };
+      const line = view.state.doc.lineAt(from);
+      return line.text.trim() ? { from: line.from, to: line.to, text: line.text } : null;
+    },
+
+    /** 옮겨 간 범위를 흐리게. 겹치면 합친다 */
+    markPulled(from, to) {
+      const ranges = view.state.field(pulledField);
+      view.dispatch({ effects: setPulledRanges.of([...ranges, { from, to }]) });
+    },
+    getPulled: () => view.state.field(pulledField).map(r => ({ ...r })),
+    /** 보관해둔 범위를 되살린다. 문서 길이를 넘는 값은 잘라낸다 */
+    setPulled(ranges) {
+      const len = view.state.doc.length;
+      view.dispatch({
+        effects: setPulledRanges.of(
+          ranges.map(r => ({ from: Math.min(r.from, len), to: Math.min(r.to, len) }))
+        ),
+      });
+    },
+    clearPulled: () => view.dispatch({ effects: setPulledRanges.of([]) }),
 
     seedImage,
     focus: () => view.focus(),

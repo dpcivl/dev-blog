@@ -119,9 +119,12 @@ def log(msg):
 
 
 def valid_name(name):
+    # fullmatch 다. match 는 파이썬의 `$` 가 끝 줄바꿈 앞에서도 맞아서
+    # "memo.md\n" 을 통과시켰다 (2026-10-31 확인). 이름에 줄바꿈이 붙으면
+    # 저장소에 열 수 없는 경로가 생긴다
     return (
         isinstance(name, str)
-        and NAME_RE.match(name) is not None
+        and NAME_RE.fullmatch(name) is not None
         and not name.startswith(".")
         and ".." not in name
         and name not in RESERVED
@@ -195,7 +198,8 @@ def gh_raw(path):
 
 
 def valid_asset(path):
-    return isinstance(path, str) and ".." not in path and ASSET_RE.match(path) is not None
+    # valid_name 과 같은 이유로 fullmatch 다
+    return isinstance(path, str) and ".." not in path and ASSET_RE.fullmatch(path) is not None
 
 
 def decode_blob(data):

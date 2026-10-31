@@ -7,10 +7,26 @@
 // 저장은 곧 GitHub 커밋이라 자동 저장을 하지 않는다 (글자마다 커밋이 쌓인다).
 // 대신 저장하지 않은 글은 이 브라우저의 localStorage 에 보관해서, 창을 닫거나
 // 저장이 거부돼도 잃지 않게 한다.
+//
+// 「초안 결정」을 누르면 화면이 3열(목록 · 글 짜기 · 읽기 전용 초안)로 바뀐다. 그 왼쪽 칸은
+// compose.js 가 맡고, 이 파일은 모드 전환 · 초안에서 가져오기 · 서버 호출만 이어준다.
+import {
+  askStash,
+  composeManuscript,
+  createCompose,
+  dropCompose,
+  hasContent,
+  parseTags,
+  readCompose,
+  slugProblem,
+  storeCompose,
+} from "./compose.js";
 import { createEditor } from "./editor.js";
 
 const READY_PREFIX = "<!-- ✅ 준비됨";
 const READY_FIRST_LINE = /^<!-- ✅ 준비됨[^\n]*-->$/;
+const READY_LEAD = /^<!-- ✅ 준비됨[^\n]*-->\n*/;
+const MEMO_MARK = /^\s*[+?!]/;
 const MAX_IMAGE = 8 * 1024 * 1024;
 
 const $ = s => document.querySelector(s);
@@ -24,11 +40,45 @@ const newBtn = $("#new");
 const newForm = $("#new-form");
 const newInput = $("#new-input");
 const toastEl = $("#toast");
+const appEl = $("#app");
+const composeEl = $("#compose");
+const decideBtn = $("#decide");
+const stashBtn = $("#stash");
+const dockBtn = $("#dock");
+const pullBtn = $("#pull");
+const pullLabel = $("#pull-label");
+const unmarkBtn = $("#unmark");
+const noteEl = $("#draft-note");
+const progressEl = $("#progress");
+const meterEl = $("#meter");
+const hintEl = $("#hint");
+const draftHint = hintEl.textContent;
+const composeHint =
+  "초안은 그대로 남습니다 — 원고로 저장하면 맨 위에 「원고로 옮김」 주석을 달고 published/ 로 옮깁니다";
 
 const ed = createEditor($("#editor"), {
   onChange: () => onInput(),
   onFiles: files => files.forEach(uploadImage),
+  onSelection: () => renderPull(),
 });
+const composer = createCompose(composeEl, {
+  onChange: () => onComposeInput(),
+  onActive: label => {
+    pullBtn.title = `${label} 로 가져오기`;
+  },
+  // 뼈대를 갈아끼우면 가져온 글이 모두 사라진 것이므로 표시도 걷는다
+  onSkeleton: () => {
+    ed.clearPulled();
+    renderProgress();
+  },
+});
+
+/** "draft" 는 지금까지의 메모 칸, "compose" 는 초안을 오른쪽으로 보내고 왼쪽에서 글을 짜는 화면 */
+let mode = "draft";
+/** 왼쪽 칸이 지금 어느 메모의 덩어리를 들고 있나 */
+let composeFor = null;
+/** 덩어리를 브라우저에 못 맡겼는데 쓴 게 있으면 true — 창을 닫을 때만 묻는다 */
+let composeUnsafe = false;
 let editableNow = false;
 function loadText(text) {
   ed.setText(text); // 새 상태는 편집 불가로 시작한다 — render() 가 다시 켠다
@@ -131,15 +181,21 @@ function toast(message, error = false) {
 
 function render() {
   nameEl.textContent = current ? stem(current.name) : "메모를 고르세요";
-  badge.hidden = !(current && isReady());
-  if (!!current !== editableNow) {
-    ed.setEditable(!!current);
-    editableNow = !!current;
+  const composing = mode === "compose";
+  badge.textContent = composing ? "초안 결정" : "준비됨";
+  badge.hidden = composing ? !current : !(current && isReady());
+  // 초안 결정 화면에서 오른쪽 초안은 읽기 전용이다
+  const editNow = !!current && !composing;
+  if (editNow !== editableNow) {
+    ed.setEditable(editNow);
+    editableNow = editNow;
   }
   saveBtn.disabled = !current || busy || !isDirty();
   readyBtn.disabled = !current || busy;
+  decideBtn.disabled = !current || busy;
+  stashBtn.disabled = busy;
   readyBtn.textContent = current && isReady() ? "완성 취소" : "완성";
-  if (current && isDirty() && !busy) statusEl.textContent = "저장 안 됨";
+  if (current && isDirty() && !busy && !composing) statusEl.textContent = "저장 안 됨";
   for (const b of listEl.querySelectorAll(".item")) {
     if (current && b.dataset.name === current.name) b.setAttribute("aria-current", "true");
     else b.removeAttribute("aria-current");
@@ -199,6 +255,11 @@ async function openMemo(name) {
     return;
   }
   keepDraft();
+  keepCompose();
+  // 다른 초안으로 넘어가면 왼쪽 칸은 보관본에서 다시 세운다. 가져온 표시는 초안 쪽 상태라
+  // 새로 열 때 사라지므로, 이전 메모로 돌아왔을 때 보관한 범위를 되살려야 한다
+  composeFor = null;
+  if (mode === "compose") setMode("draft");
   busy = true;
   statusEl.textContent = "불러오는 중…";
   render();
@@ -253,6 +314,7 @@ async function save(reason = "save") {
     current.saved = text;
     // 저장하는 동안 더 쓴 게 있으면 그건 아직 보관 대상이다
     keepDraft();
+    keepCompose();
     statusEl.textContent = `저장됨 · ${hhmm()}`;
     if (reason === "ready") toast("완성으로 표시했습니다. 다음 세션에서 Claude 가 초안을 만듭니다");
     loadList();
@@ -324,6 +386,7 @@ function readAsBase64(file) {
 
 let uploading = 0;
 async function uploadImage(file) {
+  if (mode === "compose") return;
   if (!current) {
     toast("메모를 먼저 여세요", true);
     return;
@@ -359,6 +422,204 @@ async function uploadImage(file) {
   }
 }
 
+// ── 초안 결정 · 글 짜기 ──
+
+/** 공백을 뺀 글자 수 */
+const countChars = text => text.replace(/\s/g, "").length;
+
+/** 초안에서 셀 글 — 맨 위 「준비됨」 줄은 옮길 글이 아니다 */
+function draftBody() {
+  const text = ed.getText();
+  const lead = READY_LEAD.exec(text);
+  return { text, offset: lead ? lead[0].length : 0 };
+}
+
+function renderProgress() {
+  const { text, offset } = draftBody();
+  const total = countChars(text.slice(offset));
+  let done = 0;
+  for (const r of ed.getPulled()) {
+    if (r.to > offset) done += countChars(text.slice(Math.max(r.from, offset), r.to));
+  }
+  progressEl.textContent = `${done} / ${total}자 옮김`;
+  meterEl.max = Math.max(total, 1);
+  meterEl.value = done;
+}
+
+/** 「가져오기」 — 고른 데가 있으면 눈에 띄게, 없으면 커서가 있는 줄 */
+function renderPull() {
+  if (mode !== "compose") return;
+  const picked = ed.getSelectionText() !== "";
+  pullLabel.textContent = picked ? "고른 글 가져오기" : "이 줄 가져오기";
+  pullBtn.classList.toggle("btn-primary", picked);
+  pullBtn.classList.toggle("btn-quiet", !picked);
+  pullBtn.disabled = busy || !current;
+}
+
+function pullFromDraft() {
+  if (mode !== "compose" || !current) return;
+  const r = ed.getPullRange();
+  if (!r) {
+    toast("고른 글이 없습니다. 초안에서 가져올 글을 고르세요", true);
+    return;
+  }
+  // 「준비됨」 줄이 걸렸으면 그 줄은 빼고 옮긴다
+  let { from, text } = r;
+  const lead = from === 0 ? READY_LEAD.exec(text) : null;
+  if (lead) {
+    from += lead[0].length;
+    text = text.slice(lead[0].length);
+  }
+  if (!text.trim()) {
+    toast("옮길 글이 없습니다. 「준비됨」 줄은 가져가지 않습니다", true);
+    return;
+  }
+  const covered = ed.getPulled().some(p => p.from <= from && p.to >= r.to);
+  if (covered) {
+    toast("이미 가져온 글입니다. 다시 가져오려면 「표시 지우기」를 먼저 누르세요", true);
+    return;
+  }
+  // 원문 그대로 넣는다. 문장을 만들거나 고치지 않는다
+  const res = composer.pull(text);
+  if (!res) return;
+  ed.markPulled(from, r.to);
+  renderProgress();
+  if (res.kind === "title") {
+    toast("초안의 소제목을 덩어리 제목으로 넣었습니다 — 결론 문장으로 고쳐 쓰면 됩니다");
+  } else if (MEMO_MARK.test(text)) {
+    toast("메모 표기(? ! +)가 그대로 들어왔습니다 — 왼쪽에서 풀어 쓰거나 지우세요");
+  } else {
+    toast(`${res.label} 로 가져왔습니다`);
+  }
+}
+
+function setMode(next) {
+  mode = next;
+  const composing = next === "compose";
+  appEl.dataset.mode = next;
+  composeEl.hidden = !composing;
+  noteEl.hidden = !composing;
+  decideBtn.hidden = composing;
+  saveBtn.hidden = composing;
+  readyBtn.hidden = composing;
+  statusEl.hidden = composing;
+  hintEl.textContent = composing ? composeHint : draftHint;
+  render();
+  renderPull();
+}
+
+async function enterCompose() {
+  if (!current || busy) return;
+  // 서버가 옮기는 건 저장된 글이다. 저장 안 된 변경이 있으면 화면과 어긋난다
+  if (isDirty()) {
+    toast("저장하지 않은 글이 있습니다. 먼저 저장하세요 (⌘S)", true);
+    return;
+  }
+  if (!ed.getText().trim()) {
+    toast("빈 메모는 초안으로 결정할 수 없습니다", true);
+    return;
+  }
+  if (composeFor !== current.name) {
+    composeFor = current.name;
+    const d = readCompose(current.name);
+    composer.setState(d);
+    ed.clearPulled();
+    if (d) {
+      const stale = d.base && d.base !== current.sha;
+      if (!stale && Array.isArray(d.pulled)) ed.setPulled(d.pulled);
+      toast(
+        "이 브라우저에 보관한 덩어리를 불러왔습니다" +
+          (stale ? " · 초안이 그 뒤로 바뀌어서 가져온 표시는 지웠습니다" : "")
+      );
+    }
+  }
+  setMode("compose");
+  renderProgress();
+  composer.focusFirst();
+}
+
+function leaveCompose() {
+  keepCompose();
+  setMode("draft");
+  decideBtn.focus();
+}
+
+/** 지금 덩어리를 브라우저에 보관한다. 쓴 게 없으면 보관한 것도 지운다 */
+function keepCompose() {
+  if (!composeFor) return;
+  const st = composer.getState();
+  const pulled = ed.getPulled();
+  const metaFilled = Object.values(st.meta).some(v => v.trim());
+  if (!hasContent(st.sections) && !metaFilled && !pulled.length) {
+    dropCompose(composeFor);
+    composeUnsafe = false;
+    return;
+  }
+  const kept = storeCompose(composeFor, {
+    ...st,
+    pulled,
+    base: current && current.name === composeFor ? current.sha : null,
+    at: Date.now(),
+  });
+  composeUnsafe = !kept;
+}
+
+let composeTimer;
+function onComposeInput() {
+  clearTimeout(composeTimer);
+  composeTimer = setTimeout(keepCompose, 400);
+}
+
+async function stash() {
+  if (!current || busy || mode !== "compose") return;
+  const st = composer.getState();
+  if (!hasContent(st.sections)) {
+    toast("쓴 글이 없습니다. 덩어리에 제목이나 본문을 채우세요", true);
+    return;
+  }
+  const slug = st.meta.slug.trim();
+  const problem = slugProblem(slug);
+  if (problem) {
+    composer.showSlug();
+    toast(problem, true);
+    return;
+  }
+  const text = composeManuscript(st.sections, {
+    title: st.meta.title,
+    description: st.meta.description,
+    tags: parseTags(st.meta.tags),
+  });
+  if (!(await askStash($("#stash-sheet"), { path: `posts/${slug}.md`, text }))) return;
+
+  const name = current.name;
+  busy = true;
+  statusEl.textContent = "원고로 저장하는 중…";
+  render();
+  try {
+    const r = await api("POST", "/api/stash", { memo: name, sha: current.sha, slug, content: text });
+    // 메모는 서버에서 published/ 로 옮겨졌다. 목록에서도 사라진다
+    dropDraft(name);
+    dropCompose(name);
+    current = null;
+    composeFor = null;
+    composeUnsafe = false;
+    loadText("");
+    ed.clearPulled();
+    composer.setState(null);
+    setMode("draft");
+    history.replaceState(null, "", location.pathname + location.search);
+    statusEl.textContent = "";
+    toast(`원고로 저장했습니다 — ${r.manuscript} · 초안은 ${r.moved} 로 옮겼습니다`);
+    loadList();
+  } catch (e) {
+    statusEl.textContent = "";
+    toast(e.message, true);
+  } finally {
+    busy = false;
+    render();
+  }
+}
+
 // ── 이벤트 ──
 
 let draftTimer;
@@ -373,15 +634,35 @@ document.addEventListener("keydown", e => {
     e.preventDefault();
     if (isDirty()) save();
   }
+  if (mode === "compose" && e.altKey && e.key === "Enter") {
+    e.preventDefault();
+    pullFromDraft();
+  }
 });
 
 window.addEventListener("beforeunload", e => {
-  if (!isDirty()) return;
+  keepCompose();
+  if (!isDirty() && !composeUnsafe) return;
   keepDraft();
   e.preventDefault();
   e.returnValue = "";
 });
 
+decideBtn.addEventListener("click", enterCompose);
+$("#back").addEventListener("click", leaveCompose);
+stashBtn.addEventListener("click", stash);
+pullBtn.addEventListener("click", pullFromDraft);
+unmarkBtn.addEventListener("click", () => {
+  ed.clearPulled();
+  renderProgress();
+  onComposeInput();
+});
+dockBtn.addEventListener("click", () => {
+  const closed = appEl.dataset.dock !== "closed";
+  appEl.dataset.dock = closed ? "closed" : "open";
+  dockBtn.textContent = closed ? "펴기" : "접기";
+  dockBtn.setAttribute("aria-expanded", String(!closed));
+});
 saveBtn.addEventListener("click", () => save());
 readyBtn.addEventListener("click", toggleReady);
 newBtn.addEventListener("click", () => toggleNewForm(true));

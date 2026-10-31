@@ -42,6 +42,14 @@ class TestValidName:
         # scratch 저장소에서 유일하게 main repo 가 추적하는 파일이다
         assert not svc.valid_name("README.md")
 
+    def test_끝에_붙은_줄바꿈을_거부한다(self):
+        # 2026-10-31 실제로 통과하던 구멍이다. 파이썬의 `$` 는 끝 줄바꿈 앞에서도
+        # 맞아서 `NAME_RE.match("memo.md\n")` 이 성립했다. fullmatch 로 막았다.
+        # 줄바꿈이 붙은 이름은 저장소에 열 수 없는 경로를 만든다
+        assert not svc.valid_name("memo.md\n")
+        assert not svc.valid_name("memo.md\r")
+        assert not svc.valid_name("README.md\n")
+
     def test_공백과_제어문자를_거부한다(self):
         # 공백이 든 이름은 웹 에디터로 열 수 없다. published/ 에 그런 메모가
         # 여섯 개 있지만(`항만도메인공부 - 1.md` 등) 거기는 애초에 API 가 닿지
@@ -87,6 +95,11 @@ class TestValidAsset:
         assert not svc.valid_asset("memo.md")
         assert not svc.valid_asset("a.svg")  # SVG 는 스크립트를 품을 수 있다
         assert not svc.valid_asset("a.html")
+
+    def test_끝에_붙은_줄바꿈을_거부한다(self):
+        # valid_name 과 같은 구멍이 여기에도 있었다
+        assert not svc.valid_asset("image.png\n")
+        assert not svc.valid_asset("assets/메모/x.png\n")
 
     def test_문자열이_아니면_거부한다(self):
         assert not svc.valid_asset(None)
