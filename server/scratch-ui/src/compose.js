@@ -50,12 +50,28 @@ const oneLine = v =>
     .replace(/\s*[\r\n]+\s*/g, " ")
     .trim();
 
+/**
+ * 앞말에 조사 「로/으로」 를 붙여 돌려준다. 받침이 없거나 ㄹ 이면 「로」, 그 밖의 받침은 「으로」.
+ * 판정은 마지막 한글 음절로 하고, 「상황」 처럼 닫는 괄호가 뒤에 붙은 것은 건너뛴다.
+ * 한글이 아니면 「로」 로 둔다 (published/x.md 로)
+ */
+export function withRo(word) {
+  const s = String(word ?? "");
+  const last = s.replace(/[\s」』)\]"'>]+$/, "").slice(-1);
+  const code = last.charCodeAt(0) - 0xac00;
+  const jong = code >= 0 && code <= 11171 ? code % 28 : 0;
+  return `${s}${jong === 0 || jong === 8 ? "로" : "으로"}`;
+}
+
 /** frontmatter 값. 평범한 글은 그대로 두고, YAML 이 다르게 읽을 만한 것만 따옴표로 감싼다 */
 function yamlScalar(v, inList = false) {
   const risky =
     /^[-?:,[\]{}#&*!|>'"%@`]/.test(v) ||
     /:(\s|$)|\s#/.test(v) ||
     /^(true|false|null|yes|no|on|off|~|[-+]?\d[\d_.:e+-]*)$/i.test(v) ||
+    // 0x1F · 0o17 · 0b101 · .inf · .nan · .5 는 숫자로, 2026-10-31 꼴은 날짜로 읽힌다
+    /^[-+]?(0[xob][0-9a-f_]+|\.(inf|nan)|\.\d[\d_]*(e[-+]?\d+)?)$/i.test(v) ||
+    /^\d{4}-\d{1,2}-\d{1,2}([Tt\s].*)?$/.test(v) ||
     (inList && /[,[\]{}]/.test(v));
   return risky ? JSON.stringify(v) : v;
 }

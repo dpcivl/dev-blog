@@ -142,6 +142,29 @@ class TestRewriteReadyLine:
         out = svc.rewrite_ready_line("<!-- ✅ 준비됨 (2025-01-02) -->\n본문", POSTED)
         assert out == f"{POSTED}\n본문"
 
+    def test_준비됨_주석_뒤에_같은_줄_글자가_있으면_그_글자가_살아남는다(self):
+        # 본문이 첫 줄에 붙어 있는 메모. 줄을 통째로 갈아 끼우면 본문이 날아간다
+        text = f"{READY} 본문이 같은 줄에 있다\n둘째 줄"
+        out = svc.rewrite_ready_line(text, POSTED)
+        assert "본문이 같은 줄에 있다" in out
+        assert "둘째 줄" in out
+
+    def test_같은_줄_글자가_있어도_머리줄은_맨_위에_붙는다(self):
+        out = svc.rewrite_ready_line(f"{READY} 본문\n둘째 줄", POSTED)
+        assert out.startswith(f"{POSTED}\n")
+
+    @pytest.mark.parametrize("tail", ["x", " x", "\t본문", "  본문  "])
+    def test_주석_뒤에_공백이_아닌_글자가_있으면_바꾸지_않는다(self, tail):
+        out = svc.rewrite_ready_line(f"{READY}{tail}\n둘째 줄", POSTED)
+        assert tail.strip() in out
+        assert "둘째 줄" in out
+
+    @pytest.mark.parametrize("tail", [" ", "   ", "\t", " \t "])
+    def test_주석_뒤가_공백뿐이면_주석만_있는_줄로_본다(self, tail):
+        out = svc.rewrite_ready_line(f"{READY}{tail}\n본문\n", POSTED)
+        assert out == f"{POSTED}\n본문\n"
+        assert "준비됨" not in out
+
     def test_빈_문자열이면_발행됨_줄만_남는다(self):
         out = svc.rewrite_ready_line("", POSTED)
         assert out.strip() == POSTED
@@ -160,6 +183,50 @@ class TestRewriteReadyLine:
         old = "<!-- 📤 발행됨: ./data/blog/ko/old.md (2026-01-01) -->"
         out = svc.rewrite_ready_line(f"{old}\n본문", POSTED)
         assert out == f"{POSTED}\n{old}\n본문"
+
+
+# ───────────────────────── 2b. decode_blob ─────────────────────────
+
+
+def _text(x):
+    return x if isinstance(x, str) else x.decode("utf-8")
+
+
+class TestDecodeBlob:
+    """1MB 가 넘는 파일은 Contents API 가 200 + `content: ""` + `encoding: "none"` 을
+    준다. 이걸 빈 본문으로 받아들이면 `published/` 사본이 껍데기가 되고, 같은 커밋에서
+    루트 메모가 지워진다 — 200 OK 로."""
+
+    def test_base64_본문은_그대로_디코드된다(self):
+        text = "# 제목\n\n한글 본문 ✅\n"
+        enc = base64.b64encode(text.encode()).decode()
+        out = svc.decode_blob({"content": enc, "encoding": "base64", "sha": MEMO_SHA})
+        assert _text(out) == text
+
+    def test_GitHub_가_줄바꿈을_섞어_준_base64_도_디코드된다(self):
+        text = "가나다라마바사 " * 40
+        enc = base64.b64encode(text.encode()).decode()
+        wrapped = "\n".join(enc[i : i + 60] for i in range(0, len(enc), 60)) + "\n"
+        out = svc.decode_blob({"content": wrapped, "encoding": "base64"})
+        assert _text(out) == text
+
+    def test_encoding_none_이면_빈_문자열을_돌려주지_않고_올린다(self):
+        with pytest.raises(svc.GitHubError):
+            svc.decode_blob(
+                {"content": "", "encoding": "none", "size": 2_000_000, "sha": MEMO_SHA}
+            )
+
+    def test_encoding_none_이면_content_가_차_있어도_올린다(self):
+        with pytest.raises(svc.GitHubError):
+            svc.decode_blob({"content": "abc", "encoding": "none"})
+
+    def test_encoding_키가_없어도_올린다(self):
+        with pytest.raises(svc.GitHubError):
+            svc.decode_blob({"content": "", "sha": MEMO_SHA})
+
+    def test_알_수_없는_encoding_도_올린다(self):
+        with pytest.raises(svc.GitHubError):
+            svc.decode_blob({"content": "abc", "encoding": "utf-8"})
 
 
 # ───────────────────────── 3. build_stash_tree ─────────────────────────
@@ -245,7 +312,9 @@ class FakeGitHub:
         memo_sha=MEMO_SHA,
         existing=(),
         patch_status=None,
+        memo_large=False,
     ):
+        self.memo_large = memo_large  # 1MB 넘는 파일 — Contents API 가 본문을 비워 준다
         self.memo_text = memo_text
         self.memo_sha = memo_sha
         self.existing = set(existing)  # 이미 있는 저장소 경로
@@ -324,6 +393,16 @@ class FakeGitHub:
                     sha, text = self.memo_sha, self.memo_text
                 else:
                     sha, text = MOVED_SHA, "다른 기기에서 고친 뒤의 본문\n"
+                if self.memo_large:
+                    # 실제 GitHub: 200 + content "" + encoding "none" (1~100MB)
+                    return 200, {
+                        "type": "file",
+                        "path": MEMO,
+                        "sha": sha,
+                        "size": 2_000_000,
+                        "encoding": "none",
+                        "content": "",
+                    }
                 return 200, {
                     "type": "file",
                     "path": MEMO,
@@ -386,7 +465,9 @@ def _request(payload, *, raw=None, headers=None):
     msg["Host"] = "scratch.parkhyo.in"
     msg["Origin"] = svc.ALLOWED_ORIGIN  # 교차 출처 요청 거부를 통과시킨다
     for k, v in (headers or {}).items():
-        msg[k] = v
+        del msg[k]  # 같은 이름을 덧붙이지 않고 바꾼다 (없으면 무시)
+        if v is not None:  # None 이면 헤더를 뺀다
+            msg[k] = v
     h.headers = msg
     h.log_message = lambda *a, **k: None
     h.log_request = lambda *a, **k: None
@@ -618,6 +699,93 @@ class TestReadsMemoAtHeadCommit:
         assert i_ref < i_memo
 
 
+class TestLargeMemo:
+    """메모가 1MB 를 넘으면 본문을 못 읽는다. 「전부 되거나 전부 안 된다」가 「사본이
+    원본과 같다」를 보장하지는 않는다 — 빈 사본으로 커밋이 성공하면 원본만 사라진다."""
+
+    def test_쓰기_호출이_하나도_나가지_않는다(self, world):
+        fake = world(memo_large=True)
+        _request(_payload())
+        assert fake.writes() == []
+
+    def test_오류_상태로_끝난다(self, world):
+        world(memo_large=True)
+        status, _ = _request(_payload())
+        assert status >= 400
+
+    def test_성공_응답을_주지_않는다(self, world):
+        world(memo_large=True)
+        status, _ = _request(_payload())
+        assert status != 200
+
+    def test_ref_갱신이_없다(self, world):
+        fake = world(memo_large=True)
+        _request(_payload())
+        assert fake.patches() == []
+        assert fake.find("POST", "/git/commits") == []
+
+    def test_빈_사본이_blob_으로_올라가지_않는다(self, world):
+        fake = world(memo_large=True)
+        _request(_payload())
+        assert fake.find("POST", "/git/blobs") == []
+
+
+class TestWriteGuard:
+    """새 경로에도 CSRF 가드가 걸린다. 거부되면 GitHub 를 한 번도 부르지 않는다."""
+
+    @pytest.mark.parametrize(
+        "origin",
+        [
+            "https://evil.example",
+            "http://scratch.parkhyo.in",
+            "https://scratch.parkhyo.in.evil.example",
+            "null",
+            "",
+        ],
+    )
+    def test_Origin_이_허용된_것이_아니면_403(self, world, origin):
+        fake = world()
+        status, _ = _request(_payload(), headers={"Origin": origin})
+        assert status == 403
+        assert fake.calls == []
+
+    def test_Origin_헤더가_없으면_403(self, world):
+        fake = world()
+        status, _ = _request(_payload(), headers={"Origin": None})
+        assert status == 403
+        assert fake.calls == []
+
+    @pytest.mark.parametrize(
+        "ctype",
+        ["text/plain", "application/x-www-form-urlencoded", "multipart/form-data"],
+    )
+    def test_Content_Type_이_json_이_아니면_415(self, world, ctype):
+        fake = world()
+        status, _ = _request(_payload(), headers={"Content-Type": ctype})
+        assert status == 415
+        assert fake.calls == []
+
+    def test_Content_Type_이_없으면_415(self, world):
+        fake = world()
+        status, _ = _request(_payload(), headers={"Content-Type": None})
+        assert status == 415
+        assert fake.calls == []
+
+    @pytest.mark.parametrize("token", ["", None])
+    def test_토큰이_없으면_거부하고_GitHub_를_부르지_않는다(self, world, monkeypatch, token):
+        fake = world()
+        monkeypatch.setattr(svc, "TOKEN", token)
+        status, _ = _request(_payload())
+        assert status in (401, 403, 503)
+        assert fake.calls == []
+
+    def test_가드를_통과한_정상_요청은_200(self, world):
+        # 위 거부들이 헤더 조립 실수 때문이 아님을 보인다
+        world()
+        status, _ = _request(_payload())
+        assert status == 200
+
+
 class TestHandlerConflicts:
     def test_메모_sha_가_다르면_409_이다(self, world):
         # 그 사이 다른 기기에서 바뀐 경우
@@ -641,6 +809,24 @@ class TestHandlerConflicts:
         assert fake.find("POST", "/git/commits") == []
         assert fake.patches() == []
         assert fake.contents_writes() == []
+
+    def test_published_에_같은_메모_이름이_이미_있으면_409_이다(self, world):
+        # 덮어쓰면 옛 초안이 사라진다
+        world(existing={f"published/{MEMO}"})
+        status, _ = _request(_payload())
+        assert status == 409
+
+    def test_published_에_이미_있으면_커밋도_ref_갱신도_없다(self, world):
+        fake = world(existing={f"published/{MEMO}"})
+        _request(_payload())
+        assert fake.find("POST", "/git/commits") == []
+        assert fake.patches() == []
+        assert fake.contents_writes() == []
+
+    def test_published_에_이미_있으면_쓰기_호출이_하나도_없다(self, world):
+        fake = world(existing={f"published/{MEMO}"})
+        _request(_payload())
+        assert fake.writes() == []
 
     def test_다른_슬러그의_원고가_있어도_막지_않는다(self, world):
         world(existing={"posts/other.md"})

@@ -20,6 +20,7 @@ import {
   readCompose,
   slugProblem,
   storeCompose,
+  withRo,
 } from "./compose.js";
 import { createEditor } from "./editor.js";
 
@@ -54,7 +55,7 @@ const meterEl = $("#meter");
 const hintEl = $("#hint");
 const draftHint = hintEl.textContent;
 const composeHint =
-  "초안은 그대로 남습니다 — 원고로 저장하면 맨 위에 「원고로 옮김」 주석을 달고 published/ 로 옮깁니다";
+  "초안은 아직 그대로입니다. 원고로 저장하면 맨 위에 「원고로 옮김」 주석을 달고 published/ 로 옮깁니다";
 
 const ed = createEditor($("#editor"), {
   onChange: () => onInput(),
@@ -64,7 +65,7 @@ const ed = createEditor($("#editor"), {
 const composer = createCompose(composeEl, {
   onChange: () => onComposeInput(),
   onActive: label => {
-    pullBtn.title = `${label} 로 가져오기`;
+    pullBtn.title = `${withRo(label)} 가져오기`;
   },
   // 뼈대를 갈아끼우면 가져온 글이 모두 사라진 것이므로 표시도 걷는다
   onSkeleton: () => {
@@ -184,6 +185,9 @@ function render() {
   const composing = mode === "compose";
   badge.textContent = composing ? "초안 결정" : "준비됨";
   badge.hidden = composing ? !current : !(current && isReady());
+  ed.setPlaceholder(
+    current ? "아직 비어 있습니다. 여기에 쓰세요." : "왼쪽에서 메모를 고르거나 새로 만드세요."
+  );
   // 초안 결정 화면에서 오른쪽 초안은 읽기 전용이다
   const editNow = !!current && !composing;
   if (editNow !== editableNow) {
@@ -474,9 +478,10 @@ function pullFromDraft() {
     toast("옮길 글이 없습니다. 「준비됨」 줄은 가져가지 않습니다", true);
     return;
   }
-  const covered = ed.getPulled().some(p => p.from <= from && p.to >= r.to);
-  if (covered) {
-    toast("이미 가져온 글입니다. 다시 가져오려면 「표시 지우기」를 먼저 누르세요", true);
+  // 조금이라도 겹치면 막는다. 더 넓게 고르면 이미 가져온 글이 한 번 더 들어간다
+  const overlaps = ed.getPulled().some(p => p.from < r.to && p.to > from);
+  if (overlaps) {
+    toast("이미 가져온 글이 들어 있습니다. 다시 가져오려면 「표시 지우기」를 먼저 누르세요", true);
     return;
   }
   // 원문 그대로 넣는다. 문장을 만들거나 고치지 않는다
@@ -489,7 +494,7 @@ function pullFromDraft() {
   } else if (MEMO_MARK.test(text)) {
     toast("메모 표기(? ! +)가 그대로 들어왔습니다 — 왼쪽에서 풀어 쓰거나 지우세요");
   } else {
-    toast(`${res.label} 로 가져왔습니다`);
+    toast(`${withRo(res.label)} 가져왔습니다`);
   }
 }
 
@@ -609,7 +614,7 @@ async function stash() {
     setMode("draft");
     history.replaceState(null, "", location.pathname + location.search);
     statusEl.textContent = "";
-    toast(`원고로 저장했습니다 — ${r.manuscript} · 초안은 ${r.moved} 로 옮겼습니다`);
+    toast(`원고로 저장했습니다 — ${r.manuscript} · 초안은 ${withRo(r.moved)} 옮겼습니다`);
     loadList();
   } catch (e) {
     statusEl.textContent = "";

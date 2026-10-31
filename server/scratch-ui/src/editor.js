@@ -72,6 +72,8 @@ const pulledField = StateField.define({
  */
 export function createEditor(parent, hooks) {
   const editable = new Compartment();
+  const holder = new Compartment();
+  let holderText = "왼쪽에서 메모를 고르거나 새로 만드세요.";
   // CodeMirror 는 기본 배치 스타일을 <style> 로 끼워 넣는다. CSP(style-src 'self') 가
   // 이걸 막아서 처음엔 편집 칸이 통째로 깨졌다. nginx 가 요청마다 만든 nonce 를
   // 붙이면 이 스타일만 통과한다
@@ -88,7 +90,7 @@ export function createEditor(parent, hooks) {
     pulledField,
     keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
     editable.of(EditorView.editable.of(false)),
-    placeholder("왼쪽에서 메모를 고르거나 새로 만드세요."),
+    holder.of(placeholder(holderText)),
     EditorView.contentAttributes.of({ "aria-label": "메모 본문", spellcheck: "false" }),
     EditorView.updateListener.of(u => {
       if (u.docChanged) hooks.onChange();
@@ -129,7 +131,20 @@ export function createEditor(parent, hooks) {
       // 상태를 갈아끼워도 스크롤 위치는 남는다. 긴 메모를 아래까지 본 뒤 다른 메모를
       // 열면 중간부터 보였다. scrollTop 을 직접 바꾸면 CodeMirror 가 다시 재면서
       // 되돌려서, CodeMirror 의 스크롤 명령으로 맨 위로 보낸다
-      view.dispatch({ effects: EditorView.scrollIntoView(0, { y: "start", yMargin: 200 }) });
+      view.dispatch({
+        effects: [
+          // 상태를 갈아끼우면 compartment 도 처음 값으로 돌아간다 — 지금 안내를 다시 건다
+          holder.reconfigure(placeholder(holderText)),
+          EditorView.scrollIntoView(0, { y: "start", yMargin: 200 }),
+        ],
+      });
+    },
+
+    /** 빈 칸에 비치는 안내. 메모가 열려 있는데 「고르세요」 라고 하지 않게 따로 둔다 */
+    setPlaceholder(text) {
+      if (text === holderText) return;
+      holderText = text;
+      view.dispatch({ effects: holder.reconfigure(placeholder(text)) });
     },
 
     setEditable(on) {

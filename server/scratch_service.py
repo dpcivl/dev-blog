@@ -118,6 +118,13 @@ def log(msg):
     sys.stderr.write(f"[scratch] {msg}\n")
 
 
+# 화면의 READY_FIRST_LINE 과 같은 기준. is_ready 의 startswith 보다 엄격하다 —
+# 줄을 통째로 바꾸는 쪽이라 더 조심해야 한다.
+# 줄 끝 공백까지 받는다. 손으로 붙인 준비됨 줄에 공백이 따라오는 일이 흔하고,
+# 그걸 「주석만 있는 줄」로 안 보면 준비됨 줄이 published/ 사본에 그대로 남는다
+READY_LINE_RE = re.compile(re.escape(READY_PREFIX) + r"[^\n]*-->[ \t]*\r?")
+
+
 def valid_name(name):
     # fullmatch 다. match 는 파이썬의 `$` 가 끝 줄바꿈 앞에서도 맞아서
     # "memo.md\n" 을 통과시켰다 (2026-10-31 확인). 이름에 줄바꿈이 붙으면
@@ -203,6 +210,13 @@ def valid_asset(path):
 
 
 def decode_blob(data):
+    # Contents API 는 1MB 를 넘는 파일에 200 + content "" + encoding "none" 을
+    # 준다. encoding 을 안 보면 그게 빈 본문으로 통과해서, 읽기 화면은 빈 글을
+    # 띄우고(거기서 저장하면 메모 전체가 덮인다) 원고 옮기기는 본문 없는 사본을
+    # 만든 채 원본을 지운다. 2026-10-17 부터 있던 구멍이다.
+    # /git/blobs 로 우회해 읽지 않는다 — 읽고도 MAX_MEMO 때문에 못 쓰는 상태가 된다.
+    if data.get("encoding") != "base64":
+        raise GitHubError(413, "메모가 너무 커서 웹 에디터로 다룰 수 없습니다 (1MB 넘는 메모는 로컬에서 고치세요)")
     return base64.b64decode(data.get("content", "")).decode("utf-8")
 
 
@@ -256,13 +270,14 @@ def write_file(path, raw_bytes, message, sha=None):
 
 
 def rewrite_ready_line(text, posted_line):
-    """메모 맨 윗줄을 발행됨 줄로 바꾼다.
+    """메모 맨 윗줄을 옮김 줄로 바꾼다.
 
-    준비됨 줄이 있으면 그 줄을 **바꾼다** — 둘 다 남기지 않는다 (CLAUDE.md
-    웹 에디터 절). 없으면 맨 위에 붙인다.
+    첫 줄이 준비됨 주석 하나로 끝나면 그 줄을 **바꾼다** — 둘 다 남기지 않는다
+    (CLAUDE.md 웹 에디터 절). 그 뒤에 글자가 더 있거나 준비됨 줄이 없으면 줄을
+    지우지 않고 맨 위에 붙인다 — 같은 줄의 본문이 같이 사라지면 안 된다.
     """
-    if text.startswith(READY_PREFIX):
-        _, sep, rest = text.partition("\n")
+    first, sep, rest = text.partition("\n")
+    if READY_LINE_RE.fullmatch(first):
         return posted_line + sep + rest
     return posted_line + "\n" + text
 
@@ -300,10 +315,20 @@ def stash_memo(memo, sha, slug, content):
     모든 읽기는 지금 브랜치 머리 커밋(head)을 기준으로 한다. 브랜치 이름으로
     읽으면 읽는 사이 머리가 움직였을 때 서로 다른 시점을 섞어 보게 된다.
     그 뒤에 머리가 또 움직이면 PATCH ref 가 fast-forward 가 아니라며 거부한다.
+
+    GitHub 호출은 한 번에 10회(쓰기 5회)다. 시간당 content-generating 한도가
+    있지만 하루에 몇 번 쓰는 기능이라 줄이지 않았다.
     """
-    ref = gh_or_raise("GET", f"/repos/{REPO}/git/ref/heads/{urllib.parse.quote(BRANCH, safe='/')}")
-    head = ref["object"]["sha"]
-    base_tree = gh_or_raise("GET", f"/repos/{REPO}/git/commits/{head}")["tree"]["sha"]
+    try:
+        ref = gh_or_raise("GET", f"/repos/{REPO}/git/ref/heads/{urllib.parse.quote(BRANCH, safe='/')}")
+        head = ref["object"]["sha"]
+        base_tree = gh_or_raise("GET", f"/repos/{REPO}/git/commits/{head}")["tree"]["sha"]
+    except GitHubError as e:
+        # 기본 404 문구는 「없는 메모입니다」 라 메모 탓처럼 들린다. 여기서의 404 는
+        # 브랜치나 커밋이 없다는 뜻이다
+        if e.status == 404:
+            raise GitHubError(502, f"저장소의 {BRANCH} 브랜치를 읽지 못했습니다") from e
+        raise
 
     # 없는 메모는 여기서 404 (gh_or_raise 가 「없는 메모입니다」 로 바꾼다)
     current = gh_or_raise("GET", repo_path(memo) + "?ref=" + urllib.parse.quote(head))
@@ -528,7 +553,7 @@ class Handler(BaseHTTPRequestHandler):
             return self._fail(e.status, str(e))
         except Exception as e:  # noqa: BLE001
             log(f"stash 실패: {type(e).__name__}: {e}")
-            return self._fail(500, "서버에서 처리하지 못했습니다. 메모는 그대로 남아 있습니다")
+            return self._fail(500, "서버에서 처리하지 못했습니다. 이미 옮겨졌을 수도 있으니 목록을 새로 불러와 확인하세요")
 
         log(f"stash: {memo} → posts/{slug}.md")
         return self._json(200, {"slug": slug, "manuscript": f"posts/{slug}.md", "moved": f"published/{memo}"})
@@ -536,8 +561,8 @@ class Handler(BaseHTTPRequestHandler):
     # ── POST : 이미지 올리기 · 원고로 옮기기 ──
     def do_POST(self):
         touch()
-        path = self._route().path
-        if path not in ("/api/image", "/api/stash"):
+        route = self._route().path
+        if route not in ("/api/image", "/api/stash"):
             return self._fail(404, "not found")
         if not self._write_guard():
             return None
@@ -546,7 +571,7 @@ class Handler(BaseHTTPRequestHandler):
         body = self._body()
         if body is None:
             return None
-        if path == "/api/stash":
+        if route == "/api/stash":
             return self._stash(body)
 
         memo = body.get("memo")

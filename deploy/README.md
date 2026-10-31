@@ -299,9 +299,12 @@ sudo fail2ban-client set sshd unban --all          # 테스트 기록 정리
 브라우저에서 메모를 쓰면 **비공개 scratch 저장소(`dpcivl/dev-blog-scratch`)에 바로
 커밋**된다. 맥북에서 VS Code 로 쓰던 것과 같은 저장소다.
 
-**발행은 하지 않는다.** 다 쓰면 「완성」을 눌러 메모 첫 줄에
-`<!-- ✅ 준비됨 (YYYY-MM-DD) -->` 를 붙이는 데서 끝난다. 글로 만드는 건 Claude Code
-세션에서 작성자가 검토하며 한다 (CLAUDE.md 11번 · 세션 시작 루틴).
+**블로그에 직접 발행하지 않는다 — 원고까지 만들고 멈춘다.** 다 쓰면 길이 둘이다.
+
+- 「완성」 — 메모 첫 줄에 `<!-- ✅ 준비됨 (YYYY-MM-DD) -->` 를 붙이고 끝난다. 글로 만드는 건
+  Claude Code 세션에서 작성자가 검토하며 한다 (CLAUDE.md 11번 · 세션 시작 루틴)
+- 「초안 결정」 — 초안을 오른쪽에 두고 왼쪽에서 원고를 짠 뒤 「원고로 저장」 한다.
+  아래 「초안 결정 — 원고 만들기」 절
 
 ```
 브라우저 ──▶ nginx (basic auth · CSP) ──▶ 유닉스 소켓 ──▶ scratch_service.py ──▶ GitHub API
@@ -317,12 +320,23 @@ sudo fail2ban-client set sshd unban --all          # 테스트 기록 정리
 | --- | --- |
 | 토큰이 닿는 곳 | fine-grained 토큰 — **scratch 저장소 하나 · Contents 읽기/쓰기만** |
 | 공개 블로그 | 토큰이 닿지 않는다. 서버가 뚫려도 블로그에 글이 올라가지 않는다 |
-| 다루는 파일 | 저장소 루트의 `.md` 와, 서버가 이름을 정한 `assets/<메모>/…` 이미지뿐. `published/` · `README.md` · `..` 는 거부 |
+| 다루는 파일 | 루트 `.md` 와 `assets/<메모>/…` 이미지, 그리고 `posts/` · `published/` 에 새로 만드는 원고와 초안 (아래 「다루는 경로」). `README.md` · `..` 는 거부 |
+| 덮어쓰기 | 원고 · 발행본은 **새로 만들기만** — 있으면 409. 서버가 뚫려도 지난 원고와 발행본은 다시 쓸 수 없다 |
 | 로그인 | `/stats` 와 **다른** 비밀번호 (`.htpasswd-scratch`). 아이디는 `admin` 이 아니고, 여기 적지 않는다 (아래 「아이디는 저장소에 적지 않는다」) |
 | 다른 사이트의 요청 | 쓰기는 `Content-Type: application/json` + `Origin` 이 이 사이트일 때만 (통계 비밀번호 CSRF 와 같은 이유) |
 | 남의 코드 | CSP `script-src 'self'` — 에디터는 외부 스크립트 · 글꼴 · 인라인 코드를 하나도 안 쓴다 |
 | 토큰 파일 | `/etc/parkhyo/scratch.env` root `600`. systemd 가 root 로 읽어 환경 변수로만 넘긴다 — 서비스 계정도 파일을 못 연다 |
 | 이미지 | png · jpg · gif · webp 만, 8MB 까지, **파일 앞머리가 형식과 맞아야** 받는다. SVG 는 안 받는다 (스크립트를 담을 수 있다) |
+
+**다루는 경로** — 서버가 손댈 수 있는 곳은 아래뿐이다.
+
+| 경로 | 서버가 할 수 있는 것 |
+| --- | --- |
+| 루트 `<이름>.md` | 읽기 · 쓰기 (`NAME_RE` — 슬래시 · 공백 · 제어문자 거부, `README.md` 예약) |
+| `assets/<메모>/…` | 이미지 읽기, 그리고 서버가 이름을 정한 쓰기 |
+| `posts/<slug>.md` | **새로 만들기만** (`SLUG_RE` — 소문자 · 숫자 · 하이픈, 2~80자) |
+| `published/<메모>.md` | **새로 만들기만** (`valid_name` 통과한 이름) |
+| `..` · 그 밖 | 거부 |
 
 **같은 메모를 두 곳에서 고쳐도 조용히 덮어쓰지 않는다.** 저장할 때 마지막으로 읽은
 blob sha 를 같이 보내고, 그 사이 맥북 로컬 등에서 바뀌었으면 GitHub 가 거부한다(409).
@@ -330,6 +344,28 @@ blob sha 를 같이 보내고, 그 사이 맥북 로컬 등에서 바뀌었으�
 
 **자동 저장은 하지 않는다.** 저장이 곧 커밋이라 글자마다 커밋이 쌓인다. 대신 저장 안 한
 글은 브라우저에 보관해서 창을 닫아도 다시 열면 불러올지 묻는다.
+
+### 초안 결정 — 원고 만들기 (2026-10-31)
+
+메모 화면의 「초안 결정」은 `POST /api/stash` 로 간다. 요청 한 번이 scratch 저장소에
+**커밋 하나**를 만든다.
+
+서버는 Contents API 를 쓰지 않고 **Git Data API** 로 저장한다 — blob · tree · commit 을
+만든 뒤 `PATCH refs` 로 `main` 을 옮긴다. Contents API 로 하면 파일마다 커밋이 생겨 셋이 되고,
+중간에 실패하면 메모가 두 곳에 남는다.
+
+| 경로 | 무엇 | 이미 있으면 |
+| --- | --- | --- |
+| `posts/<slug>.md` | 원고 | 409 |
+| `published/<메모>.md` | 초안. 첫 줄 준비됨 줄이 `<!-- 📤 원고로 옮김: posts/<slug>.md (YYYY-MM-DD) -->` 로 바뀐다 | 409 |
+| `<메모>.md` | 원래 메모. 지운다 | — |
+
+- 이름 규칙은 위 「다루는 경로」 표와 같다
+- 토큰 범위는 그대로다. blob · tree · commit · ref 는 Contents 읽기/쓰기 권한 안에 있다
+  (보안 점검에서 확인)
+
+> ⚠️ **아직 실제 GitHub 저장소에서 돌려본 적이 없다.** 운영에 올린 뒤 「원고로 저장」 한 번으로
+> 세 경로가 한 커밋에 들어가는지 확인해야 한다.
 
 ### 설치
 
@@ -360,6 +396,19 @@ sudo certbot certonly --webroot -w /var/www/certbot -d scratch.parkhyo.in \
   --cert-name scratch.parkhyo.in --deploy-hook "systemctl reload nginx"
 # 4. 전체 설정으로 다시 올린다 → nginx -t · reload
 ```
+
+### 고쳐서 다시 올릴 때
+
+이번 변경으로 바뀐 파일은 넷이다. 이 서비스는 CI 에 안 실리므로 손으로 올린다.
+
+```bash
+sudo install -m 644 server/scratch_service.py /opt/parkhyo/server/
+sudo install -m 644 server/scratch-ui/{index.html,app.js,app.css} /opt/parkhyo/scratch/ui/
+sudo systemctl stop parkhyo-scratch.service   # 떠 있던 프로세스를 내린다
+```
+
+`app.js` 는 `pnpm scratch:build` 의 결과물이다. 소켓은 그대로 살아 있어서, `stop` 뒤 다음
+요청이 새 코드로 다시 띄운다. `stop` 을 빼면 떠 있던 옛 프로세스가 계속 응답한다.
 
 ### 비밀번호 · 토큰 — 작성자가 직접 넣는다
 
