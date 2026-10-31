@@ -184,7 +184,9 @@ function blocksOf(body) {
   const out = [];
   const lines = body.replace(/\r\n?/g, "\n").split("\n");
   let para = [];
-  let list = null;
+  // 목록은 들여쓰기로 중첩된다. 들여쓰기 폭을 2칸이나 4칸으로 못박지 않고
+  // 스택으로 따라간다 — 더 깊어지면 밀어넣고 얕아지면 그만큼 꺼낸다
+  const stack = [];
   const flush = () => {
     if (para.length) {
       const p = document.createElement("p");
@@ -192,7 +194,7 @@ function blocksOf(body) {
       out.push(p);
       para = [];
     }
-    list = null;
+    stack.length = 0;
   };
 
   for (let i = 0; i < lines.length; i++) {
@@ -227,19 +229,31 @@ function blocksOf(body) {
       out.push(el);
       continue;
     }
-    const li = /^\s*[-*+]\s+(.+)$/.exec(line);
+    const li = /^([ \t]*)[-*+][ \t]+(.+)$/.exec(line);
     if (li) {
-      if (!list) {
+      // 탭은 네 칸으로 센다
+      const indent = li[1].replace(/\t/g, "    ").length;
+      if (!stack.length) {
         flush();
-        list = document.createElement("ul");
-        out.push(list);
+        const ul = document.createElement("ul");
+        out.push(ul);
+        stack.push({ indent, ul });
+      } else {
+        while (stack.length > 1 && indent < stack[stack.length - 1].indent) stack.pop();
+        const top = stack[stack.length - 1];
+        if (indent > top.indent) {
+          // 중첩 목록은 바로 위 항목 안에 들어간다. 첫 줄부터 깊으면 붙일 항목이 없다
+          const ul = document.createElement("ul");
+          (top.ul.lastElementChild || top.ul).append(ul);
+          stack.push({ indent, ul });
+        }
       }
       const item = document.createElement("li");
-      item.textContent = li[1];
-      list.append(item);
+      item.textContent = li[2];
+      stack[stack.length - 1].ul.append(item);
       continue;
     }
-    list = null;
+    stack.length = 0;
     para.push(line);
   }
   flush();
