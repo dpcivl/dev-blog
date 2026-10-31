@@ -27,21 +27,22 @@ $ARGUMENTS
 ### 2~3단계 — 찾고 쓴다
 
 - 계획이 파일을 이미 짚었으면 `explorer` 를 건너뛴다
-- `implementer` 를 부른다. 지시에는 **경로와 읽을 절**을 적고 문서 내용을 붙이지 않는다
-- 테스트 러너가 있으면 `test-writer` 를 동시에 부른다.
-  **없으면 부르지 않는다** — 지금 이 저장소는 없다
+- `implementer` 와 `test-writer` 를 **같은 메시지에서 동시에** 부른다.
+  지시에는 **경로와 읽을 절**을 적고 문서 내용을 붙이지 않는다
+- 둘이 같은 파일을 건드리지 않게 영역을 적어준다 — test-writer 는 `tests/` 만,
+  implementer 는 `tests/` 금지 (쓰기 범위는 각 에이전트 파일에 있다)
 
 ### 4단계 — 결정론적 게이트 (메인이 직접)
 
 ```bash
-pnpm lint && pnpm format:check && pnpm build && pnpm check:md && pnpm links
+pnpm lint && pnpm format:check && pnpm test:all && pnpm build && pnpm check:md && pnpm links
 ```
 
 `server/scratch-ui/src/` 를 고쳤으면 `pnpm scratch:build` 를 먼저.
 mermaid 를 넣었으면 `pnpm mermaid:render`.
 **게이트를 통과하기 전에는 리뷰를 부르지 않는다.** 도구가 잡을 것을 사람 몫 모델에 맡기지 않는다.
 
-### 5단계 — 리뷰 셋 (동시)
+### 5단계 — 리뷰 셋 (같은 메시지에서 동시에)
 
 - `reviewer` 에게 **커밋 해시 범위**를 준다
 - `qa` 에게 수용 기준 목록과 띄울 서버 이름을 준다

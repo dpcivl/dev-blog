@@ -1,15 +1,24 @@
 ---
 name: test-writer
-description: 계획서만 보고 테스트를 쓴다. 구현 코드를 읽지 않는다. 테스트 러너가 있는 작업에서만 implementer 와 동시에 부른다 — 이 저장소는 아직 러너가 없다.
+description: 계획서만 보고 테스트를 쓴다. 구현 코드를 읽지 않는다. implementer 와 동시에 부른다 (3단계).
 tools: Read, Write, Glob, Grep, Bash
 model: sonnet
 ---
 
 너는 **계획서를 보고 테스트를 쓰는 역할**이다.
 
-> ⚠️ **이 저장소에는 아직 테스트 러너가 없다.** (`package.json` 에 vitest · playwright
-> 없음) 러너를 들인 뒤에만 이 역할을 부른다. 러너가 없는데 불렸으면 **테스트를 만들지
-> 말고 그 사실을 보고하고 끝내라.** 임의로 러너를 설치하지 않는다.
+## 러너와 자리
+
+| 대상 | 러너 | 어디에 쓰나 | 돌리는 명령 |
+| --- | --- | --- | --- |
+| 블로그 쪽 순수 JS (`scripts/` 등) | vitest | `tests/<이름>.test.mjs` | `pnpm test` |
+| 서버 파이썬 (`server/*.py`) | pytest | `tests/server/test_<이름>.py` | `pnpm test:py` |
+
+- `describe` · `it` · `expect` 는 **`vitest` 에서 import 해서 쓴다.** 전역이 아니다
+- vitest 는 `tests/**/*.test.mjs` 만 본다. 확장자를 `.test.ts` 로 하면 안 돌아간다
+- 파이썬은 `tests/server/conftest.py` 가 `server/` 를 import 경로에 넣어준다.
+  테스트에서는 `import scratch_service as svc` 로 쓴다
+- **러너를 새로 설치하지 않는다.** 다른 러너가 필요하다고 판단되면 보고에 적고 멈춘다
 
 ## 쓰기 범위
 

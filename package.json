@@ -16,6 +16,10 @@
     "format:check": "prettier --check .",
     "format": "prettier --write .",
     "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:py": "uv run --with pytest pytest -q",
+    "test:all": "pnpm test && pnpm test:py",
     "translate": "node scripts/translate/translate.mjs",
     "translate:sample": "node scripts/translate/translate.mjs sample",
     "translate:batch": "node scripts/translate/translate.mjs batch",
@@ -73,6 +77,7 @@
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.51.0"
+    "typescript-eslint": "^8.51.0",
+    "vitest": "^5.0.5"
   }
 }

@@ -42,7 +42,7 @@ function relPath(p) {
  * 코드 블록이 그대로 발행된다 — 빌드도 통과하고 링크 검사도 통과해서
  * 사람 눈으로만 잡히는 부류다.
  */
-function detectUnrenderedMermaid(content) {
+export function detectUnrenderedMermaid(content) {
   const out = [];
   content.split("\n").forEach((line, i) => {
     if (/^\s*```mermaid\s*$/.test(line)) {
@@ -62,7 +62,7 @@ function detectUnrenderedMermaid(content) {
  * 사설 대역과 문서용 예약 대역은 통과시킨다. 예시를 써야 할 때는 RFC 5737 의
  * 문서용 주소(192.0.2.x · 198.51.100.x · 203.0.113.x)를 쓰면 이 검사에 안 걸린다.
  */
-function detectPublicIp(content) {
+export function detectPublicIp(content) {
   const findings = [];
   const lines = content.split(/\r?\n/);
   const RE = /\b(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\b/g;
@@ -198,7 +198,16 @@ async function main() {
   process.exit(1);
 }
 
-main().catch(err => {
-  console.error(err);
-  process.exit(2);
-});
+// 직접 실행일 때만 스캔한다. 테스트(tests/check-markdown.test.mjs)가 위
+// 탐지 함수를 import 하므로, 가드가 없으면 import 만으로 전체 스캔이 돌고
+// 결과에 따라 process.exit 까지 한다.
+const invokedDirectly =
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (invokedDirectly) {
+  main().catch(err => {
+    console.error(err);
+    process.exit(2);
+  });
+}

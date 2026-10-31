@@ -26,7 +26,7 @@
 | 1 | 메인 | Opus | 구현 계획, 해석 결정 기록, 쓰기 범위 배정 → 체크포인트 커밋 |
 | **G1** | **사람** | — | **계획 승인** (아래 「사람 게이트」) |
 | 2 | explorer | Sonnet | 손댈 곳 찾기 (계획이 파일을 이미 짚었으면 건너뛴다) |
-| 3 | implementer ∥ test-writer | Sonnet | 구현 ∥ 테스트 (러너가 있을 때만 — 아래 「테스트 구멍」) |
+| 3 | implementer ∥ test-writer | Sonnet | 구현 ∥ 테스트 (동시 — 아래 「테스트 러너」) |
 | 4 | 메인 | Opus | **결정론적 게이트** — 아래 명령을 직접 돌린다 |
 | 5 | reviewer ∥ qa ∥ security | Opus / Sonnet / Opus | 리뷰 ∥ 화면 확인 ∥ 보안 (동시) |
 | 6 | 메인 | Opus | 지적 통합 · 심각도 재판단 · 수정 (최대 5라운드) |
@@ -40,21 +40,37 @@
 ### 결정론적 게이트 (4단계, 메인이 직접)
 
 ```bash
-pnpm lint && pnpm format:check && pnpm build && pnpm check:md && pnpm links
+pnpm lint && pnpm format:check && pnpm test:all && pnpm build && pnpm check:md && pnpm links
 ```
 
-mermaid 블록을 넣었으면 `pnpm mermaid:render` 를 먼저. `server/scratch-ui/src/` 를
-고쳤으면 `pnpm scratch:build`. 비밀값 검사는 보안 에이전트가 아니라 여기서 한 번 더 한다.
+`pnpm test:all` 이 vitest 와 pytest 를 차례로 돌린다 (`pnpm test` · `pnpm test:py` 로
+따로도 된다). mermaid 블록을 넣었으면 `pnpm mermaid:render` 를 먼저.
+`server/scratch-ui/src/` 를 고쳤으면 `pnpm scratch:build`.
+비밀값 검사는 보안 에이전트가 아니라 여기서 한 번 더 한다.
 
-### ⚠️ 테스트 구멍
+### 테스트 러너 (2026-10-31~)
 
-**이 저장소에는 테스트 러너가 없다.** 시험 보고서의 test-writer · tester 는 pytest 를
-전제했다. 지금은 3단계의 test-writer 를 띄우지 않고, 4단계 게이트와 qa 의 브라우저
-확인이 그 자리를 대신한다.
+**두 러너가 있다.** 작성자가 「구현 · 테스트 병렬로 진행해야 한다」고 정해서 들였다.
+그 전까지는 러너가 없어 3단계의 test-writer 를 띄우지 못했다.
 
-보고서가 결과를 믿을 근거로 꼽은 **「사람이 정한 숨긴 수용 테스트」는 지금 재현할 수
-없다.** 순수 로직(덩어리 모델 · 경로 검증 · 마크다운 렌더)이 늘면 vitest 를 들이는 것을
-먼저 결정해야 한다. 그 전까지 이 파이프라인의 품질 근거는 게이트 + 리뷰 3종뿐이다.
+| 러너 | 대상 | 테스트 위치 | 명령 |
+| --- | --- | --- | --- |
+| vitest | 블로그 쪽 순수 JS (`scripts/` 의 발행 검사 등) | `tests/*.test.mjs` | `pnpm test` |
+| pytest | 서버 파이썬 (`server/*.py`) | `tests/server/test_*.py` | `pnpm test:py` |
+
+- **pytest 는 uv 로 띄운다** — `uv run --with pytest pytest`. 저장소에 venv 를
+  커밋하지 않고 두 기기에서 같은 명령으로 돌리려고 그렇게 했다. uv 가 없는 기기에는
+  설치해야 한다 (macOS `brew install uv` · Windows `winget install astral-sh.uv`)
+- **서버 파이썬은 표준 라이브러리만 쓴다.** pytest 는 개발 기기에만 있고 512MB
+  Lightsail 인스턴스는 건드리지 않는다
+- vitest 는 `tests/**/*.test.mjs` 만 본다 (`vitest.config.ts`). Astro 컴포넌트는
+  이 러너로 돌리지 않는다
+- 테스트 파일에서 `describe` · `it` · `expect` 는 **import 해서 쓴다.** 전역으로
+  켜지 않았다 — eslint 설정에 vitest 전역을 더하지 않으려고
+
+**남은 차이.** 보고서가 결과를 믿을 근거로 꼽은 「사람이 정한 숨긴 수용 테스트」는
+작성자가 미리 테스트를 숨겨뒀을 때만 성립한다. 러너는 생겼지만 그 관행은 아직 없다.
+지금 품질 근거는 게이트 + 리뷰 3종 + 위 두 러너다.
 
 ## 심각도와 자율 처리 규칙
 

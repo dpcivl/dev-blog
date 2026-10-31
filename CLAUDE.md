@@ -572,6 +572,23 @@ CLAUDE.md 이관 규칙 (2026-07-14). 이전에는 `~/.claude/projects/*/memory/
 파일 하나짜리 변경은 지금처럼 세션이 혼자 한다. 서브에이전트 한 번 부르는 고정 비용이
 약 8천 토큰이라 일보다 크다.
 
+### 테스트 (2026-10-31~)
+
+구현과 테스트를 병렬로 돌리려고 러너 둘을 들였다.
+
+```bash
+pnpm test        # vitest — tests/*.test.mjs (블로그 쪽 순수 JS)
+pnpm test:py     # pytest — tests/server/test_*.py (server/*.py)
+pnpm test:all    # 둘 다. 결정론적 게이트가 이걸 돌린다
+```
+
+- **pytest 는 `uv` 로 띄운다.** venv 를 커밋하지 않고 두 기기에서 같은 명령을 쓰려고
+  그렇게 했다. uv 가 없으면 설치해야 한다 — macOS `brew install uv`,
+  Windows `winget install astral-sh.uv`
+- 서버 파이썬은 표준 라이브러리만 쓴다. pytest 는 개발 기기에만 있고 Lightsail
+  인스턴스(512MB)는 건드리지 않는다
+- vitest 전역(`describe` 등)은 **켜지 않았다.** 테스트에서 import 해서 쓴다
+
 ## 기타 규칙
 
 - 한국어 응답 기본
