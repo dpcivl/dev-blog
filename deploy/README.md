@@ -400,15 +400,38 @@ sudo certbot certonly --webroot -w /var/www/certbot -d scratch.parkhyo.in \
 ### 고쳐서 다시 올릴 때
 
 이번 변경으로 바뀐 파일은 넷이다. 이 서비스는 CI 에 안 실리므로 손으로 올린다.
+**서버에는 저장소 체크아웃이 없다** — 맥에서 파일을 넘긴 뒤 제자리에 놓는다.
 
 ```bash
-sudo install -m 644 server/scratch_service.py /opt/parkhyo/server/
-sudo install -m 644 server/scratch-ui/{index.html,app.js,app.css} /opt/parkhyo/scratch/ui/
-sudo systemctl stop parkhyo-scratch.service   # 떠 있던 프로세스를 내린다
+# 0. 묶음을 다시 만든다. app.js 는 src/ 의 산출물이라 안 맞으면 옛 화면이 올라간다
+pnpm scratch:build
+
+# 1. 맥 → 서버 (/tmp 로)
+scp -i ~/.ssh/blog-prod-key.pem \
+  server/scratch_service.py server/scratch-ui/{index.html,app.js,app.css} \
+  ubuntu@parkhyo.in:/tmp/
+
+# 2. 제자리에 놓고 떠 있던 프로세스를 내린다
+ssh -i ~/.ssh/blog-prod-key.pem ubuntu@parkhyo.in '
+  sudo install -m 644 /tmp/scratch_service.py /opt/parkhyo/server/ &&
+  sudo install -m 644 /tmp/index.html /tmp/app.js /tmp/app.css /opt/parkhyo/scratch/ui/ &&
+  sudo systemctl stop parkhyo-scratch.service &&
+  rm -f /tmp/scratch_service.py /tmp/index.html /tmp/app.js /tmp/app.css'
 ```
 
 `app.js` 는 `pnpm scratch:build` 의 결과물이다. 소켓은 그대로 살아 있어서, `stop` 뒤 다음
 요청이 새 코드로 다시 띄운다. `stop` 을 빼면 떠 있던 옛 프로세스가 계속 응답한다.
+
+올라갔는지 확인한다.
+
+```bash
+ssh -i ~/.ssh/blog-prod-key.pem ubuntu@parkhyo.in '
+  grep -c "api/stash" /opt/parkhyo/server/scratch_service.py /opt/parkhyo/scratch/ui/app.js
+  grep -c "초안 결정" /opt/parkhyo/scratch/ui/index.html
+  systemctl is-active parkhyo-scratch.socket'
+```
+
+세 줄 다 0 이 아니고 소켓이 `active` 면 올라간 것이다.
 
 ### 비밀번호 · 토큰 — 작성자가 직접 넣는다
 
