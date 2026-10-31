@@ -10,7 +10,8 @@
 
   - 토큰은 scratch 저장소 하나 · Contents 읽기/쓰기만 (fine-grained PAT)
   - 공개 블로그 저장소에는 닿지 않는다. 서버가 뚫려도 블로그에 글이 올라가지 않는다
-  - 다루는 건 저장소 루트의 .md 와, 서버가 이름을 정한 assets/ 아래 이미지뿐이다
+  - 다루는 건 저장소 루트의 .md 와, 서버가 이름을 정한 assets/ 아래 이미지,
+    그리고 「원고로 옮기기」가 만드는 posts/ · published/ 아래 .md 뿐이다
 
 인증은 nginx 의 basic auth 가 한다. 다만 그것만으로는 부족하다는 걸 통계
 비밀번호에서 배웠다 — 브라우저는 기억한 basic auth 를 다른 사이트에서 시작된
@@ -64,6 +65,10 @@ READY_PREFIX = "<!-- ✅ 준비됨"
 NAME_RE = re.compile(r"^[^/\\\s\x00-\x1f<>:\"|?*#%]{1,120}\.md$")
 RESERVED = {"README.md"}
 
+# 원고(posts/<slug>.md)의 slug. NAME_RE 를 풀지 않고 따로 둔다 — NAME_RE 가
+# 슬래시를 막는 건 의도다. 블로그 포스트 파일명 규칙과 같은 소문자·숫자·하이픈.
+SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,78}[a-z0-9]$")
+
 # 미리보기가 읽는 이미지. 저장소 루트의 이미지(VS Code 로 붙인 image.png 등)와
 # 웹 에디터가 올린 assets/<메모>/<파일> 만. 그 밖의 파일은 내주지 않는다.
 ASSET_RE = re.compile(
@@ -91,6 +96,7 @@ COMMIT_MESSAGES = {
     "create": "웹: {name} 새로 만듦",
     "ready": "웹: {name} 준비됨",
     "unready": "웹: {name} 준비 취소",
+    "stash": "웹: {name} → 원고",
 }
 
 _timer = None
@@ -243,6 +249,97 @@ def write_file(path, raw_bytes, message, sha=None):
         body["sha"] = sha
     data = gh_or_raise("PUT", repo_path(path), body)
     return data["content"]["sha"]
+
+
+def rewrite_ready_line(text, posted_line):
+    """메모 맨 윗줄을 발행됨 줄로 바꾼다.
+
+    준비됨 줄이 있으면 그 줄을 **바꾼다** — 둘 다 남기지 않는다 (CLAUDE.md
+    웹 에디터 절). 없으면 맨 위에 붙인다.
+    """
+    if text.startswith(READY_PREFIX):
+        _, sep, rest = text.partition("\n")
+        return posted_line + sep + rest
+    return posted_line + "\n" + text
+
+
+def build_stash_tree(memo, slug, manuscript_blob, moved_blob):
+    """POST /git/trees 에 보낼 tree 배열. 파일 셋을 한 번에 바꾼다.
+
+    base_tree 는 이 배열이 아니라 요청 본문의 형제 필드다. 부르는 쪽이 싣는다.
+    """
+    return [
+        {"path": f"posts/{slug}.md", "mode": "100644", "type": "blob", "sha": manuscript_blob},
+        {"path": f"published/{memo}", "mode": "100644", "type": "blob", "sha": moved_blob},
+        # sha 를 null 로 주면 base_tree 에서 그 경로가 빠진다
+        {"path": memo, "mode": "100644", "type": "blob", "sha": None},
+    ]
+
+
+def exists_at(path, ref):
+    """ref(커밋 sha) 시점에 그 경로에 파일이 있는가."""
+    status, _ = gh("GET", repo_path(path) + "?ref=" + urllib.parse.quote(ref))
+    if status == 200:
+        return True
+    if status == 404:
+        return False
+    raise GitHubError(502, f"GitHub 응답 {status}")
+
+
+def stash_memo(memo, sha, slug, content):
+    """메모를 원고로 옮긴다. posts/<slug>.md 를 만들고, 초안은 published/ 로
+    옮기고, 원래 메모는 지운다 — Git Data API 로 **한 커밋**에.
+
+    Contents API 로 하면 커밋이 셋이 되고, 중간에 실패하면 메모가 두 곳에
+    남는다. 한 커밋이면 전부 되거나 전부 안 된다.
+
+    모든 읽기는 지금 브랜치 머리 커밋(head)을 기준으로 한다. 브랜치 이름으로
+    읽으면 읽는 사이 머리가 움직였을 때 서로 다른 시점을 섞어 보게 된다.
+    그 뒤에 머리가 또 움직이면 PATCH ref 가 fast-forward 가 아니라며 거부한다.
+    """
+    ref = gh_or_raise("GET", f"/repos/{REPO}/git/ref/heads/{urllib.parse.quote(BRANCH, safe='/')}")
+    head = ref["object"]["sha"]
+    base_tree = gh_or_raise("GET", f"/repos/{REPO}/git/commits/{head}")["tree"]["sha"]
+
+    # 없는 메모는 여기서 404 (gh_or_raise 가 「없는 메모입니다」 로 바꾼다)
+    current = gh_or_raise("GET", repo_path(memo) + "?ref=" + urllib.parse.quote(head))
+    if current.get("sha") != sha:
+        raise GitHubError(409, "다른 곳에서 이 메모가 바뀌었습니다. 새로 불러온 뒤 다시 시도하세요")
+    if exists_at(f"posts/{slug}.md", head):
+        raise GitHubError(409, f"posts/{slug}.md 가 이미 있습니다. 다른 이름을 고르세요")
+    # published/ 에 같은 이름이 있으면 트리가 그걸 조용히 덮는다
+    if exists_at(f"published/{memo}", head):
+        raise GitHubError(409, f"published/{memo} 가 이미 있습니다")
+
+    today = datetime.now(KST).strftime("%Y-%m-%d")
+    moved = rewrite_ready_line(decode_blob(current), f"<!-- 📤 원고로 옮김: posts/{slug}.md ({today}) -->")
+
+    def blob(text):
+        data = gh_or_raise("POST", f"/repos/{REPO}/git/blobs", {
+            "content": base64.b64encode(text.encode("utf-8")).decode("ascii"),
+            "encoding": "base64",
+        })
+        return data["sha"]
+
+    tree = gh_or_raise("POST", f"/repos/{REPO}/git/trees", {
+        "base_tree": base_tree,
+        "tree": build_stash_tree(memo, slug, blob(content), blob(moved)),
+    })
+    commit = gh_or_raise("POST", f"/repos/{REPO}/git/commits", {
+        "message": COMMIT_MESSAGES["stash"].format(name=memo),
+        "tree": tree["sha"],
+        "parents": [head],
+    })
+    try:
+        # force 는 켜지 않는다. 그 사이 다른 기기가 푸시했으면 거부당하는 게 맞다
+        gh_or_raise("PATCH", f"/repos/{REPO}/git/refs/heads/{urllib.parse.quote(BRANCH, safe='/')}", {
+            "sha": commit["sha"],
+            "force": False,
+        })
+    except GitHubError as e:
+        if e.status == 409:
+            raise GitHubError(409, "저장소가 그 사이 바뀌었습니다. 새로 불러온 뒤 다시 시도하세요") from e
+        raise
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -401,10 +498,42 @@ class Handler(BaseHTTPRequestHandler):
         log(f"{reason}: {name}")
         return self._json(200, {"name": name, "sha": new_sha, "ready": is_ready(text)})
 
-    # ── POST /api/image : 이미지 올리기 ──
+    # ── POST /api/stash : 메모를 원고로 옮기기 ──
+    def _stash(self, body):
+        memo = body.get("memo")
+        sha = body.get("sha")
+        slug = body.get("slug")
+        content = body.get("content")
+        if not valid_name(memo):
+            return self._fail(400, "메모 이름이 올바르지 않습니다")
+        if not (isinstance(slug, str) and SLUG_RE.fullmatch(slug)):
+            return self._fail(400, "원고 이름이 올바르지 않습니다 (소문자 · 숫자 · 하이픈, 2~80자)")
+        if not isinstance(content, str) or not content.strip():
+            return self._fail(400, "요청 형식이 잘못됐습니다")
+        if not (isinstance(sha, str) and re.fullmatch(r"[0-9a-f]{40}", sha)):
+            return self._fail(400, "요청 형식이 잘못됐습니다")
+
+        # 저장소는 LF 로 통일돼 있다 (.gitattributes)
+        text = content.replace("\r\n", "\n").replace("\r", "\n")
+        if len(text.encode("utf-8")) > MAX_MEMO:
+            return self._fail(413, f"원고가 너무 깁니다 ({MAX_MEMO // 1024}KB 까지)")
+
+        try:
+            stash_memo(memo, sha, slug, text)
+        except GitHubError as e:
+            return self._fail(e.status, str(e))
+        except Exception as e:  # noqa: BLE001
+            log(f"stash 실패: {type(e).__name__}: {e}")
+            return self._fail(500, "서버에서 처리하지 못했습니다. 메모는 그대로 남아 있습니다")
+
+        log(f"stash: {memo} → posts/{slug}.md")
+        return self._json(200, {"slug": slug, "manuscript": f"posts/{slug}.md", "moved": f"published/{memo}"})
+
+    # ── POST : 이미지 올리기 · 원고로 옮기기 ──
     def do_POST(self):
         touch()
-        if self._route().path != "/api/image":
+        path = self._route().path
+        if path not in ("/api/image", "/api/stash"):
             return self._fail(404, "not found")
         if not self._write_guard():
             return None
@@ -413,6 +542,8 @@ class Handler(BaseHTTPRequestHandler):
         body = self._body()
         if body is None:
             return None
+        if path == "/api/stash":
+            return self._stash(body)
 
         memo = body.get("memo")
         mime = body.get("mime")
