@@ -1,5 +1,5 @@
 ---
-title: "AI 라우팅 #2 — 로컬 모델한테 OpenAI API 형식으로 말을 걸고 있었다"
+title: "Ollama 로컬 LLM 라우팅 #2 — 로컬 모델한테 OpenAI API 형식으로 말을 걸고 있었다"
 description: "지난번에 세팅만 하고 안 읽었던 코드를 열어봤다. types.py 의 pydantic 모델부터 backends 의 추상 클래스까지 따라가다가, 로컬 ollama 에 보내는 요청이 OpenAI API 형식이라는 걸 알았다."
 pubDatetime: 2026-09-22T13:20:00Z
 tags:

@@ -1,5 +1,5 @@
 ---
-title: "Data Analysis Study #2 — pandas adds by matching indices, not order"
+title: "Data Analysis Study #2 — pandas Series adds by matching indices, not order"
 description: "After the lecture, I jumped straight into pandas practice. I set up the environment with uv and tried out Series, and adding two Series with different indices gave me NaN instead of values. That's when I learned pandas calculates based on index, not position."
 pubDatetime: 2026-08-31T12:10:00Z
 tags:

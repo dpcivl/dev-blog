@@ -1,5 +1,5 @@
 ---
-title: "Data Analysis Study #1 — '15% Drop in Sales' Is Still Just Data"
+title: "Data Analysis Study #1 — '15% Drop in Sales' Is Still Just Data (Data vs. Information vs. Insight)"
 description: "First lecture of week 3 in the course I'm taking. I organized how data, information, and insight differ, how data is divided by form and character, and why the analysis process doesn't flow in just one direction. The line that stuck with me most was 'the problem must never change.'"
 pubDatetime: 2026-08-31T11:50:00Z
 tags:

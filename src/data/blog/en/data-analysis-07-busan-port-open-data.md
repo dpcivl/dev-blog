@@ -1,5 +1,5 @@
 ---
-title: "Data Analysis Study #7 — I Thought the Data Was Clean Because the Filter Returned All False"
+title: "Data Analysis Study #7 — Busan Port Open Data: I Thought the Data Was Clean Because the Filter Returned All False"
 description: "I pulled two real public datasets from Busan Port Authority. I scrapped the question I'd set up for the container traffic statistics midway through, and worked with encoding and berthing time for the vessel arrival/departure data. The outlier filter came back all False because the comparison wasn't valid to begin with."
 pubDatetime: 2026-09-02T13:00:00Z
 tags:

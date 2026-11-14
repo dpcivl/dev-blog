@@ -1,5 +1,5 @@
 ---
-title: "Data Engineering Study #1 — Coffee and coffee Are Different Values"
+title: "SQL Data Cleaning — Coffee and coffee Are Different Values (Data Engineering Study #1)"
 description: "I started studying data engineering. Two days of notes on deliberately creating a dirty CSV to see how case sensitivity and empty values break aggregations, plus the principle of never touching raw data and cleaning it in staging instead, and learning UPPER, CASE, and COALESCE."
 pubDatetime: 2026-08-23T01:40:00Z
 tags:

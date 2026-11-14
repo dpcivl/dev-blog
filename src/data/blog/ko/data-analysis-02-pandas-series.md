@@ -1,5 +1,5 @@
 ---
-title: "데이터 분석 공부 #2 — pandas 는 순서가 아니라 인덱스를 맞춰 더한다"
+title: "데이터 분석 공부 #2 — pandas Series 는 순서가 아니라 인덱스를 맞춰 더한다"
 description: "강의를 듣고 바로 pandas 실습에 들어갔다. uv 로 환경을 잡고 Series 를 만져봤는데, 인덱스가 다른 두 Series 를 더했더니 값이 아니라 NaN 이 나왔다. pandas 가 위치가 아니라 인덱스를 기준으로 계산한다는 걸 거기서 알았다."
 pubDatetime: 2026-08-31T12:10:00Z
 tags:

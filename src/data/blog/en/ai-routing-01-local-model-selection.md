@@ -1,5 +1,5 @@
 ---
-title: "AI Routing #1 — One big model would do, but I split it into four small ones"
+title: "Ollama Local LLM Routing #1 — One big model would do, but I split it into four small ones"
 description: "I decided to try routing prompts across several open-source LLMs on my MacBook first. Both my home computer and MacBook fell short on specs, so I had to pick different models, and I finished installing ollama."
 pubDatetime: 2026-09-20T13:40:00Z
 tags:

@@ -1,5 +1,5 @@
 ---
-title: "데이터 엔지니어링 공부 #1 — Coffee 와 coffee 는 다른 값이다"
+title: "SQL 데이터 정제 — Coffee 와 coffee 는 다른 값이다 (데이터 엔지니어링 공부 #1)"
 description: "데이터 엔지니어링 공부를 시작했다. 일부러 더러운 CSV 를 만들어 대소문자와 빈 값이 집계를 어떻게 망가뜨리는지 확인하고, raw 데이터는 건드리지 않고 staging 에서 정제한다는 원칙과 UPPER · CASE · COALESCE 를 배운 이틀치 기록."
 pubDatetime: 2026-08-23T01:40:00Z
 tags:

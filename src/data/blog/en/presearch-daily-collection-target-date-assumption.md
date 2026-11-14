@@ -1,5 +1,5 @@
 ---
-title: "Daily 08:00 Ingestion Stopped — 'Yesterday by Calendar' Had No Data Yet"
+title: "Daily 08:00 Cloud Run Ingestion Stopped — 'Yesterday by Calendar' Had No Data Yet"
 description: "The automated ingestion pipeline failed, the gate worked correctly, and the wrong thing was my assumption. A record of the cost of computing external data publish delays by calendar, and discovering a test that gave false green lights."
 pubDatetime: 2026-07-27T22:30:00Z
 tags:

@@ -1,5 +1,5 @@
 ---
-title: "AI Routing #2 — I was talking to a local model using OpenAI API format"
+title: "Ollama Local LLM Routing #2 — I was talking to a local model using OpenAI API format"
 description: "I opened up code I had only set up but never read last time. Tracing it from the pydantic models in types.py to the abstract class in backends, I found out that requests sent to the local ollama were in OpenAI API format."
 pubDatetime: 2026-09-22T13:20:00Z
 tags:

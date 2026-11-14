@@ -1,5 +1,5 @@
 ---
-title: "Is an Agent Pipeline Usable?"
+title: "Is an AI Agent Pipeline Usable?"
 description: "Can an agent pipeline be implemented without human intervention, how do agents communicate with each other, and how much token consumption does it involve?"
 pubDatetime: 2026-10-31T06:46:00Z
 tags:
