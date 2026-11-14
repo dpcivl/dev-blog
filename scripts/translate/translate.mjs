@@ -40,6 +40,19 @@ async function enExists(slug) {
   }
 }
 
+// `koOnly: true` 는 영어판을 두지 않기로 한 글이다. batch 가 집지 않는다.
+// (`translate one <slug>` 로 직접 지목하면 여전히 번역된다 — 의도적으로
+//  한 번 돌려보고 싶을 때가 있다)
+async function isKoOnly(slug) {
+  try {
+    const body = await fs.readFile(path.join(KO_DIR, `${slug}.md`), "utf8");
+    const fm = body.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+    return !!fm && /^koOnly:\s*true\s*$/m.test(fm[1]);
+  } catch {
+    return false;
+  }
+}
+
 function fmt(n) {
   return n.toLocaleString();
 }
@@ -92,8 +105,17 @@ async function runOne(slug, client, dryRun = false) {
 async function runBatch(client) {
   const allSlugs = await listKoSlugs();
   const pending = [];
+  const koOnly = [];
   for (const slug of allSlugs) {
-    if (!(await enExists(slug))) pending.push(slug);
+    if (await enExists(slug)) continue;
+    if (await isKoOnly(slug)) {
+      koOnly.push(slug);
+      continue;
+    }
+    pending.push(slug);
+  }
+  if (koOnly.length) {
+    console.log(`\n(koOnly ${koOnly.length}건 건너뜀: ${koOnly.join(", ")})`);
   }
   console.log(
     `\n== BATCH: ${pending.length} pending (${allSlugs.length} total, ${allSlugs.length - pending.length} already translated) ==`

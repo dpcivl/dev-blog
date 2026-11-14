@@ -159,6 +159,14 @@ async function isDraft(file) {
   return !!fm && /^draft:\s*true\s*$/m.test(fm[1]);
 }
 
+// `koOnly: true` 인 글은 영어판을 두지 않기로 한 것이다. 짝이 없어도 정상이다.
+// (2026-11-14, blog-beyond-astropaper — 살아있는 문서라 번역이 토큰 상한에 걸렸다)
+async function isKoOnly(file) {
+  const body = await fs.readFile(file, "utf8");
+  const fm = body.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  return !!fm && /^koOnly:\s*true\s*$/m.test(fm[1]);
+}
+
 /**
  * KO 에 있는데 EN 이 없는 글(missing)과 그 반대(orphans).
  * KO 만 커밋하면 언어 스위치가 홈으로 fallback 되어 방문자가 이탈한다
@@ -173,6 +181,7 @@ export async function checkTranslationPairs({ koDir, enDir }) {
   for (const f of ko) {
     if (en.has(slugOf(f))) continue;
     if (await isDraft(path.join(koDir, f))) continue;
+    if (await isKoOnly(path.join(koDir, f))) continue;
     missing.push(slugOf(f));
   }
   const orphans = [...en].filter(s => !koSlugs.has(s)).sort();

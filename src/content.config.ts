@@ -21,6 +21,10 @@ const blog = defineCollection({
       canonicalURL: z.string().optional(),
       hideEditPost: z.boolean().optional(),
       timezone: z.string().optional(),
+      // 한국어로만 두는 글. 짝 검사(check:md)와 번역 일괄 실행에서 빠진다.
+      // 2026-11-14 에 blog-beyond-astropaper 가 첫 사례가 됐다 — 「살아있는
+      // 문서」라 계속 자라서 번역 출력이 토큰 상한에 걸렸다.
+      koOnly: z.boolean().optional(),
     }),
 });
 

@@ -173,9 +173,30 @@ function put(file, content = "") {
   mkdirSync(path.dirname(file), { recursive: true });
   writeFileSync(file, content);
 }
-const post = (draft) => `---\ntitle: t\ndraft: ${draft}\n---\n\n본문\n`;
+const post = draft => `---\ntitle: t\ndraft: ${draft}\n---\n\n본문\n`;
+const koOnlyPost = () => `---\ntitle: t\ndraft: false\nkoOnly: true\n---\n\n본문\n`;
 
 describe("checkTranslationPairs", () => {
+  // `koOnly: true` 는 영어판을 두지 않기로 한 글이다. 2026-11-14 에
+  // blog-beyond-astropaper 가 첫 사례가 됐다 — 살아있는 문서라 59,982자까지
+  // 자라서 번역 출력이 토큰 상한에 걸렸다.
+  it("koOnly 인 글은 짝이 없어도 missing 에 안 들어간다", async () => {
+    put(path.join(root, "ko/a.md"), koOnlyPost());
+    expect(
+      await checkTranslationPairs({ koDir: path.join(root, "ko"), enDir: path.join(root, "en") })
+    ).toEqual({ missing: [], orphans: [] });
+  });
+
+  it("koOnly 가 아닌 글은 그대로 missing 에 든다", async () => {
+    put(path.join(root, "ko/a.md"), koOnlyPost());
+    put(path.join(root, "ko/b.md"), post(false));
+    const r = await checkTranslationPairs({
+      koDir: path.join(root, "ko"),
+      enDir: path.join(root, "en"),
+    });
+    expect(r.missing).toEqual(["b"]);
+  });
+
   // CLAUDE.md 「자주 하는 실수」 1번 — KO 만 커밋하면 언어 스위치가 홈으로 fallback 된다
   it("짝이 맞으면 빈 배열을 돌려준다", async () => {
     put(path.join(root, "ko/a.md"), post(false));

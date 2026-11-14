@@ -20,6 +20,12 @@ const thinTags = getThinTagSlugs();
 // https://astro.build/config
 export default defineConfig({
   site: SITE.website,
+  // 한국어로만 두기로 한 글의 영어 URL. 이미 색인돼 있어서 지우면 404 가
+  // 되므로 한국어 글로 보낸다 (2026-11-14, `koOnly: true` 의 첫 사례).
+  redirects: {
+    "/en/posts/blog-beyond-astropaper-what-i-added":
+      "/posts/blog-beyond-astropaper-what-i-added",
+  },
   // Inline all page-scoped CSS into <style> tags → 외부 CSS 요청 제거
   // (렌더링 차단 요소 하나 더 제거, FCP 개선)
   build: {
