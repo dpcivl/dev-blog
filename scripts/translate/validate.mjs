@@ -1,3 +1,8 @@
+import fs from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { mask } from "../secret-patterns.mjs";
+
 // Structural validators for a Korean → English blog translation.
 // Each validator returns { ok: boolean, issues: string[] }.
 
@@ -175,9 +180,20 @@ function stripCodeBlocks(text) {
   return text.replace(CODE_FENCE, "").replace(INLINE_CODE, "");
 }
 
+// mermaid <img> 는 KO/EN 이 서로 다른 해시 · alt 를 갖는 게 의도다 (EN 은 영어
+// 라벨로 다시 렌더한다). 그래서 내용이 아니라 개수만 맞는지 본다.
+const MERMAID_IMG = /^<img\b[^>]*\/assets\/mermaid\//;
+
+function tagsForCompare(text) {
+  const all = extractAll(stripCodeBlocks(text), HTML_TAG);
+  const plain = all.filter(t => !MERMAID_IMG.test(t));
+  const mermaidCount = all.length - plain.length;
+  return [...plain, ...Array(mermaidCount).fill("<img mermaid>")];
+}
+
 export function validateHtmlTags(kr, en) {
-  const krTags = extractAll(stripCodeBlocks(kr), HTML_TAG);
-  const enTags = extractAll(stripCodeBlocks(en), HTML_TAG);
+  const krTags = tagsForCompare(kr);
+  const enTags = tagsForCompare(en);
   const cmp = multisetEqual(krTags, enTags);
   if (!cmp.equal) {
     return {
@@ -220,7 +236,7 @@ export function detectAccidentalStrikethrough(text) {
       findings.push({
         line: i + 1,
         matched: `~${m[1]}~`,
-        snippet: line.trim().slice(0, 100),
+        snippet: mask(line.trim()).slice(0, 100),
       });
     }
   }
@@ -285,4 +301,70 @@ export function validateAll(kr, en) {
     }
   }
   return { ok, issues: allIssues, results };
+}
+
+// ---------- 단독 실행 ----------
+//
+// 번역 없이 KO/EN 짝을 검증한다. 발행 게이트가 이것을 부른다.
+//   node scripts/translate/validate.mjs            # 짝이 있는 전 글
+//   node scripts/translate/validate.mjs <slug>...  # 지정한 글만
+// 짝이 안 맞으면(KO 없음 · EN 없음) 여기서는 건너뛴다 — 그건 check:md 의 몫이다.
+// 실패가 하나라도 있으면 exit 1.
+
+async function main() {
+  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+  const koDir = path.join(root, "src/data/blog/ko");
+  const enDir = path.join(root, "src/data/blog/en");
+  const explicit = process.argv.length > 2;
+  const slugs = explicit
+    ? process.argv.slice(2)
+    : (await fs.readdir(enDir)).filter(f => f.endsWith(".md")).map(f => f.replace(/\.md$/, "")).sort();
+
+  // slug 를 그대로 경로에 붙이므로 `../` 로 저장소 밖 .md 를 읽지 못하게 막는다.
+  const bad = slugs.filter(s => !/^[a-z0-9-]+$/.test(s));
+  if (bad.length > 0) {
+    console.error(`slug 형식이 아니다: ${bad.join(", ")} (소문자·숫자·하이픈만)`);
+    process.exit(1);
+  }
+
+  let checked = 0;
+  const failed = [];
+  for (const slug of slugs) {
+    let ko, en;
+    try {
+      [ko, en] = await Promise.all([
+        fs.readFile(path.join(koDir, `${slug}.md`), "utf8"),
+        fs.readFile(path.join(enDir, `${slug}.md`), "utf8"),
+      ]);
+    } catch (e) {
+      if (e.code !== "ENOENT") throw e;
+      // 목록에서 고른 게 아니라 직접 지목했는데 없으면 오타다 — 조용히 통과시키지 않는다.
+      if (explicit) {
+        console.error(`짝을 찾을 수 없다: ${slug} (ko/en 중 하나가 없다)`);
+        process.exit(1);
+      }
+      continue;
+    }
+    checked++;
+    const r = validateAll(ko, en);
+    if (!r.ok) failed.push({ slug, issues: r.issues });
+  }
+
+  for (const { slug, issues } of failed) {
+    console.log(`  ${slug}`);
+    for (const i of issues) console.log(`    ! ${mask(i)}`);
+  }
+  console.log(`페어 ${checked}건 검증 — 실패 ${failed.length}건`);
+  process.exit(failed.length > 0 ? 1 : 0);
+}
+
+// 직접 실행할 때만 돈다. import 하면 검증 함수만 쓸 수 있다.
+const invokedDirectly =
+  process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href;
+
+if (invokedDirectly) {
+  main().catch(e => {
+    console.error(e);
+    process.exit(2);
+  });
 }

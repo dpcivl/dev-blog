@@ -201,6 +201,25 @@ grep -nE '^\s*[+?]|^\s*![^[]' <메모파일>
 - 작성자가 명시한 게 아닌 한 본인/제3자의 이메일 / 전화번호 / 실명·식별자
 - 결제 카드 정보, 사업자번호 등
 
+**🔒 지금은 `pnpm check:md` 가 코드로 막는다 (2026-11-14~).** 위 목록이 글로만 있던
+것을 검사로 옮겼다. 차단(exit 1)과 경고가 나뉜다.
+
+| 차단 — 발행이 멈춘다 | 경고 — 기록만 |
+| --- | --- |
+| 키 접두사 (`sk-ant-` · `sk-proj-` · 구버전 `sk-` · `gh[pousr]_` · `github_pat_` · `sk_live_` · AKIA · AIza · `xox…`) | 32자 이상 hex |
+| JWT (`eyJ…`) | padding 붙은 base64 |
+| 개인키 헤더 (`-----BEGIN … PRIVATE KEY-----`) | `*.supabase.co` · `*.vercel.app` |
+| 자격증명이 박힌 URL (`scheme://user:pass@host`) | KO/EN 갈라짐 · EN 본문 한글 · 원본 `.mmd` 없음 |
+| 공인 IP · 미렌더 mermaid · KO/EN 짝 깨짐 | |
+
+- **잡은 값은 마스킹해서 찍는다.** 검사 출력이 또 하나의 유출 경로가 되면 안 된다 —
+  공인 IP 검사가 같은 줄의 AWS 키를 평문으로 찍던 것을 그래서 고쳤다
+- **마스킹한 글은 통과한다.** `REDACTED` · `<your_key>` · `EXAMPLE` 이 섞인 값은
+  건너뛴다. 위 보안 절이 지시하는 마스킹이 발행을 막으면 안 되기 때문이다
+- 검사 범위는 **`git ls-files` 기준 전부**다 (바이너리 · `tests/` · 생성 파일 제외).
+  `src/000-inbox.md` 와 `deploy/` 의 설정 파일이 여기 들어온다
+- 패턴 정의는 [scripts/secret-patterns.mjs](scripts/secret-patterns.mjs) 한곳에 있다
+
 **IP 주소 (2026-09-06 실제 사고):** 작성자의 집 공인 IP 가 `deploy/README.md` 와 블로그 본문에 그대로 들어간 채 push 됐다. 하필 *"집 IP 는 공개 저장소에 올리지 말 것"* 이라고 적어둔 문서 자체였다. 지금은 `pnpm check:md` 가 공인 IP 를 잡아 exit 1 로 막는다 (사설 대역과 RFC 5737 문서용 주소는 통과). **예시가 필요하면 `192.0.2.1` · `198.51.100.1` · `203.0.113.1` 을 쓴다.**
 
 **의심 패턴 (발행 전에 grep 한 번 돌릴 것):**
@@ -746,6 +765,8 @@ pnpm translate one <slug>       # 단일 포스트 번역 (신규 or 재번역).
 pnpm translate batch            # 아직 EN 없는 KO 포스트 일괄 번역
 pnpm translate sample           # 지정된 샘플 3편 (스모크 테스트)
 pnpm translate dry <slug>       # 번역 + validate 만, 파일 쓰기 X (검증용)
+pnpm translate:validate         # 번역 없이 KO/EN 페어 검증만 (전체)
+pnpm translate:validate <slug>  # 한 글만
 ```
 
 - **모델**: 기본 `claude-sonnet-5`. `.env` 의 `ANTHROPIC_MODEL` 로 override 가능
