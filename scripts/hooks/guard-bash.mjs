@@ -24,11 +24,33 @@ const SECRET_PATH = [
 // 예시·템플릿은 비밀이 아니다.
 const EXAMPLE = /\.env\.(example|sample|template|dist)\b/;
 
+// 로그 읽기 전용 키 (2026-11-14~). 서버의 `logsro` 계정에만 등록돼 있고 그 계정은
+// sudo 가 없고 adm 그룹으로 로그만 읽는다. 세션이 통계 진단을 직접 하려고 만들었다.
+//
+// 허용하는 건 딱 한 모양 — 명령이 이 키로 logsro 에 ssh 하는 것으로 시작하고,
+// 키 이름이 그 자리에 한 번만 나올 때. `cat` 으로 키를 읽거나 다른 계정에 쓰는
+// 것은 막는다. 운영 키(*.pem)는 여전히 위 규칙에 걸린다.
+const RO_KEY_MENTION = /parkhyo-logs-ro(?!\.pub)/g;
+const RO_KEY_USE = /^\s*ssh\s+-i\s+~\/\.ssh\/parkhyo-logs-ro\s+logsro@parkhyo\.in(\s|$)/;
+
 export function judge(command) {
   if (typeof command !== "string" || !command.trim()) return null;
 
   // 예시 파일만 건드리는 명령은 통과. (.env.example 은 저장소에 있다)
-  const stripped = command.replace(new RegExp(EXAMPLE.source, "g"), "");
+  let stripped = command.replace(new RegExp(EXAMPLE.source, "g"), "");
+
+  const roMentions = stripped.match(RO_KEY_MENTION) || [];
+  if (roMentions.length === 1 && RO_KEY_USE.test(stripped)) {
+    stripped = stripped.replace(RO_KEY_MENTION, "");
+  } else if (roMentions.length > 0) {
+    return {
+      what: "로그 읽기 전용 키",
+      matched: "parkhyo-logs-ro",
+      reason:
+        `로그 읽기 전용 키는 \`ssh -i ~/.ssh/parkhyo-logs-ro logsro@parkhyo.in …\` ` +
+        `모양으로만 쓸 수 있습니다. 키 파일을 읽거나 다른 계정에 쓰는 명령은 막습니다.`,
+    };
+  }
 
   for (const { re, what } of SECRET_PATH) {
     const m = stripped.match(re);

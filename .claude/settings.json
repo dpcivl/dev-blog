@@ -52,6 +52,7 @@
       "Read(deploy/**/*secret*)",
       "Read(**/id_rsa*)",
       "Read(**/id_ed25519*)",
+      "Read(~/.ssh/parkhyo-logs-ro)",
       "Bash(git push --force *)",
       "Bash(git push -f *)",
       "Bash(git reset --hard *)",

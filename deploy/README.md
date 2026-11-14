@@ -1046,6 +1046,42 @@ sudo /usr/local/bin/generate-stats
 
 > `rm` 대신 `mv` 를 쓴다. 판단이 틀렸을 때 되돌릴 수 있어야 한다.
 
+### 로그 읽기 전용 계정 — `logsro` (2026-11-14~)
+
+통계가 부풀 때마다 진단은 서버 로그를 봐야 하는데, Claude 세션은 운영 키를 쓰는
+명령이 훅에 막혀서 작성자가 명령을 붙여넣고 출력을 다시 붙여주는 식으로 했다.
+막는 것 자체는 맞다 — 운영 키는 `ubuntu` 계정이고 sudo 가 된다. 그래서 **진단만
+할 수 있는 계정을 따로** 만들었다.
+
+| 할 수 있음 | 할 수 없음 |
+| --- | --- |
+| `/var/log` 읽기 (`adm` 그룹) · `/var/lib/beacon-verify` 읽기 | sudo · 쓰기 · 설치 |
+| 키로 접속 | 비밀번호 로그인 (잠김) · 포워딩 · pty (`restrict`) |
+
+```bash
+# 만들 때 (운영 키로, 한 번)
+sudo useradd --create-home --shell /bin/bash logsro
+sudo usermod -aG adm logsro
+sudo passwd -l logsro
+sudo install -d -m 700 -o logsro -g logsro /home/logsro/.ssh
+echo 'restrict <공개키>' | sudo tee /home/logsro/.ssh/authorized_keys
+sudo chown logsro:logsro /home/logsro/.ssh/authorized_keys && sudo chmod 600 /home/logsro/.ssh/authorized_keys
+
+# 쓸 때
+ssh -i ~/.ssh/parkhyo-logs-ro logsro@parkhyo.in 'wc -l /var/log/nginx/beacon.log'
+```
+
+- **개인키는 작성자 맥의 `~/.ssh/parkhyo-logs-ro` 에만 있다.** 저장소에 없다.
+  다른 기기에서 쓰려면 그 기기에서 키를 새로 만들고 공개키를 `authorized_keys` 에 한 줄 더한다
+- 암호 없는 키다. 세션이 비대화식으로 써야 해서다. 대신 할 수 있는 게 로그 읽기뿐이다
+- 세션 쪽 차단은 두 겹이다 — `scripts/hooks/guard-bash.mjs` 가 이 키를 **위 「쓸 때」
+  모양으로만** 통과시키고(`cat` 으로 읽기 · 다른 계정 · 다른 도구는 막음),
+  `.claude/settings.json` 이 Read 도구로 여는 것을 막는다. 둘 다 글자를 보는 방식이라
+  완벽하지 않다. **진짜 방어선은 서버 계정 권한이다**
+- 접속 시험 (2026-11-14): 로그 읽기 됨 · `sudo -n true` 거부 · `/var/log/nginx` 와
+  `/usr/local/bin` 쓰기 거부
+- **회수**: `sudo rm /home/logsro/.ssh/authorized_keys` (계정째 지우려면 `sudo userdel -r logsro`)
+
 ### 통계 비밀번호를 브라우저에서 바꾸기
 
 `/stats/password/` 에서 바꾼다. 아이디는 그대로이고 비밀번호만 바뀐다 — 서비스가 파일의 유일한 사용자를 대상으로 삼는다.

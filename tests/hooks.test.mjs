@@ -20,6 +20,12 @@ describe("guard-bash — 막아야 하는 것", () => {
     ["cat deploy/ssh/deploy_key", "배포 키"],
     ["cat ~/.ssh/id_rsa", "SSH 개인키"],
     ["openssl rsa -in server.pem", "인증서"],
+    ["cat ~/.ssh/parkhyo-logs-ro", "읽기 전용 키라도 읽는 건 막는다"],
+    ["ssh -i ~/.ssh/parkhyo-logs-ro ubuntu@parkhyo.in id", "읽기 전용 키를 다른 계정에"],
+    ["scp -i ~/.ssh/parkhyo-logs-ro x logsro@parkhyo.in:/tmp/", "ssh 말고 다른 도구로"],
+    ["ssh -i ~/.ssh/parkhyo-logs-ro logsro@parkhyo.in id; cat ~/.ssh/parkhyo-logs-ro", "허용 모양 뒤에 덧붙여 읽기"],
+    ["echo x && ssh -i ~/.ssh/parkhyo-logs-ro logsro@parkhyo.in id", "앞에 다른 명령을 붙이기"],
+    ["ssh -i ~/.ssh/parkhyo-logs-ro logsro@parkhyo.in -i ~/.ssh/blog-prod-key.pem", "운영 키를 같이 쓰기"],
   ];
   for (const [cmd, why] of blocked) {
     it(`${why}: ${cmd}`, () => {
@@ -46,6 +52,12 @@ describe("guard-bash — 통과해야 하는 것", () => {
       expect(judge(cmd), cmd).toBeNull();
     });
   }
+
+  it("로그 읽기 전용 키로 logsro 에 ssh 하는 것은 통과한다", () => {
+    expect(judge("ssh -i ~/.ssh/parkhyo-logs-ro logsro@parkhyo.in 'wc -l /var/log/nginx/beacon.log'")).toBeNull();
+    expect(judge("ssh -i ~/.ssh/parkhyo-logs-ro logsro@parkhyo.in 'bash -s' <<'EOF'\ncd /var/log/nginx\nEOF")).toBeNull();
+    expect(judge("cat ~/.ssh/parkhyo-logs-ro.pub")).toBeNull();
+  });
 
   it("cat .env.example 은 통과한다", () => {
     expect(judge("cat .env.example")).toBeNull();
