@@ -1,0 +1,176 @@
+#!/usr/bin/env python3
+"""비콘 중 「같은 IP 가 그 글을 받아간 것」만 골라 따로 쌓는다.
+
+    설치: sudo install -m 755 verify-beacons /usr/local/bin/verify-beacons
+    호출: generate-stats 가 GoAccess 보다 먼저 부른다.
+
+왜 (2026-11-14)
+---------------
+네 번째로 숫자가 부풀었다. 2주치 비콘 169개 IP 중 **151개가 그 글을 받아간
+기록이 없었다.** 「글을 열었다」는 신호만 오고 글은 안 받아간 것이다.
+
+진짜 브라우저는 페이지를 받은 그 연결로 비콘을 보내므로 IP 가 같을 수밖에
+없다. 다른 IP 에서 비콘이 온다는 건 요청마다 IP 를 바꾸는 크롤러라는 뜻이다.
+그 무리는 출처(`aocr.org`)를 꾸미고 UA 를 Chrome/146 하나로 고정하고 있었다.
+
+대조군으로 확인했다 — 작성자 본인 비콘 22건은 **22건 모두** 같은 IP 로 페이지를
+받아간 기록이 있었다. 측정이 틀린 게 아니다.
+
+어떻게
+------
+- 페이지 기록: access.log 의 GET 200/304 에서 (IP, 경로) 를 모은다
+- beacon.log 의 새 줄마다 (IP, 경로) 가 거기 있으면 verified.log, 없으면 rejected.log
+- 어디까지 읽었는지(inode · 줄 수)를 state.json 에 남겨 다음 실행은 새 줄만 본다
+- 결과 파일은 /var/log/nginx 밖에 둔다. logrotate 가 `*.log` 를 돌리기 때문이다.
+  verified.log 는 하루 수십 줄이라 회전할 필요가 없고, 회전하면 GoAccess 의
+  이어 읽기(--persist)가 inode 를 잃는다
+
+한계
+----
+- 브라우저 캐시에서 글을 다시 연 재방문자는 페이지 요청이 안 남아 빠질 수 있다
+- 한 IP 로 페이지와 비콘을 다 보내는 크롤러는 못 거른다
+- 회전 직후 beacon.log.1 이 이미 압축돼 있으면 그 꼬리(최대 한 시간)는 놓친다
+"""
+
+from __future__ import annotations
+
+import gzip
+import json
+import os
+import re
+import sys
+from pathlib import Path
+
+LOG_DIR = Path(os.environ.get("BEACON_LOG_DIR", "/var/log/nginx"))
+OUT_DIR = Path(os.environ.get("BEACON_VERIFY_DIR", "/var/lib/beacon-verify"))
+
+# combined 와 beacon 포맷 공통 앞부분: IP - 사용자 [시각] "메서드 경로 프로토콜" 상태
+LINE = re.compile(r'^(\S+) \S+ \S+ \[[^\]]*\] "(\S+) (\S+)[^"]*" (\d{3}) ')
+
+
+def parse(line: str):
+    """(ip, method, path, status) — 모양이 다르면 None."""
+    m = LINE.match(line)
+    if not m:
+        return None
+    ip, method, path, status = m.groups()
+    return ip, method, path.split("?", 1)[0], int(status)
+
+
+def read_lines(path: Path) -> list[str]:
+    """완결된 줄만 돌려준다. 압축 여부는 내용으로 판단한다 (이름이 아니라)."""
+    with open(path, "rb") as f:
+        head = f.read(2)
+    opener = gzip.open if head == b"\x1f\x8b" else open
+    with opener(path, "rb") as f:
+        data = f.read()
+    text = data.decode("utf-8", errors="replace")
+    lines = text.split("\n")
+    # 마지막 조각은 개행이 없으면 nginx 가 아직 쓰는 중일 수 있다. 다음 실행에 읽는다.
+    return lines[:-1]
+
+
+def rotated(base: Path) -> list[Path]:
+    """base, base.1, base.2.gz … 를 오래된 것부터."""
+    found = []
+    for p in base.parent.glob(base.name + "*"):
+        suffix = p.name[len(base.name):]
+        if suffix == "":
+            n = 0
+        else:
+            m = re.fullmatch(r"\.(\d+)(\.gz)?", suffix)
+            if not m:
+                continue
+            n = int(m.group(1))
+        found.append((n, p))
+    return [p for _, p in sorted(found, key=lambda t: -t[0])]
+
+
+def page_set(paths: list[Path]) -> set[tuple[str, str]]:
+    seen = set()
+    for p in paths:
+        for line in read_lines(p):
+            r = parse(line)
+            if not r:
+                continue
+            ip, method, path, status = r
+            if method != "GET" or status not in (200, 304):
+                continue
+            if path.startswith("/b/"):
+                continue
+            seen.add((ip, path))
+    return seen
+
+
+def split(lines: list[str], pages: set[tuple[str, str]]):
+    ok, bad = [], []
+    for line in lines:
+        r = parse(line)
+        if not r:
+            continue
+        ip, _, path, _ = r
+        (ok if (ip, path) in pages else bad).append(line)
+    return ok, bad
+
+
+def load_state(path: Path):
+    try:
+        return json.loads(path.read_text())
+    except (FileNotFoundError, ValueError):
+        return None
+
+
+def run(log_dir: Path = LOG_DIR, out_dir: Path = OUT_DIR) -> tuple[int, int]:
+    beacon = log_dir / "beacon.log"
+    access = log_dir / "access.log"
+    state_path = out_dir / "state.json"
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    if not beacon.exists():
+        print(f"{beacon} 없음 — 건너뛴다", file=sys.stderr)
+        return 0, 0
+
+    ino = beacon.stat().st_ino
+    cur = read_lines(beacon)
+    state = load_state(state_path)
+
+    if state is None:
+        # 첫 실행: 남아 있는 로그 전부로 시작한다
+        new = []
+        for p in rotated(beacon):
+            new += cur if p == beacon else read_lines(p)
+        access_files = rotated(access)
+    else:
+        new = []
+        if state["inode"] == ino:
+            new = cur[state["lines"]:]
+        else:
+            # 회전됐다. 옛 파일은 beacon.log.1 로 이름만 바뀌었을 것이다
+            old = log_dir / "beacon.log.1"
+            if old.exists() and old.stat().st_ino == state["inode"]:
+                new = read_lines(old)[state["lines"]:]
+            else:
+                print("회전된 beacon 로그를 못 찾음 — 그 꼬리는 건너뛴다", file=sys.stderr)
+            new += cur
+        # 비콘은 페이지보다 늦게 온다. 자정 회전을 넘긴 경우만 챙기면 된다
+        access_files = [p for p in rotated(access) if p.name in ("access.log", "access.log.1")]
+
+    ok, bad = split(new, page_set(access_files))
+
+    for name, lines in (("verified.log", ok), ("rejected.log", bad)):
+        if lines:
+            with open(out_dir / name, "a", encoding="utf-8") as f:
+                f.write("".join(l + "\n" for l in lines))
+                f.flush()
+                os.fsync(f.fileno())
+
+    # 결과를 쓴 뒤에 위치를 기록한다. 중간에 죽으면 중복은 생겨도 누락은 없다
+    tmp = state_path.with_suffix(".tmp")
+    tmp.write_text(json.dumps({"inode": ino, "lines": len(cur)}))
+    tmp.replace(state_path)
+    return len(ok), len(bad)
+
+
+if __name__ == "__main__":
+    ok, bad = run()
+    print(f"비콘 확인 {ok} · 거름 {bad}")

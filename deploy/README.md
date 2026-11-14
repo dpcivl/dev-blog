@@ -606,6 +606,7 @@ Vercel Analytics 를 걷어낸 자리를 nginx 로그 분석으로 대신한다.
 sudo apt install -y goaccess apache2-utils
 
 sudo install -m 755 deploy/bin/generate-stats /usr/local/bin/generate-stats
+sudo install -m 755 deploy/bin/verify-beacons /usr/local/bin/verify-beacons   # 2026-11-14~
 sudo mkdir -p /var/www/stats /var/lib/goaccess
 
 # 대시보드 접근용 비밀번호 (사용자 이름은 원하는 대로)
@@ -848,6 +849,54 @@ access_log /var/log/nginx/beacon-all.log beacon if=$log_beacon;
 
 RSS 는 원래 `/` 가 붙어 나가서 건드리지 않았다. 바꿨으면 guid 가 달라져 구독자 리더기에
 글이 전부 새 글로 다시 떴을 것이다.
+
+#### IP 를 바꿔가며 비콘만 쏘는 크롤러 — 같은 IP 가 글을 받아갔는지 본다 (2026-11-14)
+
+글 페이지만 세도 **네 번째로 부풀었다.** 2주치 `beacon.log` 를 열어보니 이랬다.
+
+```
+비콘 IP 169개 중 1회만 온 것          163
+그 IP 로 그 글을 받아간 기록이 없는 것  151   ← 글을 「열었다」는 신호만 왔다
+11/05 하루 43건 · IP 42개 · 대역 열 곳 이상
+출처 aocr.org 33건 — 전부 11/05–07, 전부 Chrome/146 한 가지
+```
+
+진짜 브라우저는 **페이지를 받은 그 연결로** 비콘을 보낸다. IP 가 같을 수밖에
+없다. 다른 IP 에서 비콘이 온다는 건 요청마다 IP 를 바꾸는 크롤러라는 뜻이다.
+
+**대조군으로 측정부터 확인했다.** 본인 IP 는 통계에서 빠지지만 `access.log` 에는
+남는다. 본인 비콘 22건은 **22건 모두** 같은 IP 로 그 페이지를 받아간 기록이
+있었다. 브라우저 캐시 때문에 측정이 틀렸을 가능성은 이걸로 지웠다.
+
+```
+그 외 · 페이지 받음   145
+그 외 · 페이지 없음   329
+본인  · 페이지 받음    22
+```
+
+nginx 는 요청 한 건만 보고 판정하므로 「앞서 이 IP 가 이 글을 받았나」를 모른다.
+그래서 집계 직전에 `deploy/bin/verify-beacons` 가 한 번 거른다.
+
+```
+access.log  ──(GET 200/304 의 IP·경로)──┐
+beacon.log  ──(새 줄만)─────────────────┴─▶ 짝이 있음 → /var/lib/beacon-verify/verified.log ─▶ GoAccess
+                                              짝이 없음 → /var/lib/beacon-verify/rejected.log (효과 측정용)
+```
+
+- **어디까지 읽었는지**(inode · 줄 수)를 `state.json` 에 남겨 매시간 새 줄만 본다.
+  logrotate 로 이름이 바뀌면 `beacon.log.1` 의 꼬리부터 마저 읽는다
+- 결과 파일을 `/var/log/nginx` 밖에 둔 건 logrotate 가 `*.log` 를 돌리기 때문이다.
+  하루 수십 줄이라 회전할 필요가 없고, 회전하면 GoAccess 이어 읽기가 inode 를 잃는다
+- **새 DB(`/var/lib/goaccess-verified`)로 다시 쌓는다.** 첫 실행이 남아 있는 로그
+  (2주 안팎) 전부를 검증해서 시작하므로 대시보드 기록은 그 이전이 비게 된다.
+  옛 DB(`/var/lib/goaccess-beacon`)는 지우지 않았다 — `generate-stats` 의
+  `DB_BEACON` 한 줄을 되돌리면 예전 수치로 돌아간다
+- **효과는 `verified.log` 와 `rejected.log` 의 줄 수로 잰다.** 지난 사건들과 같은
+  원칙이다 — 거르기 전 모습이 남아 있어야 다음에 「맞게 줄었나」를 알 수 있다
+
+**한계.** 캐시에서 글을 다시 연 재방문자는 페이지 요청이 안 남아 빠질 수 있다.
+한 IP 로 페이지와 비콘을 다 보내는 크롤러는 못 거른다. 회전 직후 `beacon.log.1` 이
+이미 압축돼 있으면 그 꼬리(최대 한 시간)는 놓친다.
 
 #### 유입 경로 — 출처는 페이지가 따로 실어 보낸다 (2026-10-18)
 
