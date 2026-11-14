@@ -1,0 +1,5 @@
+%% alt: Backend request flow from user to web server, WAS, and DB
+flowchart LR
+  U["User"] --> W["Web Server<br/>(Nginx · Apache HTTP Server)"]
+  W --> A["WAS<br/>(Tomcat)"]
+  A --> D["DB"]

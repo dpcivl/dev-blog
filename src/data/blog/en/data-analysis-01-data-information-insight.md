@@ -42,7 +42,7 @@ If all you have is "exam score: 85," that's just one fact. Add "10 points above 
 
 And what lets you connect information to an actual action is **insight**. Carrying forward the sales example, it looks like this.
 
-<img src="/assets/mermaid/07a241f85795a97d.svg" alt="Three stages from data to information to insight. The data is the uninterpreted fact that 'sales dropped 15%,' the information is the contextualized result that 'visitors stayed steady but mobile payment drop-off rose,' and the insight is the judgment that connects to action: 'prioritize improving the mobile payment screen and measure the effect'" width="944" height="118" style="max-width:min(100%, 944px);height:auto;" />
+<img src="/assets/mermaid/9d6d81271fbb727f.svg" alt="Three stages from data to information to insight. The data is the uninterpreted fact that 'sales dropped 15%,' the information is the contextualized result that 'visitors stayed steady but mobile payment drop-off rose,' and the insight is the judgment that connects to action: 'prioritize improving the mobile payment screen and measure the effect'" width="1045" height="142" style="max-width:min(100%, 1045px);height:auto;" />
 
 You have to reach insight for it to help with decision-making. If you stop at "sales dropped 15%," you can't decide anything.
 
@@ -50,7 +50,7 @@ You have to reach insight for it to help with decision-making. If you stop at "s
 
 Data is divided along two perspectives. By **form**, it's structured · semi-structured · unstructured. By **character**, it's numerical · categorical.
 
-<img src="/assets/mermaid/6de1bad647515ab9.svg" alt="Two axes for dividing data. From the form perspective: structured (rows and columns, clear schema), semi-structured (meaning expressed through keys and tags, flexible structure), unstructured (no fixed structure, requires feature extraction). From the character perspective: numerical (discrete · continuous) and categorical (nominal · ordinal)" width="1349" height="430" style="max-width:min(100%, 1349px);height:auto;" />
+<img src="/assets/mermaid/7eb5596d6e61e652.svg" alt="Two axes for dividing data. From the form perspective: structured (rows and columns, clear schema), semi-structured (meaning expressed through keys and tags, flexible structure), unstructured (no fixed structure, requires feature extraction). From the character perspective: numerical (discrete · continuous) and categorical (nominal · ordinal)" width="877" height="822" style="max-width:min(100%, 877px);height:auto;" />
 
 The reason you need to look at both axes together is that **you need to check both storage format and real-world meaning at the same time to choose an appropriate analysis method.**
 
@@ -101,7 +101,7 @@ Databases came up too. Membership tiers are often managed as stored codes, in wh
 
 Data analysis isn't about loading a file and computing right away — it's **a process of continually aligning the question, the data, and the method.**
 
-<img src="/assets/mermaid/68194e0b0cab646b.svg" alt="Six stages of the data analysis process and the flow of going back. Proceeding from problem definition to data collection, preprocessing, exploration and visualization, modeling, and interpreting results, if new facts are discovered during exploration or modeling, you go back to the problem definition or preprocessing stage. However, even when going back, the originally defined problem itself doesn't change" width="1124" height="139" style="max-width:min(100%, 1124px);height:auto;" />
+<img src="/assets/mermaid/13fbdadb52facb0e.svg" alt="Six stages of the data analysis process and the flow of going back. Proceeding from problem definition to data collection, preprocessing, exploration and visualization, modeling, and interpreting results, if new facts are discovered during exploration or modeling, you go back to the problem definition or preprocessing stage. However, even when going back, the originally defined problem itself doesn't change" width="1358" height="139" style="max-width:min(100%, 1358px);height:auto;" />
 
 If you discover new facts during exploration or modeling, you go back to the question, collection, or preprocessing stages and revise them. Apparently going back actually happens quite often.
 

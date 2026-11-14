@@ -20,7 +20,7 @@ The code is in the [ai-routing-trial repository](https://github.com/dpcivl/ai-ro
 
 ## Overall flow
 
-<img src="/assets/mermaid/2b42350815328e34.svg" alt="사용자가 ai-router ask 로 질문하면 cli 가 명령을 해석하고 config 가 models.yaml 을 읽은 뒤, 라우터가 카테고리를 판단해 추론 · 코딩 · 비전 모델 중 하나를 고르고, 백엔드가 Ollama 에 HTTP 요청을 보내 응답과 속도 측정값을 돌려주는 흐름" width="629" height="814" style="max-width:min(100%, 629px);height:auto;" />
+<img src="/assets/mermaid/f895fe8aeb83e90c.svg" alt="User asks a question via ai-router ask, cli interprets the command, config reads models.yaml, then the router determines the category and picks one of reasoning / coding / vision models, and the backend sends an HTTP request to Ollama and returns the response with speed measurements" width="629" height="862" style="max-width:min(100%, 629px);height:auto;" />
 
 The core idea is **the router decides, and the backend executes**.
 

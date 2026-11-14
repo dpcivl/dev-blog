@@ -1,0 +1,10 @@
+%% alt: Six stages of the data analysis process and the flow of going back. Proceeding from problem definition to data collection, preprocessing, exploration and visualization, modeling, and interpreting results, if new facts are discovered during exploration or modeling, you go back to the problem definition or preprocessing stage. However, even when going back, the originally defined problem itself doesn't change
+flowchart LR
+  A["Define Problem"] --> B["Collect Data"]
+  B --> C["Preprocess"]
+  C --> D["Explore · Visualize"]
+  D --> E["Model"]
+  E --> F["Interpret Results"]
+  D -.->|"New finding"| A
+  D -.->|"Reprocess"| C
+  E -.->|"New finding"| C

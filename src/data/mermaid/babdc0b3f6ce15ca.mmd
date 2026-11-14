@@ -1,0 +1,7 @@
+%% alt: A flow that embeds the question, finds similar equipment in the vector index, follows TRIGGERED relationships to gather alarms, and shapes the result for the LLM
+flowchart TD
+  Q["Question<br/>Equipment with temperature-related alarms"] --> E["Embed question<br/>text-embedding-3-small"]
+  E --> V["Vector search<br/>queryNodes — top k similar equipment + score"]
+  V --> G["Graph expansion<br/>OPTIONAL MATCH — follow TRIGGERED relationships"]
+  G --> C["collect<br/>Group alarms by equipment"]
+  C --> L["Shape for LLM"]

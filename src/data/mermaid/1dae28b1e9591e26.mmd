@@ -1,0 +1,12 @@
+%% alt: Comparison showing the same relationship expressed as foreign-key joins in a relational DB versus edges in a graph DB
+flowchart LR
+  subgraph G["Graph — just follow the arrows"]
+      direction LR
+    GL["(Line)"] -->|"USES"| GE["(Equipment)"]
+    GE -->|"HAS_PART"| GP["(Part)"]
+  end
+  subgraph R["Relational — 3 JOINs to cross 3 hops"]
+      direction LR
+    RL["Line table"] -->|"line_id FK"| RE["Equipment table"]
+    RE -->|"equip_id FK"| RP["Part table"]
+  end

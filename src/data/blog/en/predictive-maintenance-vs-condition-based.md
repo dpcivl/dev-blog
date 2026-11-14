@@ -36,7 +36,7 @@ I realized that to do AX properly, I needed to understand predictive maintenance
 
 ## Predictive maintenance proceeds in five stages
 
-<img src="/assets/mermaid/69f589ae62409f4d.svg" alt="5 stages of predictive maintenance — from data collection to linking with maintenance decisions" width="1315" height="118" style="max-width:min(100%, 1315px);height:auto;" />
+<img src="/assets/mermaid/d51f22583c9f97a6.svg" alt="5 stages of predictive maintenance — from data collection to linking with maintenance decisions" width="1489" height="142" style="max-width:min(100%, 1489px);height:auto;" />
 
 1. **Data collection** — Gather sensor data, equipment operation history, and maintenance history
 2. **Anomaly detection** — Detect patterns that differ from the normal state

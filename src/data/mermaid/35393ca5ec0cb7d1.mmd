@@ -1,0 +1,10 @@
+%% alt: Port facility hierarchy — ports are divided into basic, functional, support, and waterfront facilities; under basic facilities are waterway facilities awaiting entry permit, perimeter facilities, port transport facilities, and mooring facilities (wharf, quay wall, bollard)
+flowchart LR
+  P["Port"] --> B["Basic facilities"]
+  P --> F["Functional facilities"]
+  P --> S["Support facilities"]
+  P --> W["Waterfront facilities"]
+  B --> B1["Waterway facilities<br/>Anchorage · Shipping lane<br/>— Awaiting entry permit"]
+  B --> B2["Perimeter facilities"]
+  B --> B3["Port transport facilities"]
+  B --> B4["Mooring facilities<br/>Wharf · Quay wall · Bollard"]

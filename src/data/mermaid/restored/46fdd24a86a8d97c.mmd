@@ -1,8 +1,11 @@
 %% alt: Chroma 는 임베딩을 별도 컬렉션에 두고, Neo4j 는 임베딩을 노드 속성으로 붙여 벡터와 관계가 한 노드에 공존하는 구조를 비교한 그림
 flowchart TD
   subgraph N["Neo4j — 임베딩이 노드에 붙는다"]
+    direction TB
     NE["Equipment: 가열로<br/>name · description<br/>embedding 1536차원"] -->|"TRIGGERED"| NA["Alarm: 온도 초과"]
   end
   subgraph C["Chroma — 임베딩이 따로 있다"]
+    direction TB
     CD["문서"] -->|"임베딩해서 저장"| CC["컬렉션<br/>벡터 + 메타데이터"]
   end
+  N ~~~ C

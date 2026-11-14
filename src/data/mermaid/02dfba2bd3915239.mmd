@@ -1,0 +1,10 @@
+%% alt: 9-step request flow where the user presses a button on screen, passing through Controller · Service · Mapper · MyBatis · Oracle, and returning a JSON response
+flowchart TD
+  S1["1. User presses a button on screen"] --> S2["2. App sends HTTP request to the URL"]
+  S2 --> S3["3. Spring calls the Controller method for the URL"]
+  S3 --> S4["4. Controller calls Service"]
+  S4 --> S5["5. Service calls Mapper method"]
+  S5 --> S6["6. MyBatis runs SQL from XML on Oracle<br/>Rows are returned"]
+  S6 --> S7["7. Rows converted to DTO<br/>passed up Service → Controller"]
+  S7 --> S8["8. Spring converts DTO to JSON response"]
+  S8 --> S9["9. App receives JSON and displays on screen"]

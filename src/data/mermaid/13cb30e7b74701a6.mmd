@@ -1,0 +1,9 @@
+%% alt: RAG data preparation pipeline — through data selection, cleansing, chunking and metadata attachment, and OCR of analog data, data loads into a vector store, with quality control feeding back rather than ending after one pass
+flowchart TD
+  A["1. Data Selection<br/>Based on target questions"] --> B["2. Cleansing<br/>Automated + human review"]
+  A2["4. Analog Data<br/>OCR + preprocessing + review"] --> B
+  B --> C["Chunking"]
+  C --> D["3. Metadata<br/>Attach title · section path"]
+  D --> E["Vector Store"]
+  E --> F["Validate with eval set"]
+  F -.->|"5. Quality Control — not a one-time task"| A

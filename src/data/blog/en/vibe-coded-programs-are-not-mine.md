@@ -44,7 +44,7 @@ It seems better to write out the implementation approach in detail. I haven't tr
 
 I suspect that planning step by step — wireframe → mockup → PoC → prototype → pilot → deployment — leads to work with fewer gaps.
 
-<img src="/assets/mermaid/27dd166c6229d81a.svg" alt="기획 단계 순서 — 와이어프레임, 목업, PoC, 프로토타입, 파일럿, 배포" width="906" height="70" style="max-width:min(100%, 906px);height:auto;" />
+<img src="/assets/mermaid/495d1adf7582dd3d.svg" alt="Planning stage sequence — wireframe, mockup, PoC, prototype, pilot, deployment" width="972" height="70" style="max-width:min(100%, 972px);height:auto;" />
 
 AI can do anything. And precisely because it can do anything, it might implement parts you never planned for, resulting in a service that turns out differently than expected.
 
@@ -70,6 +70,6 @@ I think I need to study feature design. I believe you need to be able to picture
 
 For example, if you're implementing anomaly detection, you need to collect data, define the criteria for an anomalous state, decide what input values will be used to detect anomalies, decide the output values, and decide how to present it to the user.
 
-<img src="/assets/mermaid/2fbf23707612fbc0.svg" alt="이상 탐지 기능 설계 순서 — 데이터 수집, 이상 기준 정의, 탐지 방식과 입력값, 출력값, 사용자 표출" width="276" height="510" style="max-width:min(100%, 276px);height:auto;" />
+<img src="/assets/mermaid/d5084d7e057f1036.svg" alt="Anomaly detection design flow — data collection, anomaly criteria, detection method and inputs, outputs, user display" width="276" height="534" style="max-width:min(100%, 276px);height:auto;" />
 
 To think through the detailed structure within each step of a process like this, I think you need to understand the underlying principles of how those features are actually implemented.

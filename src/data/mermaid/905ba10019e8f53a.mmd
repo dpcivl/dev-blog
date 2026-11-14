@@ -1,0 +1,7 @@
+%% alt: Layered architecture — a request enters through the Controller, passes through the Service's business logic, then descends to the Repository's data access. Before separation, a single Controller held all three responsibilities
+flowchart TD
+  R["HTTP request"] --> C["Controller<br/>Receive request, send response"]
+  C --> S["Service<br/>Business logic<br/>(id issuance · update rules)"]
+  S --> P["Repository<br/>Data access"]
+  P --> DB["Storage"]
+  X["Before separation<br/>Controller held storage · logic · response all at once"] -.->|"Separate responsibilities"| C

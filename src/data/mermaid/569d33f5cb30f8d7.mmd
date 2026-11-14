@@ -1,0 +1,14 @@
+%% alt: Session-based authentication sequence — when a user logs in with id/pw, the server creates a session, stores it, and sends the session ID back as a cookie. On every subsequent request, the browser automatically attaches the cookie, and the server looks up the session store by session ID to identify the user
+sequenceDiagram
+    participant B as Browser
+    participant S as Server
+    participant D as Session store<br/>(Memory · DB · Redis)
+    B->>S: 1. Login (id / pw)
+    S->>S: 2. Verify id/pw
+    S->>D: Save session<br/>abc123 → Kim Chulsoo
+    S-->>B: Send session ID(abc123) as cookie
+    Note over B: Browser stores cookie
+    B->>S: 3. Subsequent request (cookie abc123 auto-attached)
+    S->>D: 4. Look up abc123
+    D-->>S: Kim Chulsoo
+    S-->>B: Response (identifies user and processes)

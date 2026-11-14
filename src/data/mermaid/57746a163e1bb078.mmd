@@ -1,0 +1,6 @@
+%% alt: Routing structure where a classifier judges incoming prompts and sends them to one of the reasoning, coding, or vision models
+flowchart LR
+  P["Prompt"] --> C["Classifier<br/>qwen3.5-2b"]
+  C -->|"Reasoning"| R["deepseek-r1:8b"]
+  C -->|"Coding"| K["qwen2.5-coder:7b"]
+  C -->|"Image"| V["gemma4:12b"]

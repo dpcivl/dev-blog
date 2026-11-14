@@ -1,0 +1,6 @@
+%% alt: Graph RAG learning roadmap — five stages from Neo4j basics to FastAPI backend
+flowchart TD
+  P1["1. Neo4j Graph Basics<br/>Cypher · Nodes · Relationships<br/>Build a mini graph"] --> P2["2. Neo4j Vector Index<br/>No separate Chroma<br/>Vector search in one DB"]
+  P2 --> P3["3. Hybrid Search<br/>Find candidates by vector<br/>Expand relations by graph"]
+  P3 --> P4["4. vLLM + Reranker<br/>Self-hosted inference server<br/>Re-rank search results"]
+  P4 --> P5["5. FastAPI Backend Structure<br/>RAG search endpoint<br/>SSE streaming response"]

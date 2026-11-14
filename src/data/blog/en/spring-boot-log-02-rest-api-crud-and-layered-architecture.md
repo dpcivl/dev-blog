@@ -99,7 +99,7 @@ At one point I hit a 400 — I **checked the cause immediately from the stack tr
 
 Up to this point, **the storage, logic, and response were all mixed together inside the controller.** The controller's original responsibility is just "receive request, send response," but it was also holding business logic (issuing ids, todo update rules). This needed to be split.
 
-<img src="/assets/mermaid/c0ec09d442545a4e.svg" alt="레이어드 아키텍처 — 요청이 컨트롤러로 들어와 서비스의 비즈니스 로직을 거쳐 리포지토리의 데이터 접근으로 내려간다. 분리 전에는 컨트롤러 하나가 이 세 책임을 모두 들고 있었다" width="460" height="662" style="max-width:min(100%, 460px);height:auto;" />
+<img src="/assets/mermaid/905ba10019e8f53a.svg" alt="Layered architecture — a request enters through the Controller, passes through the Service's business logic, then descends to the Repository's data access. Before separation, a single Controller held all three responsibilities" width="485" height="678" style="max-width:min(100%, 485px);height:auto;" />
 
 ## Layered Architecture — Controller / Service / Repository
 

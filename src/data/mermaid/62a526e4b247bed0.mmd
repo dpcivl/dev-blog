@@ -1,0 +1,9 @@
+%% alt: Export process 8-step flow — Booking number from transport reservation, container number from container securing, seal number and VGM from stuffing, HS Code from export declaration, bay plan from loading prep, B/L issued after departure
+flowchart TD
+  A["1. Transport reservation<br/>→ Booking number"] --> B["2. Container securing<br/>→ Container number"]
+  B --> C["3. Stuffing<br/>→ Seal number · VGM"]
+  C --> D["4. Export declaration<br/>HS Code · UNI-PASS"]
+  D --> E["5. Terminal gate-in"]
+  E --> F["6. Loading prep<br/>Bay plan"]
+  F --> G["7. Loading"]
+  G --> H["8. Departure · Docs complete<br/>→ B/L"]

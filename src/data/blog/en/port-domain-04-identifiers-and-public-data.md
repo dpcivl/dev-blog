@@ -64,7 +64,7 @@ Draft determines port facility usage fees, pilotage fees, and ship inspection co
 
 **The code system differs depending on whether it's FCL or LCL.** In other words, even for the same cargo, how it's loaded changes the identification structure.
 
-<img src="/assets/mermaid/5bb3ea8e8ac7a766.svg" alt="화물 식별자 계층 — 적하목록에 MRN 이 붙고 그 아래 마스터 B/L 일련번호인 MSN 이, 혼재화물의 경우 다시 하우스 B/L 일련번호인 HSN 이 붙는다. FCL 은 마스터 B/L, LCL 은 하우스 B/L 로 이어진다" width="480" height="350" style="max-width:min(100%, 480px);height:auto;" />
+<img src="/assets/mermaid/d44f2995ce0d9b8e.svg" alt="Cargo identifier hierarchy — the manifest carries an MRN, beneath which sits the MSN, the master B/L serial number, and for consolidated cargo an HSN, the house B/L serial number, follows. FCL leads to the master B/L, LCL to the house B/L" width="691" height="310" style="max-width:min(100%, 691px);height:auto;" />
 
 **Port identification codes** — Indicate where cargo is going from and to. Just as aviation has IATA codes, ports have their own identification codes.
 

@@ -69,7 +69,7 @@ I could see the result of embedding the description text.
 
 There's something worth pointing out here. In Chroma, embeddings were stored separately in a collection, but in Neo4j, **they attach as a property of the node.** That means vectors and graph structure can coexist on the same node.
 
-<img src="/assets/mermaid/46fdd24a86a8d97c.svg" alt="A comparison showing that Chroma keeps embeddings in a separate collection, while Neo4j attaches embeddings as node properties so vectors and relationships coexist on a single node" width="293" height="702" style="max-width:min(100%, 293px);height:auto;" />
+<img src="/assets/mermaid/0e91aee321d42ce5.svg" alt="A comparison showing that Chroma keeps embeddings in a separate collection, while Neo4j attaches embeddings as node properties so vectors and relationships coexist on a single node" width="322" height="702" style="max-width:min(100%, 322px);height:auto;" />
 
 ## Vector search — the question also needs to be embedded
 
@@ -165,7 +165,7 @@ Two things I hadn't seen before were added to the query.
 - **`OPTIONAL MATCH`**: With a regular `MATCH`, if there's no match, that entire row disappears from the result. `OPTIONAL MATCH` still returns the result even without a match, filling the missing part with `null`
 - **`collect()`**: If one piece of equipment triggers multiple alarms, the result would come back as multiple rows — this collapses them into a single list
 
-<img src="/assets/mermaid/a6e5aa54fb342655.svg" alt="A flow that embeds the question, finds similar equipment in the vector index, follows TRIGGERED relationships to gather alarms, and shapes the result for the LLM" width="276" height="782" style="max-width:min(100%, 276px);height:auto;" />
+<img src="/assets/mermaid/babdc0b3f6ce15ca.svg" alt="A flow that embeds the question, finds similar equipment in the vector index, follows TRIGGERED relationships to gather alarms, and shapes the result for the LLM" width="276" height="806" style="max-width:min(100%, 276px);height:auto;" />
 
 ![Vector + graph search result. Furnace similarity 0.8145 with related alarm Temperature Exceeded, Cooler 0.6893 with an empty list, Press 0.6781 with an empty list](/assets/posts/graph-rag-02-neo4j-vector-index/04-vector-plus-graph-alarms.webp)
 

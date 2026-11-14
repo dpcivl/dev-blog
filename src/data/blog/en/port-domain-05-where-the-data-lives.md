@@ -51,7 +51,7 @@ Busan Port is a single space. The export/import process, the arrival/departure p
 
 So when you set a topic and go to pull data, you might not be able to get everything from one place — you **may need to pull from each agency separately.** Each agency specializes in handling different data.
 
-<img src="/assets/mermaid/40403fd3e030344f.svg" alt="부산항이라는 한 공간에서 일어나는 일의 데이터가 세 기관으로 나뉘어 관리된다 — 해양수산부는 선박 입출항, 부산항만공사는 물동량, 관세청은 품목과 금액을 담당한다" width="753" height="350" style="max-width:min(100%, 753px);height:auto;" />
+<img src="/assets/mermaid/ecfc72ac4b0fa786.svg" alt="The data for what happens in Busan Port, a single space, is managed across three agencies — Ministry of Oceans and Fisheries handles vessel arrivals/departures, Busan Port Authority handles cargo volume, and Korea Customs Service handles items and amounts" width="796" height="422" style="max-width:min(100%, 796px);height:auto;" />
 
 ## What Each Agency Holds
 

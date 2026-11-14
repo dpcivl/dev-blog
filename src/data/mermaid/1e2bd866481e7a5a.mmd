@@ -1,0 +1,7 @@
+%% alt: The flow where Spring creates implementations at app startup, stores them as Beans in the container, and injects the type the constructor requires when creating a Controller
+flowchart TD
+  A["App starts"] --> B["Create implementations one by one<br/>GradeServiceImpl · LoginService"]
+  B --> C["Store in container<br/>These objects are Beans"]
+  C --> D["Time to create GradeController"]
+  D --> E["Constructor requires GradeService type"]
+  E --> F["Pull GradeServiceImpl from the box and inject it"]

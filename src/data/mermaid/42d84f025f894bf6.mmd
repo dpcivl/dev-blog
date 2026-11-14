@@ -1,0 +1,15 @@
+%% alt: Difference between sessions and JWT — with sessions, the server remembers user info in a session store and the user carries only a ticket number, but with JWT, the information is held in the token itself, so the server stores nothing and only verifies the signature
+flowchart LR
+  subgraph JWT["JWT — The server doesn't remember"]
+      direction LR
+    JB["Browser<br/>Holds token (with info)"] --> JS["Server"]
+    JS --> JV{"Verify signature only"}
+    JV -.->|"No storage · Any server OK"| JS
+  end
+  subgraph SESS["Session — The server remembers"]
+      direction LR
+    SB["Browser<br/>Holds only session ID (ticket)"] --> SS["Server"]
+    SS --> SD[("Session store<br/>abc123 → Kim Chulsoo")]
+    SD -.->|"Needs sharing across multiple servers"| SS
+  end
+  JWT ~~~ SESS

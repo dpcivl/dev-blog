@@ -1,0 +1,10 @@
+%% alt: 9-step exploration order for a first look at a DataFrame
+flowchart TD
+  A["1. head()<br/>Loaded correctly?"] --> B["2. shape<br/>Size and shape"]
+  B --> C["3. columns / index<br/>Column and index names"]
+  C --> D["4. dtypes<br/>Data types"]
+  D --> E["5. info()<br/>Overall structure"]
+  E --> F["6. isna().sum()<br/>Missing value count"]
+  F --> G["7. describe()<br/>Numeric distribution"]
+  G --> H["8. unique() / value_counts()<br/>Check categoricals"]
+  H --> I["9. sample()<br/>Random re-scan"]

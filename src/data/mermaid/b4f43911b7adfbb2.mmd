@@ -1,0 +1,6 @@
+%% alt: Conversion sequence for deriving berthing time in hours from a string datetime column
+flowchart TD
+  A["Arrival · Departure datetime<br/>(string)"] --> B["pd.to_datetime()<br/>Convert to datetime type"]
+  B --> C["Departure - Arrival<br/>timedelta64"]
+  C --> D[".dt.total_seconds()<br/>Seconds as float"]
+  D --> E["÷ 3600<br/>Berthing time in hours"]

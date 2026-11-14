@@ -37,7 +37,7 @@ Sometimes transshipment happens because cargo loaded on several small ships gets
 3. It goes to a storage yard. **It isn't even inspected.** It sits in a bonded area waiting
 4. Once the transshipment vessel arrives, the cargo is loaded and the ship departs
 
-<img src="/assets/mermaid/f64a812cbf4dff28.svg" alt="환적 화물 처리 흐름 — 피더선이 입항해 양하한 컨테이너는 관세선을 통과하지 않고 보세구역에서 대기하다 메인라인 선박에 선적되어 출항한다. 관세선을 넘지 않으므로 수입통계가 아니라 항만 처리량으로만 잡힌다" width="1018" height="222" style="max-width:min(100%, 1018px);height:auto;" />
+<img src="/assets/mermaid/0b08febae2494ace.svg" alt="Transshipment cargo flow — a feeder ship enters port and discharges containers, which wait in a bonded area without crossing the customs line, then are loaded onto a mainline vessel and depart. Since the customs line is never crossed, this counts only as port throughput, not import statistics" width="1323" height="246" style="max-width:min(100%, 1323px);height:auto;" />
 
 Step 2 was the most interesting part to me.
 

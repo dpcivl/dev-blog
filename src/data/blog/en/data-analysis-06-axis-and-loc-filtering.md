@@ -73,7 +73,7 @@ Here's why. **`axis` doesn't mean "what to group by" — it means "which directi
 
 So it's easier to remember by the length of the result. `axis=0` gives a result with **as many entries as there are columns**, and `axis=1` gives a result with **as many entries as there are rows**.
 
-<img src="/assets/mermaid/3a279ef66400f6da.svg" alt="axis 값에 따라 계산 방향과 결과의 길이가 어떻게 달라지는지 비교한 다이어그램" width="871" height="222" style="max-width:min(100%, 871px);height:auto;" />
+<img src="/assets/mermaid/963749b108cc0af1.svg" alt="Diagram comparing how the calculation direction and result length change depending on the axis value" width="896" height="246" style="max-width:min(100%, 896px);height:auto;" />
 
 The place you'll actually use this most is when deriving a new column.
 
@@ -228,7 +228,7 @@ If results like this can be based on 5 or 10 years of accumulated data, customer
 
 At the end of the lecture, we went over the order to follow when first examining a DataFrame.
 
-<img src="/assets/mermaid/bac79fcbaee78a67.svg" alt="데이터프레임을 처음 받았을 때 확인하는 9단계 탐색 순서" width="271" height="1118" style="max-width:min(100%, 271px);height:auto;" />
+<img src="/assets/mermaid/b6a35a227aa860c5.svg" alt="9-step exploration order for a first look at a DataFrame" width="271" height="1118" style="max-width:min(100%, 271px);height:auto;" />
 
 **1. Check that the data loaded correctly**
 

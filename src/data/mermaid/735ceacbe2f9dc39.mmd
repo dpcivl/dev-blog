@@ -1,0 +1,6 @@
+%% alt: Process of switching to a different question after the original analysis question didn't fit the data
+flowchart TD
+  Q1["Original question<br/>Assess Busan Port efficiency<br/>via annual cargo volume"] --> C{"Can this data<br/>answer it?"}
+  C -->|"Yearly variance may<br/>cause underestimation"| X["Unfit"]
+  X --> Q2["New question<br/>Which pier is used more<br/>North Port or New Port"]
+  Q2 --> A["Compute pier totals · New Port total<br/>to derive New Port share"]

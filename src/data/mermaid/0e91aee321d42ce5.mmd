@@ -1,0 +1,11 @@
+%% alt: A comparison showing that Chroma keeps embeddings in a separate collection, while Neo4j attaches embeddings as node properties so vectors and relationships coexist on a single node
+flowchart TD
+  subgraph N["Neo4j — Embedding attached to node"]
+      direction TB
+    NE["Equipment: Furnace<br/>name · description<br/>embedding 1536-dim"] -->|"TRIGGERED"| NA["Alarm: Over temperature"]
+  end
+  subgraph C["Chroma — Embedding kept separate"]
+      direction TB
+    CD["Document"] -->|"Embed & store"| CC["Collection<br/>vector + metadata"]
+  end
+  N ~~~ C

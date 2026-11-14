@@ -1,0 +1,8 @@
+%% alt: Diagram comparing how the calculation direction and result length change depending on the axis value
+flowchart LR
+  A["df.sum(axis=?)"] --> B["axis=0"]
+  A --> C["axis=1"]
+  B --> B1["Scans row-wise<br/>top to bottom"]
+  B1 --> B2["Rows collapse<br/>Result length = column count"]
+  C --> C1["Scans column-wise<br/>left to right"]
+  C1 --> C2["Columns collapse<br/>Result length = row count"]

@@ -1,0 +1,6 @@
+%% alt: Cargo identifier hierarchy — the manifest carries an MRN, beneath which sits the MSN, the master B/L serial number, and for consolidated cargo an HSN, the house B/L serial number, follows. FCL leads to the master B/L, LCL to the house B/L
+flowchart LR
+  M["Manifest<br/>MRN"] --> S["Master B/L<br/>MSN · 4 digits"]
+  S --> H["House B/L<br/>HSN · 3 digits"]
+  F["FCL<br/>Full container"] --> S
+  L["LCL<br/>Shared container · consolidated"] --> H

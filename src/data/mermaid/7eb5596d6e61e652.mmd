@@ -1,0 +1,13 @@
+%% alt: Two axes for dividing data. From the form perspective: structured (rows and columns, clear schema), semi-structured (meaning expressed through keys and tags, flexible structure), unstructured (no fixed structure, requires feature extraction). From the character perspective: numerical (discrete · continuous) and categorical (nominal · ordinal)
+flowchart LR
+  R["Data"] --> F["Form"]
+  R --> C["Character"]
+  F --> F1["Structured<br/>Rows & columns · clear schema"]
+  F --> F2["Semi-structured<br/>Meaning via keys · tags"]
+  F --> F3["Unstructured<br/>Needs feature extraction"]
+  C --> C1["Numerical<br/>Arithmetic is meaningful"]
+  C --> C2["Categorical<br/>Frequency & ratio matter"]
+  C1 --> N1["Discrete<br/>Counted values"]
+  C1 --> N2["Continuous<br/>Values in between exist"]
+  C2 --> G1["Nominal<br/>No order"]
+  C2 --> G2["Ordinal<br/>Comparable"]

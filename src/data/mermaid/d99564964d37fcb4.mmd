@@ -1,0 +1,9 @@
+%% alt: The relationship between a table, Series, and DataFrame. pandas converts structured data stored as a file (a table) into a Python object called a DataFrame. A DataFrame is made up of multiple Series, each a 1D array corresponding to one column. Each Series shares the same index.
+flowchart LR
+  T["Structured data<br/>Table in a file · 2D"] -->|"pandas converts"| DF
+  IDX["Index<br/>Label identifying values"] -.->|"Attached to each Series"| DF
+  subgraph DF["DataFrame · Python object"]
+    S1["Series<br/>One column · 1D"]
+    S2["Series<br/>One column · 1D"]
+    S3["Series<br/>One column · 1D"]
+  end

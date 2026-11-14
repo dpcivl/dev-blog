@@ -1,0 +1,12 @@
+%% alt: User asks a question via ai-router ask, cli interprets the command, config reads models.yaml, then the router determines the category and picks one of reasoning / coding / vision models, and the backend sends an HTTP request to Ollama and returns the response with speed measurements
+flowchart TD
+  A["User: ai-router ask 'question'"] --> B["cli.py<br/>Parse command"]
+  B --> C["config.py<br/>Read models.yaml"]
+  C --> D["routers/<br/>Which category?"]
+  D -->|"reasoning"| E1["deepseek-r1:8b"]
+  D -->|"coding"| E2["qwen2.5-coder:7b"]
+  D -->|"vision"| E3["gemma4:12b"]
+  E1 --> F["backends/<br/>HTTP request to Ollama"]
+  E2 --> F
+  E3 --> F
+  F --> G["Response + speed measurement"]

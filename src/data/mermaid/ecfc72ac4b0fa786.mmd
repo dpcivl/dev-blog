@@ -1,0 +1,8 @@
+%% alt: The data for what happens in Busan Port, a single space, is managed across three agencies — Ministry of Oceans and Fisheries handles vessel arrivals/departures, Busan Port Authority handles cargo volume, and Korea Customs Service handles items and amounts
+flowchart LR
+  P["Busan Port<br/>— one space"] --> A["Ministry of Oceans and Fisheries · PORT-MIS<br/>Vessel arrivals/departures · Port facilities"]
+  P --> B["Busan Port Authority<br/>Cargo volume · Export/Import/Transshipment"]
+  P --> C["Korea Customs Service<br/>HS Code · Items · Amounts"]
+  A -.-> Q["To see one subject,<br/>must gather from multiple agencies"]
+  B -.-> Q
+  C -.-> Q

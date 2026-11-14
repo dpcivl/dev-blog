@@ -34,7 +34,7 @@ I briefed the AI on my MacBook's specs, and since I needed to load multiple mode
 | Coding | `qwen2.5-coder:7b` |
 | Vision | `gemma4:12b` |
 
-<img src="/assets/mermaid/5e423ca8494bb9b0.svg" alt="들어온 프롬프트를 분류기가 판단해 추론 · 코딩 · 비전 모델 중 하나로 보내는 라우팅 구조" width="629" height="326" style="max-width:min(100%, 629px);height:auto;" />
+<img src="/assets/mermaid/57746a163e1bb078.svg" alt="Routing structure where a classifier judges incoming prompts and sends them to one of the reasoning, coding, or vision models" width="636" height="278" style="max-width:min(100%, 636px);height:auto;" />
 
 Honestly, using `gemma4:12b` alone would be superior across the board. But since **routing between AI models is the whole point of this project**, I picked things this way instead.
 

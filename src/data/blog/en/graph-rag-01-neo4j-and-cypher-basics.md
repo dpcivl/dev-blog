@@ -21,7 +21,7 @@ It's been a while since I last wrote on the blog. I started a new job this week,
 
 I'm getting into graph RAG, so I laid out a plan for it.
 
-<img src="/assets/mermaid/0e8748c364b54798.svg" alt="그래프 RAG 학습 로드맵 — Neo4j 기초부터 FastAPI 백엔드까지 다섯 단계" width="229" height="726" style="max-width:min(100%, 229px);height:auto;" />
+<img src="/assets/mermaid/c4e57d894d5cf6f3.svg" alt="Graph RAG learning roadmap — five stages from Neo4j basics to FastAPI backend" width="276" height="798" style="max-width:min(100%, 276px);height:auto;" />
 
 I put in step 2 because I'm curious about it. I've [built a blog QA system with Chroma before](/en/posts/rag-system-chroma-blog-qa), and back then the vector DB was a separate component. I still don't know why you'd bother putting vectors and a graph into the same DB.
 
@@ -47,7 +47,7 @@ After creating the instance, it took a while for the status to change to Running
 - **Relational DB (MySQL, etc.)**: relationships are expressed with tables + foreign keys. To find out "which equipment does Line A use," you need a `JOIN`
 - **Graph DB (Neo4j)**: "which equipment does Line A use" is stored directly as an arrow (edge) from the start, so you follow it without any `JOIN`
 
-<img src="/assets/mermaid/85c243c15b67472c.svg" alt="같은 관계를 관계형 DB 의 외래 키 연결과 그래프 DB 의 엣지로 각각 표현한 비교 그림" width="852" height="314" style="max-width:min(100%, 852px);height:auto;" />
+<img src="/assets/mermaid/1dae28b1e9591e26.svg" alt="Comparison showing the same relationship expressed as foreign-key joins in a relational DB versus edges in a graph DB" width="831" height="314" style="max-width:min(100%, 831px);height:auto;" />
 
 Apparently 3-hop and 5-hop relationship queries are much faster and more intuitive this way. I haven't actually measured how much faster yet.
 

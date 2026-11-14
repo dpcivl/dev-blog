@@ -120,7 +120,7 @@ But the year-to-year data had too much variance, and using this to say anything 
 
 What I originally wanted to look at was annual cargo volume to gauge Busan Port's efficiency, but I concluded this data wasn't suited for that.
 
-<img src="/assets/mermaid/6483802d7c85c1af.svg" alt="Process of switching to a different question after the original analysis question didn't fit the data" width="247" height="765" style="max-width:min(100%, 247px);height:auto;" />
+<img src="/assets/mermaid/735ceacbe2f9dc39.svg" alt="Process of switching to a different question after the original analysis question didn't fit the data" width="276" height="820" style="max-width:min(100%, 276px);height:auto;" />
 
 I decided it would be better to look at which port showed the highest frequency of use. By computing the total across all terminals and the total across New Port terminals, and seeing which one is used more, I could tell which port to use for efficient container transport.
 
@@ -202,7 +202,7 @@ Running `df.describe().T` showed something off. The total tonnage is large, but 
 
 I put off dealing with missing values and started with the easier part: berthing time — how long a ship stays at port.
 
-<img src="/assets/mermaid/d0ef2b6c4b5104c7.svg" alt="Conversion sequence for deriving berthing time in hours from a string datetime column" width="208" height="606" style="max-width:min(100%, 208px);height:auto;" />
+<img src="/assets/mermaid/b4f43911b7adfbb2.svg" alt="Conversion sequence for deriving berthing time in hours from a string datetime column" width="273" height="606" style="max-width:min(100%, 273px);height:auto;" />
 
 `to_datetime()` handles converting a string to datetime.
 

@@ -55,7 +55,7 @@ Structured data is usually in table form. A table is a 2D array, and pandas conv
 
 A **Series**, meanwhile, is one component that makes up that table. When several Series come together, they form a table — a DataFrame.
 
-<img src="/assets/mermaid/87ca33b248f8d79e.svg" alt="The relationship between a table, Series, and DataFrame. pandas converts structured data stored as a file (a table) into a Python object called a DataFrame. A DataFrame is made up of multiple Series, each a 1D array corresponding to one column. Each Series shares the same index." width="1028" height="222" style="max-width:min(100%, 1028px);height:auto;" />
+<img src="/assets/mermaid/d99564964d37fcb4.svg" alt="The relationship between a table, Series, and DataFrame. pandas converts structured data stored as a file (a table) into a Python object called a DataFrame. A DataFrame is made up of multiple Series, each a 1D array corresponding to one column. Each Series shares the same index." width="1175" height="222" style="max-width:min(100%, 1175px);height:auto;" />
 
 So if you know how to handle a Series, you can extract column characteristics or pick out just the columns you need.
 

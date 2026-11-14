@@ -1,0 +1,7 @@
+%% alt: Transshipment cargo flow — a feeder ship enters port and discharges containers, which wait in a bonded area without crossing the customs line, then are loaded onto a mainline vessel and depart. Since the customs line is never crossed, this counts only as port throughput, not import statistics
+flowchart LR
+  A["Feeder ship arrives"] --> B["Discharge"]
+  B --> C["Wait in bonded area<br/>No inspection"]
+  C --> D["Load on mainline vessel"]
+  D --> E["Depart"]
+  B -.->|"No customs line crossing"| X["Port fee only<br/>No import stats · Throughput counted"]

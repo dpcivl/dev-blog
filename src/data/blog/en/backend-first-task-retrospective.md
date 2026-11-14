@@ -53,7 +53,7 @@ The comparison to a `const` pointer turned out to be pretty accurate. A `final` 
 
 And Spring calls this constructor for you when the app starts. That's DI.
 
-<img src="/assets/mermaid/19004444e65637b6.svg" alt="Spring 이 앱 시작 시 구현체를 만들어 컨테이너에 Bean 으로 보관하고, Controller 를 만들 때 생성자가 요구하는 타입을 꺼내 넣어주는 흐름" width="276" height="710" style="max-width:min(100%, 276px);height:auto;" />
+<img src="/assets/mermaid/1e2bd866481e7a5a.svg" alt="The flow where Spring creates implementations at app startup, stores them as Beans in the container, and injects the type the constructor requires when creating a Controller" width="276" height="758" style="max-width:min(100%, 276px);height:auto;" />
 
 When Spring starts the app, it builds the implementations one by one and stores them in a container. The objects held in this box are called **Beans**. When it's time to build `GradeController`, Spring notices "this constructor needs a `GradeService` type," pulls the already-built instance out of the box, and plugs it in automatically.
 
@@ -63,7 +63,7 @@ I had seen dependency injection once before [when studying Spring Boot](/en/post
 
 It took me a while to figure out what the assignment description meant by this phrase. Broken down, the order looks like this.
 
-<img src="/assets/mermaid/1253e7d27d9cc9ea.svg" alt="사용자가 화면에서 버튼을 누른 뒤 Controller · Service · Mapper · MyBatis · 오라클을 거쳐 JSON 응답이 돌아오는 9단계 요청 흐름" width="276" height="1166" style="max-width:min(100%, 276px);height:auto;" />
+<img src="/assets/mermaid/02dfba2bd3915239.svg" alt="9-step request flow where the user presses a button on screen, passing through Controller · Service · Mapper · MyBatis · Oracle, and returning a JSON response" width="276" height="1166" style="max-width:min(100%, 276px);height:auto;" />
 
 In my case, the existing Nexacro screen already had the logic for displaying data. So all I needed to do was copy which table, which columns, and which conditions it used for the lookup. **It's about pulling the same answer out through a different channel.**
 
