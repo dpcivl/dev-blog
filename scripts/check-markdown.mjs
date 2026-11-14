@@ -196,7 +196,18 @@ function gitCommitTimes(dirs) {
   try {
     out = execFileSync(
       "git",
-      ["log", "--format=%ct", "--name-only", "--", ...dirs.map(d => path.relative(REPO_ROOT, d))],
+      [
+        "log",
+        "--format=%ct",
+        "--name-only",
+        "--",
+        // 슬래시로 바꿔서 넘긴다. Windows 에서 path.relative 는
+        // `src\data\blog\ko` 를 주는데, Git for Windows 는 pathspec 의
+        // 백슬래시를 디렉토리 구분자로 보지 않는다 → 매칭 실패 → 시각 표가
+        // 비고 **갈라짐 검사가 조용히 0건**이 된다. 조용히 꺼지는 검사는
+        // 없는 것보다 나쁘다. (아래 조회 쪽은 이미 정규화하고 있었다)
+        ...dirs.map(d => path.relative(REPO_ROOT, d).replaceAll("\\", "/")),
+      ],
       { cwd: REPO_ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 64 * 1024 * 1024 }
     );
   } catch {
