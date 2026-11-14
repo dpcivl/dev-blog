@@ -13,9 +13,12 @@ import {
 import { transformerFileName } from "./src/utils/transformers/fileName";
 import { SITE } from "./src/config";
 import { getThinTagSlugs } from "./src/utils/thinTags";
+import { getPostLastmod } from "./src/utils/postLastmod";
 
 // 글 1편짜리 태그 목록 — 빌드 시작 시 한 번만 계산 (sitemap filter 가 매 URL 마다 호출됨)
 const thinTags = getThinTagSlugs();
+// 글 URL → 마지막 수정 시각. sitemap 의 <lastmod> 용
+const postLastmod = getPostLastmod();
 
 // https://astro.build/config
 export default defineConfig({
@@ -60,6 +63,12 @@ export default defineConfig({
         }
 
         return true;
+      },
+      // 글 페이지에만 <lastmod> 를 단다. 근거는 utils/postLastmod.ts
+      serialize: item => {
+        const date = postLastmod.get(new URL(item.url).pathname);
+        if (date) item.lastmod = date.toISOString();
+        return item;
       },
     }),
   ],
