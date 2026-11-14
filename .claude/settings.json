@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Read",
+      "Bash(git status)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git branch *)",
+      "Bash(git ls-files *)",
+      "Bash(git check-ignore *)",
+      "Bash(git rev-parse *)",
+      "Bash(ls *)",
+      "Bash(wc *)",
+      "Bash(find *)",
+      "Bash(date)",
+      "Bash(date *)",
+      "Bash(pnpm check:md)",
+      "Bash(pnpm check:md *)",
+      "Bash(pnpm links)",
+      "Bash(pnpm test)",
+      "Bash(pnpm test:all)",
+      "Bash(pnpm lint)",
+      "Bash(pnpm format:check)",
+      "Bash(pnpm build)",
+      "Bash(pnpm astro check)",
+      "Bash(pnpm mermaid:render)",
+      "Bash(pnpm mermaid:dry)",
+      "Bash(pnpm images:webp)",
+      "Bash(node --check *)"
+    ],
+    "ask": [
+      "Bash(git push *)",
+      "Bash(git commit *)",
+      "Bash(gh *)",
+      "Bash(rm *)",
+      "Bash(mv *)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(grep *)",
+      "Bash(pnpm translate *)"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(deploy/**/*key*)",
+      "Read(deploy/**/*secret*)",
+      "Read(**/id_rsa*)",
+      "Read(**/id_ed25519*)",
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(git reset --hard *)",
+      "Bash(rm -rf *)",
+      "Bash(pnpm mermaid:gc)"
+    ]
+  }
+}
