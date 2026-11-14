@@ -1,5 +1,5 @@
 ---
-title: "Data Analysis Study #3 — loc includes the end, iloc excludes it"
+title: "Data Analysis Study #3 — pandas loc includes the end, iloc excludes it"
 description: "Week 3, day 2. I went through Series attributes and pulled out values with loc and iloc. I confirmed that slicing doesn't raise an error even when it goes out of range, and that loc and iloc handle the endpoint differently. I also cover conditional filtering and aggregating boolean Series."
 pubDatetime: 2026-09-01T03:50:00Z
 tags:

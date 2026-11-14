@@ -1,5 +1,5 @@
 ---
-title: "Image Classification Training Pipeline — An 11-Step Checklist"
+title: "PyTorch Image Classification Training Pipeline — An 11-Step Checklist"
 description: "I abstracted the training flow I learned yesterday through the NDT hands-on exercise into a step-by-step checklist applicable to any image classification problem. Along with small questions like why normalization is needed."
 pubDatetime: 2026-05-21T01:30:00Z
 tags:

@@ -1,5 +1,5 @@
 ---
-title: "Data Analysis Study #6 — I gave axis=0 but got column totals"
+title: "Data Analysis Study #6 — I gave axis=0 in pandas but got column totals"
 description: "I went over pandas' axis concept, then loc/iloc indexing and boolean mask filtering. I memorized axis numbers as row/column, but the result came out opposite and confused me for a while."
 pubDatetime: 2026-09-02T09:40:00Z
 tags:

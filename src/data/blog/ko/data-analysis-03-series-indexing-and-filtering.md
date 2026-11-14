@@ -1,5 +1,5 @@
 ---
-title: "데이터 분석 공부 #3 — loc 는 끝을 포함하고 iloc 는 제외한다"
+title: "데이터 분석 공부 #3 — pandas loc 는 끝을 포함하고 iloc 는 제외한다"
 description: "3주 2일차. Series 의 속성들을 훑고 loc 와 iloc 로 값을 꺼내봤다. 슬라이싱이 범위를 넘어도 오류가 안 난다는 것, 그리고 loc 와 iloc 의 끝 처리가 다르다는 것을 확인했다. 조건 필터링과 불리언 Series 집계까지 정리한다."
 pubDatetime: 2026-09-01T03:50:00Z
 tags:

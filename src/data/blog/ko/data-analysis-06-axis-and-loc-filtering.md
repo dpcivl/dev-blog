@@ -1,5 +1,5 @@
 ---
-title: "데이터 분석 공부 #6 — axis=0 을 줬는데 열 합계가 나왔다"
+title: "데이터 분석 공부 #6 — pandas 에서 axis=0 을 줬는데 열 합계가 나왔다"
 description: "pandas 의 축(axis) 개념부터 시작해서 loc · iloc 인덱싱과 boolean mask 필터링까지 정리했다. axis 번호를 행/열로 외웠다가 결과가 반대로 나와서 한참 헷갈렸다."
 pubDatetime: 2026-09-02T09:40:00Z
 tags:

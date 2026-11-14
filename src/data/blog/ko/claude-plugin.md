@@ -1,5 +1,5 @@
 ---
-title: "플러그인을 만들어보자"
+title: "Claude Code 플러그인을 만들어보자"
 description: "만든 skills를 프로젝트마다 옮기는 작업이 번거로워서 skill과 에이전트를 플러그인으로 묶어 내 컴퓨터에 설치해본 기록"
 pubDatetime: 2026-11-01T03:52:00Z
 tags:

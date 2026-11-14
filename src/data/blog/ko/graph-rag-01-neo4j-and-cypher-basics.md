@@ -1,5 +1,5 @@
 ---
-title: "그래프 RAG 공부 #1 — RETURN 을 속성으로 했더니 그래프가 안 나왔다"
+title: "Neo4j Cypher — RETURN 을 속성으로 했더니 그래프가 안 나왔다 (그래프 RAG 공부 #1)"
 description: "그래프 RAG 를 공부하기로 하고 Neo4j Aura 무료 인스턴스부터 만들었다. Cypher 로 노드와 관계를 만들어봤는데, 조회 결과가 표로만 나오고 그래프 뷰가 안 떴다. RETURN 에 무엇을 넘기느냐의 문제였다."
 pubDatetime: 2026-09-12T03:30:00Z
 tags:

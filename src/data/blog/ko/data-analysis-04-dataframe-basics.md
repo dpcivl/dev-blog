@@ -1,5 +1,5 @@
 ---
-title: "데이터 분석 공부 #4 — DataFrame 을 받으면 info() 부터 본다"
+title: "데이터 분석 공부 #4 — pandas DataFrame 을 받으면 info() 부터 본다"
 description: "Series 에 이어 DataFrame 을 봤다. 표를 딕셔너리로 만들어 DataFrame 에 넣는 것부터, 열을 Series 로 뽑을 때와 DataFrame 으로 뽑을 때의 차이, dtypes 와 info() 로 표의 생김새를 먼저 파악하는 것까지 정리한다."
 pubDatetime: 2026-09-01T09:20:00Z
 tags:

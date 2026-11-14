@@ -1,5 +1,5 @@
 ---
-title: "Vercel이 옛날 글을 계속 보여준 이유 — 빈 컨텐츠 컬렉션 함정"
+title: "Vercel이 옛날 글을 계속 보여준 이유 — 빈 Astro 콘텐츠 컬렉션 함정"
 description: "샘플 포스트를 모두 지우고 push 했는데도 Vercel 배포본에는 이전 글이 그대로 남아있던 현상을 추적했다."
 pubDatetime: 2026-05-05T13:00:00Z
 tags:

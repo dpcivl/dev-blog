@@ -1,5 +1,5 @@
 ---
-title: "Studying Graph RAG #1 — I used RETURN with properties and the graph view wouldn't show"
+title: "Neo4j Cypher — I used RETURN with properties and the graph view wouldn't show (Studying Graph RAG #1)"
 description: "I decided to study graph RAG and started by setting up a free Neo4j Aura instance. I created nodes and relationships with Cypher, but the query results only showed up as a table, not a graph. It turned out to be about what you pass to RETURN."
 pubDatetime: 2026-09-12T03:30:00Z
 tags:

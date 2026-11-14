@@ -1,5 +1,5 @@
 ---
-title: "Let's Build a Plugin"
+title: "Let's Build a Claude Code Plugin"
 description: "A record of bundling skills and agents I built into a plugin and installing it on my computer, because moving skills between projects every time was a hassle"
 pubDatetime: 2026-11-01T03:52:00Z
 tags:

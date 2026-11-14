@@ -1,5 +1,5 @@
 ---
-title: "The Screen Froze for a Moment When I Tapped — Tracing the Cause"
+title: "The Screen Froze for a Moment When I Tapped — Tracing a Next.js INP Issue"
 description: "Tracing an intermittent tab-switch stutter, I confused my tools (Lighthouse ≠ INP), misdiagnosed Realtime, fixed an obvious waste with little payoff, and concluded it wasn't a single bug but a structural cost of SPA navigation. A retrospective that keeps the failures in."
 pubDatetime: 2026-07-10T11:00:00Z
 tags:

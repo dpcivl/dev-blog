@@ -1,5 +1,5 @@
 ---
-title: "Data Analysis Study #4 — When I Get a DataFrame, I Start with info()"
+title: "Data Analysis Study #4 — When I Get a pandas DataFrame, I Start with info()"
 description: "Following Series, I looked at DataFrame. I cover making a table into a dictionary and putting it into a DataFrame, the difference between pulling a column out as a Series versus as a DataFrame, and grasping the shape of a table first with dtypes and info()."
 pubDatetime: 2026-09-01T09:20:00Z
 tags:

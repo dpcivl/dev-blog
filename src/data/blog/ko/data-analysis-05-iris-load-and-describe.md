@@ -1,5 +1,5 @@
 ---
-title: "데이터 분석 공부 #5 — read_csv 가 첫 줄을 컬럼 이름으로 가져갔다"
+title: "데이터 분석 공부 #5 — pandas read_csv 가 첫 줄을 컬럼 이름으로 가져갔다"
 description: "Iris 데이터셋으로 실제 분석을 시작했다. csv 를 읽자마자 컬럼 이름이 깨져 있어서 skiprows 와 header 로 고쳐야 했다. 기술통계에서 무엇을 보는지, 파생 변수를 붙이기 전에 원본을 복사하는 이유까지 정리한다."
 pubDatetime: 2026-09-01T09:40:00Z
 tags:

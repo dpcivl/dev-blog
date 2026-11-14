@@ -1,5 +1,5 @@
 ---
-title: "Data Analysis Study #5 — read_csv took the first row as column names"
+title: "Data Analysis Study #5 — pandas read_csv took the first row as column names"
 description: "I started actual analysis with the Iris dataset. As soon as I read the csv, the column names were broken, and I had to fix it with skiprows and header. I cover what to look at in descriptive statistics, and why you copy the original before attaching derived variables."
 pubDatetime: 2026-09-01T09:40:00Z
 tags:

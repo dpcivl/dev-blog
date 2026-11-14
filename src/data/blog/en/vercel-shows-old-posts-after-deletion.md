@@ -1,5 +1,5 @@
 ---
-title: "Why Vercel Kept Showing Old Posts — The Empty Content Collection Trap"
+title: "Why Vercel Kept Showing Old Posts — The Empty Astro Content Collection Trap"
 description: "I traced down a phenomenon where the previous posts kept showing up in the Vercel deployment even after I deleted all sample posts and pushed."
 pubDatetime: 2026-05-05T13:00:00Z
 tags:

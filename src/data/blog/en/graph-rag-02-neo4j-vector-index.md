@@ -1,5 +1,5 @@
 ---
-title: "Studying Graph RAG #2 — SEARCH was a syntax error, but the warning told me to switch to SEARCH"
+title: "Neo4j Vector Index — SEARCH was a syntax error, but the warning told me to switch to SEARCH (Studying Graph RAG #2)"
 description: "I created a vector index in Neo4j and attached embedded equipment descriptions as node properties. I tried searching with SEARCH and got a syntax error, so I went back to queryNodes — but running that produced a warning telling me to switch to SEARCH. In the end, I pulled both vector-matched equipment and its alarms in a single query."
 pubDatetime: 2026-09-13T03:20:00Z
 tags:

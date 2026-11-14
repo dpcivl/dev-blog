@@ -1,5 +1,5 @@
 ---
-title: "The Day Before Launch, I Overhauled Performance — And One Thing I Never Fixed"
+title: "The Day Before Launch, I Overhauled Next.js Performance — TTFB, LCP, and One Thing I Never Fixed"
 description: "A tuning retrospective from the day before launching a solo-developed app: TTFB 3.15s → 10ms, LCP 22.1s → 1.4s. And the story of the PWA bottom system bar color I burned a whole day on but never fixed on the web."
 pubDatetime: 2026-07-11T07:00:00Z
 tags:

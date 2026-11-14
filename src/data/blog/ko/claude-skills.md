@@ -1,5 +1,5 @@
 ---
-title: "클로드 skills 공부하기"
+title: "Claude Code skills 공부하기"
 description: "클로드가 꺼내 보는 업무 매뉴얼인 skills를 설계, 목업, 구현, 보안 단계로 만들고 호출해서 서비스를 만들어본 기록"
 pubDatetime: 2026-10-31T14:53:00Z
 tags:

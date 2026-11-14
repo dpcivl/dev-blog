@@ -1,5 +1,5 @@
 ---
-title: "그래프 RAG 공부 #2 — SEARCH 는 문법 에러인데, 경고는 SEARCH 로 바꾸라고 했다"
+title: "Neo4j 벡터 인덱스 — SEARCH 는 문법 에러인데, 경고는 SEARCH 로 바꾸라고 했다 (그래프 RAG 공부 #2)"
 description: "Neo4j 에 벡터 인덱스를 만들고 설비 설명을 임베딩해 노드 속성으로 붙였다. SEARCH 로 검색하려다 문법 에러가 나서 queryNodes 로 돌아갔는데, 그걸 실행하자 서버가 SEARCH 로 바꾸라는 경고를 냈다. 마지막에는 벡터로 찾은 설비의 알람까지 한 쿼리로 가져왔다."
 pubDatetime: 2026-09-13T03:20:00Z
 tags:

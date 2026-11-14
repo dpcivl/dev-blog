@@ -1,5 +1,5 @@
 ---
-title: "Studying Claude Skills"
+title: "Studying Claude Code Skills"
 description: "A record of building skills — the task manuals Claude pulls out when needed — across design, mockup, implementation, and security stages, then calling them to build a service"
 pubDatetime: 2026-10-31T14:53:00Z
 tags:
