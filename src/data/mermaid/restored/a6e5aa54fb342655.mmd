@@ -1,0 +1,7 @@
+%% alt: 질문을 임베딩해 벡터 인덱스에서 비슷한 설비를 찾고, TRIGGERED 관계를 따라 알람을 모아 LLM 에 넘길 형태로 만드는 흐름
+flowchart TD
+  Q["질문<br/>온도 문제로 알람이 발생하는 설비"] --> E["질문도 임베딩<br/>text-embedding-3-small"]
+  E --> V["벡터 검색<br/>queryNodes — 비슷한 설비 k개 + score"]
+  V --> G["그래프 확장<br/>OPTIONAL MATCH — TRIGGERED 관계 따라가기"]
+  G --> C["collect<br/>설비별 알람 리스트로 묶기"]
+  C --> L["LLM 에 넘길 수 있는 형태"]

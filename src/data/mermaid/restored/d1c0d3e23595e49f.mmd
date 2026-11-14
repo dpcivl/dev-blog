@@ -1,0 +1,10 @@
+%% alt: presearch 수집 파이프라인 — Cloud Scheduler 가 매일 08시 Cloud Run Job 을 깨우고, 네이버 검색량과 주가를 모아 BigQuery 에 적재한다. 커버리지 게이트가 목표일 데이터 확보율을 검사해 부족하면 발행을 멈춘다
+flowchart TD
+  S["Cloud Scheduler<br/>매일 08시 KST"] --> J["Cloud Run Job"]
+  J --> N["네이버 데이터랩<br/>검색량"]
+  J --> P["주가 · 거래대금"]
+  N --> BQ["BigQuery"]
+  P --> BQ
+  BQ --> G{"커버리지 게이트<br/>목표일 확보율"}
+  G -->|"충분"| API["Cloud Run<br/>FastAPI → React"]
+  G -->|"부족 (fresh 0/400)"| STOP["중단<br/>반쪽 데이터를 올리지 않는다"]

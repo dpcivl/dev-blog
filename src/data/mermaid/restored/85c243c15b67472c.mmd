@@ -1,0 +1,10 @@
+%% alt: 같은 관계를 관계형 DB 의 외래 키 연결과 그래프 DB 의 엣지로 각각 표현한 비교 그림
+flowchart LR
+  subgraph G["그래프 — 화살표를 따라가면 끝"]
+    GL["(Line)"] -->|"USES"| GE["(Equipment)"]
+    GE -->|"HAS_PART"| GP["(Part)"]
+  end
+  subgraph R["관계형 — 3단계 건너려면 JOIN 3번"]
+    RL["Line 테이블"] -->|"line_id FK"| RE["Equipment 테이블"]
+    RE -->|"equip_id FK"| RP["Part 테이블"]
+  end

@@ -1,0 +1,5 @@
+%% alt: 사용자에서 웹 서버, WAS, DB 로 이어지는 백엔드 요청 흐름도
+flowchart LR
+  U["사용자"] --> W["웹 서버<br/>(Nginx · Apache HTTP Server)"]
+  W --> A["WAS<br/>(톰캣)"]
+  A --> D["DB"]

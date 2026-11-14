@@ -1,0 +1,14 @@
+%% alt: 세션 기반 인증 시퀀스 — 사용자가 id/pw 로 로그인하면 서버가 세션을 만들어 저장소에 보관하고 세션ID 를 쿠키로 내려준다. 이후 요청마다 브라우저가 쿠키를 자동으로 실어 보내고, 서버는 세션ID 로 저장소를 조회해 사용자를 알아본다
+sequenceDiagram
+    participant B as 브라우저
+    participant S as 서버
+    participant D as 세션 저장소<br/>(메모리 · DB · Redis)
+    B->>S: 1. 로그인 (id / pw)
+    S->>S: 2. id/pw 확인
+    S->>D: 세션 저장<br/>abc123 → 김철수
+    S-->>B: 쿠키로 세션ID(abc123) 내려줌
+    Note over B: 브라우저가 쿠키를 보관
+    B->>S: 3. 이후 요청 (쿠키 abc123 자동 첨부)
+    S->>D: 4. abc123 조회
+    D-->>S: 김철수
+    S-->>B: 응답 (누구인지 알고 처리)

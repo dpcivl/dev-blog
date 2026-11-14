@@ -13,6 +13,13 @@
 
 여기에 한 벌 남겨두면 언제든 다시 렌더할 수 있다.
 
+## restored/ 는 다른 것이다
+
+`restored/` 에 있는 31건은 **SVG 에서 거꾸로 복원한 것**이고, 이 폴더의
+`<hash>.mmd` 와 성격이 다르다 — 파일명 해시와 내용 해시가 일치하지 않아
+다시 렌더하면 다른 SVG 가 나온다. 섞지 말 것. 자세한 내용은
+[restored/README.md](restored/README.md).
+
 ## 주의
 
 - **직접 고치지 않는다.** 글의 mermaid 블록을 고치고 `pnpm mermaid:render` 를

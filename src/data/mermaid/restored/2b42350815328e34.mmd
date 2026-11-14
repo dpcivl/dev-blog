@@ -1,0 +1,12 @@
+%% alt: 사용자가 ai-router ask 로 질문하면 cli 가 명령을 해석하고 config 가 models.yaml 을 읽은 뒤, 라우터가 카테고리를 판단해 추론 · 코딩 · 비전 모델 중 하나를 고르고, 백엔드가 Ollama 에 HTTP 요청을 보내 응답과 속도 측정값을 돌려주는 흐름
+flowchart TD
+  A["사용자: ai-router ask '질문'"] --> B["cli.py<br/>명령 해석"]
+  B --> C["config.py<br/>models.yaml 읽기"]
+  C --> D["routers/<br/>어느 카테고리?"]
+  D -->|"reasoning"| E1["deepseek-r1:8b"]
+  D -->|"coding"| E2["qwen2.5-coder:7b"]
+  D -->|"vision"| E3["gemma4:12b"]
+  E1 --> F["backends/<br/>Ollama 에 HTTP 요청"]
+  E2 --> F
+  E3 --> F
+  F --> G["응답 + 속도 측정값"]

@@ -1,0 +1,10 @@
+%% alt: 데이터프레임을 처음 받았을 때 확인하는 9단계 탐색 순서
+flowchart TD
+  A["1. head()<br/>제대로 불러와졌는지"] --> B["2. shape<br/>크기와 모양"]
+  B --> C["3. columns / index<br/>컬럼과 인덱스 이름"]
+  C --> D["4. dtypes<br/>데이터 타입"]
+  D --> E["5. info()<br/>전체 구조"]
+  E --> F["6. isna().sum()<br/>결측값 개수"]
+  F --> G["7. describe()<br/>수치형 분포"]
+  G --> H["8. unique() / value_counts()<br/>범주형 확인"]
+  H --> I["9. sample()<br/>무작위로 다시 훑기"]

@@ -1,0 +1,7 @@
+%% alt: Spring 이 앱 시작 시 구현체를 만들어 컨테이너에 Bean 으로 보관하고, Controller 를 만들 때 생성자가 요구하는 타입을 꺼내 넣어주는 흐름
+flowchart TD
+  A["앱 시작"] --> B["구현체를 하나씩 생성<br/>GradeServiceImpl · LoginService"]
+  B --> C["컨테이너에 보관<br/>이 객체들이 Bean"]
+  C --> D["GradeController 를 만들 차례"]
+  D --> E["생성자가 GradeService 타입을 요구한다"]
+  E --> F["상자에서 GradeServiceImpl 을 꺼내 넣어준다"]

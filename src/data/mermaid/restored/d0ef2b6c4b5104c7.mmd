@@ -1,0 +1,6 @@
+%% alt: 문자열 일시 컬럼에서 시간 단위 계류시간을 만들어내는 변환 순서
+flowchart TD
+  A["입항일시 · 출항일시<br/>(문자열)"] --> B["pd.to_datetime()<br/>시간 타입으로 변환"]
+  B --> C["출항 - 입항<br/>timedelta64"]
+  C --> D[".dt.total_seconds()<br/>초 단위 float"]
+  D --> E["÷ 3600<br/>시간 단위 계류시간"]

@@ -1,0 +1,10 @@
+%% alt: 사용자가 화면에서 버튼을 누른 뒤 Controller · Service · Mapper · MyBatis · 오라클을 거쳐 JSON 응답이 돌아오는 9단계 요청 흐름
+flowchart TD
+  S1["1. 사용자가 앱에서 화면 · 버튼을 누른다"] --> S2["2. 앱이 해당 URL 로 HTTP 요청을 보낸다"]
+  S2 --> S3["3. Spring 이 URL 에 맞는 Controller 메서드를 호출"]
+  S3 --> S4["4. Controller 가 Service 를 호출"]
+  S4 --> S5["5. Service 가 Mapper 메서드를 호출"]
+  S5 --> S6["6. MyBatis 가 XML 의 SQL 을 오라클에서 실행<br/>로우들이 돌아온다"]
+  S6 --> S7["7. 로우가 DTO 로 변환되어<br/>Service → Controller 로 올라간다"]
+  S7 --> S8["8. Spring 이 DTO 를 JSON 으로 변환해 응답"]
+  S8 --> S9["9. 앱이 JSON 을 받아 화면에 표시"]

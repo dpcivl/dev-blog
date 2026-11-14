@@ -1,0 +1,9 @@
+%% alt: 표와 Series 와 DataFrame 의 관계. 파일로 있는 정형 데이터(표)를 pandas 가 파이썬 객체인 DataFrame 으로 바꾸고, DataFrame 은 열 하나에 해당하는 1차원 배열인 Series 여러 개가 모여 이루어진다. 각 Series 는 인덱스를 공유한다
+flowchart LR
+  T["정형 데이터<br/>파일 속 표 · 2차원"] -->|"pandas 가 변환"| DF
+  IDX["인덱스<br/>값을 식별하는 이름표"] -.->|"각 Series 에 붙는다"| DF
+  subgraph DF["DataFrame · 파이썬 객체"]
+    S1["Series<br/>열 하나 · 1차원"]
+    S2["Series<br/>열 하나 · 1차원"]
+    S3["Series<br/>열 하나 · 1차원"]
+  end
