@@ -42,6 +42,11 @@ import { createMermaidRenderer } from "mermaid-isomorphic";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const BLOG_DIR = path.join(ROOT, "src", "data", "blog");
+// mermaid 원본 보관소 (2026-11-14~). 렌더하면 블록이 <img> 로 치환돼 글에서
+// 소스가 사라진다. 그래서 EN 다이어그램을 만들려 했을 때 번역할 재료가
+// 없었다 — 발행된 24편 모두 원본이 어디에도 남아 있지 않았고 git history
+// 에도 없었다. 해시별로 한 벌 남겨두면 언제든 다시 렌더할 수 있다.
+const MMD_DIR = path.join(ROOT, "src", "data", "mermaid");
 const ASSET_DIR = path.join(ROOT, "public", "assets", "mermaid");
 
 const MERMAID_BLOCK = /```mermaid\r?\n([\s\S]*?)\r?\n```/g;
@@ -211,6 +216,23 @@ async function main() {
         console.error(`  ✗ ${t.hash}: ${r.reason?.message || r.reason}`);
       }
     }
+  }
+
+  // 원본 보존. 치환 전에 해둬야 한다 — 치환되면 소스가 사라진다.
+  // 고아 .mmd 는 정리하지 않는다 (gc 는 .svg 만 본다). 용량이 작고,
+  // gc 로직은 한 번 사고가 난 자리라 건드리지 않는다.
+  if (!dryRun) {
+    await mkdir(MMD_DIR, { recursive: true });
+    let saved = 0;
+    for (const hash of seenHashes) {
+      const mmdPath = path.join(MMD_DIR, `${hash}.mmd`);
+      if (existsSync(mmdPath)) continue;
+      const job = jobs.find(j => j.hash === hash);
+      if (!job) continue;
+      await writeFile(mmdPath, job.source.endsWith("\n") ? job.source : job.source + "\n", "utf8");
+      saved++;
+    }
+    if (saved > 0) console.log(`  원본 ${saved}개 보존 → src/data/mermaid/`);
   }
 
   if (dryRun) {

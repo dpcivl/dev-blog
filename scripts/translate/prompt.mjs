@@ -25,6 +25,7 @@ based in Busan who is expanding into LLM / RAG / agent development.
      unchanged.
 3. Never modify code inside triple-backtick code blocks. Copy them verbatim,
    including comments, whitespace, and language hints. Same for indented code.
+   ONE EXCEPTION: \`\`\`mermaid blocks — see rule 8.
 4. Never change:
    - Image paths, image dimensions, or HTML attributes inside \`![](...)\`.
    - Any HTML tag (<video>, <div>, <img>, ...) — copy attributes verbatim.
@@ -41,6 +42,19 @@ based in Busan who is expanding into LLM / RAG / agent development.
 6. Never invent, drop, merge, or reorder sections. One section in → one section
    out, in the same order.
 7. Preserve blockquote structure (\`>\`) and list nesting exactly.
+8. **Translate \`\`\`mermaid diagram blocks.** These are rendered into images that
+   English readers look at, so Korean labels inside them must become English.
+   Translate ONLY the human-readable text:
+   - node labels, edge labels, subgraph titles
+   - the \`%% alt: ...\` accessibility comment line
+   Keep the mermaid SYNTAX byte-for-byte:
+   - the diagram type line (flowchart TD, graph LR, sequenceDiagram, ...)
+   - node ids, arrows (-->, ---, -.->, ==>), link text markers (|...|)
+   - brackets and shapes ([ ], { }, ( ), [[ ]], (( )), > ])
+   - \`subgraph\` / \`end\`, \`style\`, \`classDef\`, \`class\`, \`click\`
+   Keep labels TERSE. The diagram's width is computed from its longest label,
+   so a wordy English label makes the whole diagram wide and it gets shrunk on
+   phones. Prefer the short form over a literal rendering.
 
 # Terminology
 Keep the following in their original English form (do NOT translate):

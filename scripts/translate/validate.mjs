@@ -51,6 +51,11 @@ function stripCommentsFromCode(code) {
     .replace(/<!--[\s\S]*?-->/g, ""); // <!-- html comments -->
 }
 
+// A fenced block's first line carries the language hint, e.g. ```mermaid.
+function isMermaidBlock(block) {
+  return /^```\s*mermaid\s*$/im.test(block.split("\n")[0]);
+}
+
 export function validateCodeBlocks(kr, en) {
   const krBlocks = extractAll(kr, CODE_FENCE);
   const enBlocks = extractAll(en, CODE_FENCE);
@@ -63,6 +68,11 @@ export function validateCodeBlocks(kr, en) {
   }
   for (let i = 0; i < krBlocks.length; i++) {
     if (krBlocks[i] === enBlocks[i]) continue;
+    // mermaid blocks are SUPPOSED to differ — their labels get translated so
+    // that the rendered diagram reads English (prompt.mjs rule 8). The pair is
+    // rendered into two separate SVGs, so identical mermaid source would mean
+    // the EN diagram was left in Korean. Count only, never compare content.
+    if (isMermaidBlock(krBlocks[i])) continue;
     // Compare with comments stripped — if that matches, treat as OK
     // (comment translation is desirable, not a failure).
     if (stripCommentsFromCode(krBlocks[i]) === stripCommentsFromCode(enBlocks[i])) {

@@ -139,9 +139,11 @@ ls src/scratch/posts/*.md 2>/dev/null
    - 디버깅이나 빌드 트리거용으로 만든 임시 포스트(`hello-world.md`, `test-*.md` 등)는 처리 후 삭제
    - 단, 사용자가 "남겨둬"라고 한 건 유지
 
-6. **다이어그램 렌더** — 포스트에 ` ```mermaid ` 블록을 넣었다면 **커밋 전에 반드시 `pnpm mermaid:render`** 실행. Astro 에는 mermaid 플러그인이 없어서(아래 섹션 참고) 렌더를 잊으면 다이어그램 대신 **코드 블록이 그대로 발행된다.** 빌드도 링크 검사도 통과하므로 조용히 나간다. `pnpm check:md` 가 미렌더 블록을 잡아주니 커밋 전에 같이 돌릴 것.
+6. **EN 번역 — 재개 (2026-11-14~).** KO 글을 발행하면 `pnpm translate one <slug>` 로 EN 도 만들고 **KO + EN 을 한 커밋에** 넣는다. 한쪽만 커밋하면 언어 스위치가 홈으로 fallback 된다. 자세한 규칙은 아래 [## 번역 워크플로우 (KO → EN)](#번역-워크플로우-ko--en) 섹션 참고.
 
-7. **EN 번역 — 재개 (2026-11-14~).** KO 글을 발행하면 `pnpm translate one <slug>` 로 EN 도 만들고 **KO + EN 을 한 커밋에** 넣는다. 한쪽만 커밋하면 언어 스위치가 홈으로 fallback 된다. 자세한 규칙은 아래 [## 번역 워크플로우 (KO → EN)](#번역-워크플로우-ko--en) 섹션 참고.
+7. **다이어그램 렌더 — 번역 뒤에 한다 (순서 주의, 2026-11-14~).** ` ```mermaid ` 블록을 넣었다면 **커밋 전에 반드시 `pnpm mermaid:render`** 실행. Astro 에는 mermaid 플러그인이 없어서(아래 섹션 참고) 렌더를 잊으면 다이어그램 대신 **코드 블록이 그대로 발행된다.** 빌드도 링크 검사도 통과하므로 조용히 나간다. `pnpm check:md` 가 미렌더 블록을 잡아주니 커밋 전에 같이 돌릴 것.
+
+   ⚠️ **6번(번역)보다 먼저 돌리면 안 된다.** 렌더는 mermaid 블록을 `<img>` 로 치환하고 **원본을 글에서 지운다.** 번역이 그다음에 오면 번역할 재료가 이미 없어서 EN 글이 **한국어 그림을 그대로 참조**하게 된다. 2026-11-14 에 EN 24편이 그 상태였다 — 영어 독자가 영어 설명을 읽고 한국어 그림을 봤다. 번역을 먼저 하면 EN 쪽 mermaid 소스도 영어가 되고, 렌더가 `ko/` 와 `en/` 을 모두 훑어 **각 언어로 따로 렌더**한다 (해시가 소스 기준이라 자동으로 갈라진다).
 
 8. **Commit & Push**
    - 한 번에 commit: **KO 파일** (번역을 다시 켠 뒤에는 KO + EN 함께) + 이미지 + inbox 업데이트 + 임시 파일 삭제 묶어서
@@ -696,11 +698,13 @@ main 푸시 → GitHub Actions 빌드 → rsync → releases/<시각>-<sha>/ →
 
 1. 포스트 MD 에 ` ```mermaid ` 코드 블록으로 자유롭게 작성
 2. 첫 줄에 `%% alt: 다이어그램 설명` (접근성용, mermaid 는 `%%` 를 주석 처리)
-3. `pnpm mermaid:render` 실행 — 신규 블록만 로컬 Playwright 로 SVG 생성 (해시 캐싱)
+3. **EN 번역을 먼저 돌린다** (`pnpm translate one <slug>`). 블록 안의 라벨이 영어가 된다. 렌더를 먼저 하면 원본이 치환돼 사라져서 EN 이 한국어 그림을 쓰게 된다
+4. `pnpm mermaid:render` 실행 — 신규 블록만 로컬 Playwright 로 SVG 생성 (해시 캐싱). `ko/` 와 `en/` 을 모두 훑으므로 두 언어가 각각 렌더된다
    - `public/assets/mermaid/<hash>.svg` 로 저장
+   - **원본을 `src/data/mermaid/<hash>.mmd` 에 보존** (2026-11-14~). 치환되면 글에서 소스가 사라지므로, 나중에 다시 렌더할 재료를 남긴다
    - MD 의 mermaid 블록을 `<img src="/assets/mermaid/<hash>.svg" alt="..." style="max-width:100%;height:auto;" />` 로 자동 재작성
-4. `git commit` — SVG + 재작성된 MD 함께
-5. 필요 시 `pnpm mermaid:gc` 로 참조 없는 hash 파일 정리 (legacy 명명 SVG 는 안 건드림)
+5. `git commit` — SVG + `.mmd` + 재작성된 MD 함께
+6. 필요 시 `pnpm mermaid:gc` 로 참조 없는 hash 파일 정리 (legacy 명명 SVG 는 안 건드림). **`.mmd` 는 gc 대상이 아니다** — 고아가 남아도 용량이 작고, gc 는 한 번 사고가 난 자리라 건드리지 않았다
 
 **Astro 파이프라인엔 mermaid 플러그인 없음** — 재추가하지 말 것. 서버는 이미지만 서빙.
 
@@ -774,11 +778,12 @@ pnpm translate dry <slug>       # 번역 + validate 만, 파일 쓰기 X (검증
 
 ### 권장 워크플로우
 
-1. `src/data/blog/ko/<slug>.md` 작성 (인박스 · 스크래치 · 사용자 요청 등에서)
-2. `pnpm translate one <slug>` — EN 생성
-3. `pnpm check:md` — 전체 tilde strikethrough 검사 (translate 도 페어 검증하지만 다른 KO 포스트 문제도 함께 잡음)
-4. `git add src/data/blog/{ko,en}/<slug>.md` — **KO + EN 함께 스테이지**
-5. `git commit -m "Publish post: <제목>"` + push
+1. `src/data/blog/ko/<slug>.md` 작성 (인박스 · 스크래치 · 사용자 요청 등에서). mermaid 블록은 **렌더하지 않은 상태로 둔다**
+2. `pnpm translate one <slug>` — EN 생성. mermaid 블록 안의 라벨도 영어가 된다
+3. `pnpm mermaid:render` — **번역 뒤에.** KO · EN 각각 렌더되고 원본은 `src/data/mermaid/<hash>.mmd` 에 보존된다
+4. `pnpm check:md` — 전체 tilde strikethrough 검사 (translate 도 페어 검증하지만 다른 KO 포스트 문제도 함께 잡음)
+5. `git add src/data/blog/{ko,en}/<slug>.md` — **KO + EN 함께 스테이지.** SVG 와 `.mmd` 도 함께
+6. `git commit -m "Publish post: <제목>"` + push
 
 ### 자주 하는 실수
 
