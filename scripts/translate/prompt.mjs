@@ -25,9 +25,18 @@ based in Busan who is expanding into LLM / RAG / agent development.
      unchanged.
 3. Never modify code inside triple-backtick code blocks. Copy them verbatim,
    including comments, whitespace, and language hints. Same for indented code.
+   **This includes program OUTPUT.** A block tagged \`text\`, \`txt\`, \`console\`,
+   \`log\`, or with no language at all is usually something the author actually
+   saw on screen — a command's output, a REPL session, a directory tree, an
+   error message. Translating it makes the post claim the reader will see
+   English when running the same thing, and they will not. Korean strings
+   inside such a block stay Korean, even when the surrounding prose is English.
    ONE EXCEPTION: \`\`\`mermaid blocks — see rule 8.
 4. Never change:
-   - Image paths, image dimensions, or HTML attributes inside \`![](...)\`.
+   - Image PATHS and dimensions inside \`![alt](path)\` and \`<img src="…">\`.
+     **But DO translate the alt text** — \`![설명](/assets/x.png)\` becomes
+     \`![description](/assets/x.png)\`. Alt text is what a screen reader speaks;
+     leaving it Korean on an English page serves no one. Keep it short.
    - Any HTML tag (<video>, <div>, <img>, ...) — copy attributes verbatim.
    - Heading levels (# / ## / ### stay the same depth and count).
    - External URLs (https://..., mailto:..., etc.) — copy verbatim.

@@ -121,7 +121,7 @@ I looked at what's different from what I ran before. The earlier `[:USES]` and `
 
 I got this kind of result.
 
-![Neo4j Studio 의 Table 뷰. l.name · e.name · a.message · a.severity 네 컬럼에 열간단조 라인1 · 가열로 · 온도 초과 · high 가 한 행으로 나와 있다](/assets/posts/graph-rag-01-neo4j-and-cypher-basics/01-return-properties-table.webp)
+![Neo4j Studio Table view. The four columns l.name · e.name · a.message · a.severity show 열간단조 라인1 · 가열로 · 온도 초과 · high in a single row](/assets/posts/graph-rag-01-neo4j-and-cypher-basics/01-return-properties-table.webp)
 
 ## The graph didn't show up
 
@@ -136,7 +136,7 @@ RETURN path
 
 I added `path =` to the `MATCH` to name the entire path, and returned that path as-is. This time, the graph view showed up.
 
-![Neo4j Studio 의 Graph 뷰. 열간단조 라인1 에서 가열로로 USES 화살표가, 가열로에서 온도 초과로 TRIGGERED 화살표가 이어져 있다. 오른쪽 Results overview 에 Nodes 3 · Relationships 2 가 표시돼 있다](/assets/posts/graph-rag-01-neo4j-and-cypher-basics/02-return-path-graph-view.webp)
+![Neo4j Studio Graph view. A USES arrow runs from 열간단조 라인1 to 가열로, and a TRIGGERED arrow from 가열로 to 온도 초과. The Results overview on the right shows Nodes 3 · Relationships 2](/assets/posts/graph-rag-01-neo4j-and-cypher-basics/02-return-path-graph-view.webp)
 
 **It wasn't that the query was wrong — it was about what you pass to `RETURN`.** With the same `MATCH`, pulling out properties gives you a table, while pulling out nodes or a path gives you a graph.
 

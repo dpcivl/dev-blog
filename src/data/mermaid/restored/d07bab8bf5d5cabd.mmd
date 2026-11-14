@@ -1,0 +1,5 @@
+%% alt: 도메인 통합 전 크롤러가 겪던 순환. sitemap 과 robots.txt 는 parkhyo.in 을 가리키고, parkhyo.in 은 307 임시 리디렉트로 www 에 넘기고, 실제 본문을 서빙하는 www 가 내보내는 canonical 은 다시 parkhyo.in 을 가리켜 제자리로 돌아온다
+flowchart LR
+  S["sitemap · robots.txt<br/>hreflang · 581개 URL"] --> A["parkhyo.in"]
+  A -->|"307 임시"| B["www.parkhyo.in<br/>200 · 실제 본문"]
+  B -->|"canonical"| A

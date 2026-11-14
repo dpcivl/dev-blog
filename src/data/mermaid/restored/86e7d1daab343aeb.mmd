@@ -1,0 +1,8 @@
+%% alt: 배포 흐름. main 브랜치에 푸시하면 GitHub Actions 가 빌드하고 dist 를 서버의 새 릴리스 디렉토리로 rsync 한 뒤, current 심볼릭 링크를 그 릴리스로 원자적으로 바꾼다. nginx 는 current 만 바라보므로 교체가 순간에 끝나고, 배포가 실패하면 링크가 그대로 남아 직전 릴리스가 계속 서빙된다
+flowchart LR
+  P["main 푸시"] --> CI["GitHub Actions<br/>pnpm build"]
+  CI -->|"rsync"| R["releases/<시각>-<sha>/"]
+  R --> L["current 링크 교체<br/>(원자적)"]
+  L --> N["nginx 가 current 를 서빙"]
+  CI -.->|"빌드 실패"| K["링크 그대로<br/>직전 릴리스 유지"]
+  K -.-> N

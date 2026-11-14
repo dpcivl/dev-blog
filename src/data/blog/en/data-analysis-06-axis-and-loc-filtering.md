@@ -196,7 +196,7 @@ condition = orders["quantity"] >= 2
 orders[condition]
 ```
 
-![quantity 가 2 이상인 행만 남은 데이터프레임 출력](/assets/posts/data-analysis-06-axis-and-loc-filtering/01-filtering-quantity.webp)
+![DataFrame output with only the rows where quantity is 2 or more](/assets/posts/data-analysis-06-axis-and-loc-filtering/01-filtering-quantity.webp)
 
 Only the `True` rows satisfying the condition are printed, and the rest are excluded.
 
@@ -210,7 +210,7 @@ filtered[
 ]
 ```
 
-![총액 30만 원 이상인 주문에서 고객·상품·수량 열만 남긴 출력](/assets/posts/data-analysis-06-axis-and-loc-filtering/02-filtering-selected-columns.webp)
+![Output keeping only the customer, product and quantity columns for orders totalling 300,000 won or more](/assets/posts/data-analysis-06-axis-and-loc-filtering/02-filtering-selected-columns.webp)
 
 If you want to use two or more conditions, use `&` or `|` just like you did with a Series.
 

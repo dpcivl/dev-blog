@@ -252,7 +252,11 @@ export function validateAccidentalStrikethrough(text) {
   return { ok: issues.length === 0, issues };
 }
 
-export function validateLengthRatio(kr, en, min = 0.5, max = 2.0) {
+// 상한을 2.0 → 2.5 로 올렸다 (2026-11-14). 95쌍을 재보니 **중앙값이 1.75**,
+// 최대가 2.20 이었다 — 한국어는 조사와 어미가 짧아 같은 내용이 영어로 가면
+// 평균 1.7~1.8배가 된다. 2.0 은 정상 범위를 자르고 있었고(12건이 2.01~2.15),
+// 그런 경고가 쌓이면 진짜 신호가 묻힌다. 3배 넘게 부풀린 번역은 여전히 잡는다.
+export function validateLengthRatio(kr, en, min = 0.5, max = 2.5) {
   if (kr.length === 0) return { ok: true, issues: [] };
   const ratio = en.length / kr.length;
   if (ratio < min || ratio > max) {
