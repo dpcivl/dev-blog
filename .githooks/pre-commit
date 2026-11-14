@@ -1,0 +1,15 @@
+#!/bin/sh
+# 스테이지된 내용에서 비밀값을 찾는다. 걸리면 커밋을 멈춘다.
+#
+# 작업 트리가 아니라 스테이지를 본다 — `git add` 뒤에 그 줄을 지워도
+# 커밋에는 남기 때문이다 (2026-11-14 보안 점검 S-5).
+#
+# 설치: pnpm install 이 package.json 의 prepare 로 core.hooksPath 를 건다.
+#       끄려면 git config --unset core.hooksPath
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "pre-commit: node 가 없어 비밀값 검사를 건너뜁니다." >&2
+  exit 0
+fi
+
+exec node "$(git rev-parse --show-toplevel)/scripts/check-staged.mjs"

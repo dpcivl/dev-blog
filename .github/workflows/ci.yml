@@ -29,6 +29,10 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           persist-credentials: false
+          # 전체 히스토리를 받는다. check:md 의 갈라짐 검사가 git 커밋 시각을
+          # 쓰는데, 얕은 clone 이면 모든 시각이 같아져 **조용히 0건**이 된다.
+          # (차단 검사는 영향받지 않지만, 경고가 거짓으로 비는 것이 더 나쁘다)
+          fetch-depth: 0
 
       # 버전은 저장소 핀을 따른다 — package.json 의 packageManager 와 .nvmrc.
       # 배포(deploy.yml)와 같은 런타임이어야 CI 통과가 배포 성공을 보장한다.
@@ -49,6 +53,17 @@ jobs:
 
       - name: "📝 Checking code format"
         run: pnpm run format:check
+
+      # 발행 검사는 훅이 아니라 **여기가 마지막 받침**이다 (2026-11-14 보안 점검 S-5).
+      # pre-commit·pre-push 는 node 가 없으면 통과시키고(GUI 클라이언트는 로그인
+      # 셸 PATH 를 못 받는 일이 흔하다), --no-verify 로 넘길 수 있고, 훅을 아직
+      # 설치하지 않은 새 기기에서는 아예 안 돈다. 그 뒤를 보는 것이 없으면
+      # 한 번 새는 것으로 공개된다.
+      - name: "🔒 발행 검사 (시크릿 · 공인 IP · 미렌더 mermaid · KO/EN 짝)"
+        run: pnpm run check:md
+
+      - name: "🧪 Tests"
+        run: pnpm run test
 
       - name: "🚀 Build the project"
         run: pnpm run build

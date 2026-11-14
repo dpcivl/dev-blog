@@ -125,10 +125,12 @@ describe("detectSecrets — 마스킹", () => {
     }
   });
 
-  it("matched 는 앞 6자 + … 형식이다", async () => {
+  // 차단·경고 모두 앞 4자 + 길이로 통일했다. 6자는 hex 를 24비트 드러낸다
+  // (2026-11-14 2차 보안 점검 S-9).
+  it("matched 는 앞 4자 + 길이 형식이다", async () => {
     const secret = "ghp_" + A.slice(0, 36);
     const [hit] = detectSecrets(secret);
-    expect(hit.matched).toBe(secret.slice(0, 6) + "…");
+    expect(hit.matched).toBe(`${secret.slice(0, 4)}…(${secret.length}자)`);
   });
 });
 

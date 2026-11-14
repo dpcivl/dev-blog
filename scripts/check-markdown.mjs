@@ -125,7 +125,9 @@ export function detectSecrets(text) {
         line: i + 1,
         kind: h.kind,
         matched: h.blocking
-          ? h.value.slice(0, 6) + "…"
+          // 차단·경고 모두 앞 4자 + 길이로 통일한다. 6자는 hex 24비트를
+          // 드러낸다 (2026-11-14 2차 점검 S-9).
+          ? `${h.value.slice(0, 4)}…(${h.value.length}자)`
           : `${h.value.slice(0, 4)}…(${h.value.length}자)`,
         blocking: h.blocking,
       });
