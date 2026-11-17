@@ -16,13 +16,14 @@ import "dotenv/config";
 import fs from "node:fs/promises";
 import path from "node:path";
 import Anthropic from "@anthropic-ai/sdk";
+import { FALLBACK_OPTS } from "./translate-one.mjs";
 
-const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-5";
+const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5";
 const MAX_TOKENS = 8000;
 const PRICE_IN = 2;
 const PRICE_OUT = 10;
 const PRICE_CACHE_WRITE = 2.5;
-const PRICE_CACHE_READ = 0.2;
+const PRICE_CACHE_READ = 0.1;
 
 const SYSTEM = `You translate the human-readable labels inside a mermaid diagram source from Korean to English. The diagram is from a Korean developer's learning blog; the English version of the post is published alongside it.
 
@@ -157,14 +158,22 @@ async function main() {
     ].join("\n");
 
     const t0 = Date.now();
-    const res = await client.messages
+    const res = await client.beta.messages
       .stream({
         model: MODEL,
         max_tokens: MAX_TOKENS,
+        ...FALLBACK_OPTS,
         system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } }],
         messages: [{ role: "user", content: userMsg }],
       })
       .finalMessage();
+
+    // fallback 모델까지 거절하면 본문이 비어 있다. 빈 파일을 쓰지 않고 넘어간다.
+    if (res.stop_reason === "refusal") {
+      console.log(`  → ${hash} ✗ 거절됨 (${res.stop_details?.category ?? "no category"}) — 파일 안 씀`);
+      problems.push({ hash, issues: ["refused"] });
+      continue;
+    }
 
     let en = res.content
       .filter(b => b.type === "text")

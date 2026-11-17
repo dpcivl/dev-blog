@@ -813,6 +813,10 @@ main 푸시 → GitHub Actions 빌드 → rsync → releases/<시각>-<sha>/ →
 
 ### 실행 명령
 
+API 를 부르는 명령(`translate one` · `batch` · `sample` · `dry`)은 **금고 값을 넣어 실행한다**
+— 아래 「세팅 요구사항」. 예: `python3 <hi-harness>/scripts/envvault.py run -- pnpm translate one <slug>`
+(Windows 는 `py -3`). `translate:validate` 는 API 를 안 불러서 그냥 돌린다.
+
 ```bash
 pnpm translate one <slug>       # 단일 포스트 번역 (신규 or 재번역). 가장 자주 씀.
 pnpm translate batch            # 아직 EN 없는 KO 포스트 일괄 번역
@@ -822,15 +826,21 @@ pnpm translate:validate         # 번역 없이 KO/EN 페어 검증만 (전체)
 pnpm translate:validate <slug>  # 한 글만
 ```
 
-- **모델**: 기본 `claude-sonnet-5`. `.env` 의 `ANTHROPIC_MODEL` 로 override 가능
+- **모델**: 기본 `claude-sonnet-5-5` (2026-11-17~, 이전 `claude-sonnet-5`). 금고 `.env` 의 `ANTHROPIC_MODEL` 로 override 가능. 기본 모델일 때만 정책 거절 시 Sonnet 5 로 서버에서 재시도한다 (fallbacks). 둘 다 거절하면 파일을 쓰지 않고 멈춘다
 - **비용**: 포스트 1개당 대략 $0.04–0.08 (프롬프트 캐시 hit 시 저렴)
 - **소요**: 30–60초 per post
 
 ### 세팅 요구사항
 
-- `.env` 파일에 `ANTHROPIC_API_KEY=sk-ant-xxx` 필수 (`.env.example` 참조)
-- `.env` 는 `.gitignore` 대상 → **두 기기 각각 수동 세팅**. Mac 초기 세팅 시 Windows 쪽 값을 안전한 채널 (1Password · USB · AirDrop) 로 옮기고 `cp .env.example .env` 후 값 채우기
-- API 키 없으면 `translate` 명령이 즉시 실패 → 안내 에러 메시지 출력
+- 필요한 키는 `ANTHROPIC_API_KEY` (필수) · `ANTHROPIC_MODEL` (선택). 키 이름은 `.env.example` 에 있다
+- **값은 외장 SSD 금고(`HI-VAULT/dpcivl__dev-blog/.env`)에만 둔다** (2026-11-17~). 노트북에 `.env` 를 만들지
+  않는다 — 공통 규칙(hi-harness `rules/common.md` 「비밀값」)이다. 예전에는 「두 기기 각각 수동 세팅」이었고,
+  그 지침대로 맥에 실제 값이 든 `.env` 가 남아 있었다
+- 실행은 `envvault.py run -- <명령>` 으로 한다. 금고 값을 환경 변수로 넣어주고, 번역 스크립트의
+  `dotenv/config` 는 `.env` 파일이 없으면 조용히 넘어가 그 환경 변수를 쓴다 — **코드는 고칠 필요가 없다**
+- SSD 가 없으면 `run` 이 실패한다. 꽂아 달라고 하면 된다. API 키 없이 `translate` 를 돌리면 즉시 실패하고 안내가 나온다
+- ⚠️ **SSD 가 NTFS 라 맥에서는 읽기 전용이다.** 맥에서 `run` · `status` 는 되지만 `adopt` 처럼 금고에
+  **쓰는** 일은 실패한다. 키를 새로 넣거나 바꾸는 건 Windows 에서 한다
 
 ### 자동 검증 ([validate.mjs](scripts/translate/validate.mjs))
 

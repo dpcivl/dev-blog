@@ -5,15 +5,22 @@ import { SYSTEM_PROMPT } from "./prompt.mjs";
 import { validateAll } from "./validate.mjs";
 import { rewriteAnchors } from "./anchor-rewrite.mjs";
 
-const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-5";
+const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5";
+// Sonnet 5.5 는 보안 관련 글(시크릿 검사 · 훅 등)을 정책상 거절할 수 있다.
+// 거절되면 같은 요청을 Sonnet 5 로 서버에서 다시 돌린다. 다른 모델로
+// override 했을 때는 걸지 않는다 (fallback 대상이 모델마다 다르다).
+export const FALLBACK_OPTS =
+  MODEL === "claude-sonnet-5-5"
+    ? { betas: ["server-side-fallback-2026-06-01"], fallbacks: [{ model: "claude-sonnet-5" }] }
+    : {};
 // 살아있는 문서(blog-beyond-astropaper-what-i-added 등)가 계속 길어져서 8000 으로는
 // 잘린다. 출력 토큰은 실제 사용분만 과금되므로 상한을 넉넉히 둔다.
 const MAX_TOKENS = Number(process.env.TRANSLATE_MAX_TOKENS || 32000);
-// Pricing per 1M tokens (Sonnet 5 intro pricing through 2026-08-31: $2/$10)
+// Pricing per 1M tokens (Sonnet 5.5: $2/$10, cache read $0.10)
 const PRICE_IN = 2;
 const PRICE_OUT = 10;
 const PRICE_CACHE_WRITE = 2.5; // 1.25x input
-const PRICE_CACHE_READ = 0.2;  // 0.1x input
+const PRICE_CACHE_READ = 0.1;
 
 /**
  * Translate a single Korean markdown file to English.
@@ -29,10 +36,11 @@ export async function translateOne({ koPath, enPath, client, dryRun = false }) {
 
   // 스트리밍으로 받는다 — max_tokens 가 크면 SDK 가 non-streaming 요청을
   // "Streaming is required (10분 초과 가능)" 으로 거부한다.
-  const response = await client.messages
+  const response = await client.beta.messages
     .stream({
       model: MODEL,
       max_tokens: MAX_TOKENS,
+      ...FALLBACK_OPTS,
     system: [
       {
         type: "text",
@@ -55,6 +63,13 @@ ${koContent}
 
   // 출력 상한에 걸리면 응답이 문장 중간에서 끊긴다. 그대로 쓰면 EN 포스트가
   // 반쪽짜리로 발행되므로 여기서 멈춘다 (validator 경고만으로는 놓친다).
+  // fallback 모델까지 거절하면 본문 없이 끝난다. 빈 EN 을 쓰지 않도록 멈춘다.
+  if (response.stop_reason === "refusal") {
+    throw new Error(
+      `translation refused by ${response.model} ` +
+        `(${response.stop_details?.category ?? "no category"}). File not written: ${enPath}`
+    );
+  }
   if (response.stop_reason === "max_tokens") {
     throw new Error(
       `translation truncated: hit max_tokens (${MAX_TOKENS}). ` +
